@@ -42,7 +42,7 @@ class NormalLoginForm extends Component {
                         <Button type="primary" htmlType="submit" className="login-form-button">
                             Register
                         </Button>
-                        Or <a>login now!</a>
+                        Or <a onClick={this.props.showLogin}>login now!</a>
                     </FormItem>
                 </Form>
             </div>

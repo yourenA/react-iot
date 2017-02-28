@@ -3,7 +3,7 @@ import {Form, Icon, Input, Button, Checkbox,message} from 'antd';
 const FormItem = Form.Item;
 import './login.scss';
 import $ from 'jquery'
-
+import messageJson from './../../common/message.json'
 
 class NormalLoginForm extends Component {
     handleSubmit = (e) => {
@@ -20,7 +20,7 @@ class NormalLoginForm extends Component {
                         // console.log(msg);
                         sessionStorage.setItem('username',values.username);
                         sessionStorage.setItem('usertoken',msg.token);
-                        message.success("登陆成功");
+                        message.success(messageJson['sign in success']);
                         if(values.remember === true){
                             localStorage.setItem('username',values.username);
                             localStorage.setItem('usertoken',msg.token);
@@ -67,7 +67,7 @@ class NormalLoginForm extends Component {
                         <Button type="primary" htmlType="submit" className="login-form-button">
                             Log in
                         </Button>
-                        Or <a>register now!</a>
+                        Or <a onClick={this.props.showRegister}>register now!</a>
                     </FormItem>
                 </Form>
             </div>

@@ -8,9 +8,9 @@ class mask extends Component {
         this.props.hideMask();
     }
     render() {
-        const display=this.props.isHide ? 'none': 'block';
+        const classNames=this.props.isHide ? 'mask hide': 'mask show';
         return (
-            <div className="mask" style={{display:display}} onClick={this.hideMask}>
+            <div className={classNames}   onClick={this.hideMask}>
             </div>
         );
     }

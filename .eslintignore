@@ -1,0 +1,6 @@
+# /node_modules/* and /bower_components/* ignored by default
+node_modules/*
+# Ignore dist files
+dist/*
+# Ignore yarn.lock
+/yarn.lock

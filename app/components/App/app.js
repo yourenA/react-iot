@@ -8,6 +8,8 @@ import LoginDiv from '../Login/login'
 import RegisterDiv from '../Login/register'
 import UserSubMenu from '../Login/userSubmenu'
 import $ from 'jquery'
+import messageJson from './../../common/message.json'
+var  del=123;
 class App extends Component {
     state = {
         current: '/',
@@ -32,12 +34,14 @@ class App extends Component {
     }
     showLogin = ()=> {
         this.setState({
+            showRegisterDiv: false,
             showMask: true,
             showLoginDiv: true
         });
     }
     showRegister = ()=> {
         this.setState({
+            showLoginDiv: false,
             showMask: true,
             showRegisterDiv: true
         });
@@ -65,7 +69,7 @@ class App extends Component {
                 sessionStorage.removeItem('usertoken');
                 localStorage.removeItem('username');
                 localStorage.removeItem('usertoken');
-                message.success('退出成功');
+                message.success(messageJson['sign out success']);
                 that.setState({
                     username:null
                 });
@@ -81,7 +85,6 @@ class App extends Component {
 
     }
     render() {
-
         return (
             <div className="App">
                 <div className="header-nav">
@@ -95,16 +98,16 @@ class App extends Component {
                             <Menu.Item key="/">
                                 <Link to="/"><Icon type="mail"/>主页</Link>
                             </Menu.Item>
-                            <Menu.Item key="app">
+                            <Menu.Item key="page2">
                                 <Link to="/page2"><Icon type="appstore"/>操作一</Link>
                             </Menu.Item>
-                            <Menu.Item key="button">
+                            <Menu.Item key="page3">
                                 <Link to="/page3">操作二</Link>
                             </Menu.Item>
                         </Menu>
                         <div className="loginOrRegisterBtn">
                             {
-                                this.state.username?<div className="username"><span>{this.state.username}</span> <UserSubMenu loginout={this.loginout}/></div> :
+                                this.state.username?<div className="username"><span>{this.state.username}</span> <UserSubMenu showLogin={this.showLogin} loginout={this.loginout}/></div> :
                                     <p> <span className="loginBtn" onClick={this.showLogin}>登录</span> | <span onClick={this.showRegister} className="registerBtn">注册</span></p>
                             }
                         </div>
@@ -113,8 +116,8 @@ class App extends Component {
 
                 </div>
                 <Mask hideMask={this.hideMask} isHide={!this.state.showMask}/>
-                <LoginDiv login={this.login} hideMask={this.hideMask} isHide={!this.state.showLoginDiv} />
-                <RegisterDiv isHide={!this.state.showRegisterDiv}/>
+                <LoginDiv login={this.login} hideMask={this.hideMask} isHide={!this.state.showLoginDiv}  showRegister={this.showRegister}/>
+                <RegisterDiv isHide={!this.state.showRegisterDiv} showLogin={this.showLogin}/>
                 <div className="container">
                     {this.props.children }
                 </div>

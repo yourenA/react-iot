@@ -6,12 +6,15 @@ class SubMenu extends Component {
     loginout=()=>{
         this.props.loginout()
     }
+    ModifyPassword=()=>{
+        this.props.showLogin()
+    }
     render() {
         return (
             <ul className="userSubMenu">
-                <li onClick={this.loginout}>退出</li>
                 <li>管理账号</li>
-                <li>切换账号</li>
+                <li onClick={this.ModifyPassword}>切换账号</li>
+                <li onClick={this.loginout}>退出</li>
             </ul>
         );
     }
