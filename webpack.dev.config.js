@@ -13,15 +13,20 @@ module.exports = {
     port: 8080
 
   },
-  entry: [
-    'webpack/hot/dev-server',
-    'webpack-dev-server/client?http://localhost:8080',
-    path.resolve(__dirname, 'app/index.js')
-  ],
+  entry: {
+    index: [
+      './app/index.js'
+    ],
+    vendor: [
+      'react',
+      'react-dom',
+      'react-router',
+    ]
+  },
   output: {
-    path: __dirname + '/build',
-    publicPath: 'static',
-    filename: './bundle.js'
+    path: './dist',
+    publicPath:'/dist/',
+    filename:'[name].js',
   },
   module: {
     loaders: [{
@@ -55,13 +60,14 @@ module.exports = {
     })
   ],
   plugins: [
+    new webpack.optimize.CommonsChunkPlugin('vendor', 'vendor.js'),
     new webpack.DefinePlugin({
       'process.env': {
         'NODE_ENV': '"development"'
       }
     }),
     new OpenBrowserPlugin({
-      url: 'http://localhost:8080'
+      url: 'http://localhost:7070'
     })
   ]
 };

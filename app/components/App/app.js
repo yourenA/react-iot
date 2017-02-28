@@ -93,13 +93,13 @@ class App extends Component {
                             mode="horizontal"
                         >
                             <Menu.Item key="/">
-                                <Link to="/"><Icon type="mail"/>首页</Link>
+                                <Link to="/"><Icon type="mail"/>主页</Link>
                             </Menu.Item>
                             <Menu.Item key="app">
-                                <Icon type="appstore"/>操作一
+                                <Link to="/page2"><Icon type="appstore"/>操作一</Link>
                             </Menu.Item>
                             <Menu.Item key="button">
-                                <Link to="/button">操作二</Link>
+                                <Link to="/page3">操作二</Link>
                             </Menu.Item>
                         </Menu>
                         <div className="loginOrRegisterBtn">

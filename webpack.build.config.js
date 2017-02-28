@@ -5,18 +5,25 @@ var autoprefixer = require('autoprefixer')
 var uglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 
 module.exports = {
-  entry: [
-    path.resolve(__dirname, 'app/index.js')
-  ],
+  entry: {
+    index: [
+      './app/index.js'
+    ],
+    vendor: [
+      'react',
+      'react-dom',
+      'react-router',
+    ]
+  },
   output: {
-    path: __dirname + '/build',
-    publicPath: '../',
-    filename: './bundle.js'
+    path: './dist',
+    publicPath:'/dist/',
+    filename:'[name].js',
   },
   module: {
     loaders: [{
       test: /\.css$/,
-      loader: ExtractTextPlugin.extract('style', 'css')
+      loader: ExtractTextPlugin.extract('style', 'css!postcss')
     }, {
       test: /\.js[x]?$/,
       exclude: /node_modules/,
@@ -39,6 +46,7 @@ module.exports = {
     extensions: ['', '.js', '.jsx'],
   },
   plugins: [
+    new webpack.optimize.CommonsChunkPlugin('vendor', 'vendor.js'),
     new webpack.DefinePlugin({
       'process.env': {
         'NODE_ENV': '"production"'
