@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
-import {Link,IndexLink} from 'react-router'
 import logo from './logo.svg';
-import './App.scss'
+import './app.scss'
 import {message} from 'antd';
 import Mask from '../Login/mask';
 import LoginDiv from '../Login/login'
 import RegisterDiv from '../Login/register'
 import UserSubMenu from '../Login/userSubmenu'
+import Nav from './nav'
 import $ from 'jquery'
 import messageJson from './../../common/message.json'
 class App extends Component {
@@ -88,43 +88,13 @@ class App extends Component {
         });
 
     }
-    showOrHoidePhoneMenu=()=>{
-        const clientW=document.documentElement.clientWidth
-
-        if(clientW <= 620){
-            $(".nav ul").slideToggle(200);
-        }
-    }
     render() {
         return (
             <div className="App">
                 <div className="header-nav">
                     <div className="header-nav-content">
                         <img src={logo} className="App-logo" alt="logo"/>
-                        <div className="nav">
-                            <ul ref="nav_list" onClick={this.showOrHoidePhoneMenu}>
-                                <li >
-                                    <IndexLink  to="/"  activeClassName="actived">网站首页</IndexLink>
-                                </li>
-                                <li >
-                                    <Link to="/page2"  activeClassName="actived">公司案例</Link>
-                                </li>
-                                <li >
-                                    <Link to="/page3" activeClassName="actived">公司相册</Link>
-                                </li>
-                                <li >
-                                    <Link  >团队博客</Link>
-                                </li>
-                                <li >
-                                    <Link >关于我们</Link>
-                                </li>
-                            </ul>
-                            <div className="menu-icon" onClick={this.showOrHoidePhoneMenu}>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                        </div>
+                        <Nav />
                         <div className="loginOrRegisterBtn">
                             {
                                 this.state.username?<div className="username"><span>{this.state.username}</span> <UserSubMenu showLogin={this.showLogin} loginout={this.loginout}/></div> :
