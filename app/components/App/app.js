@@ -102,15 +102,15 @@ class App extends Component {
                     <div className="header-nav-content">
                         <img src={logo} className="App-logo" alt="logo"/>
                         <div className="nav">
-                            <ul ref="nav_list">
+                            <ul ref="nav_list" onClick={this.showOrHoidePhoneMenu}>
                                 <li >
-                                    <IndexLink  to="/" onClick={this.showOrHoidePhoneMenu}  activeClassName="actived">网站首页</IndexLink>
+                                    <IndexLink  to="/"  activeClassName="actived">网站首页</IndexLink>
                                 </li>
                                 <li >
-                                    <Link to="/page2" onClick={this.showOrHoidePhoneMenu} activeClassName="actived">公司案例</Link>
+                                    <Link to="/page2"  activeClassName="actived">公司案例</Link>
                                 </li>
                                 <li >
-                                    <Link to="/page3" onClick={this.showOrHoidePhoneMenu} activeClassName="actived">公司相册</Link>
+                                    <Link to="/page3" activeClassName="actived">公司相册</Link>
                                 </li>
                                 <li >
                                     <Link  >团队博客</Link>
