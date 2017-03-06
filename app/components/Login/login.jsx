@@ -29,7 +29,11 @@ class NormalLoginForm extends Component {
                         that.props.login(values.username)
                     },
                     error:function (XMLHttpRequest) {
-                        message.error(XMLHttpRequest.responseJSON.message);
+                        if(XMLHttpRequest.status === 0){
+                            message.error(messageJson['unknown error']);
+                        }else{
+                            message.error(messageJson['sign in fail']);
+                        }
                     }
                 });
             }

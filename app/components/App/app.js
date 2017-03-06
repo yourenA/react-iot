@@ -1,36 +1,40 @@
 import React, {Component} from 'react';
-import {Link} from 'react-router'
+import {Link,IndexLink} from 'react-router'
 import logo from './logo.svg';
 import './App.scss'
-import {Menu, Icon,message} from 'antd';
+import {message} from 'antd';
 import Mask from '../Login/mask';
 import LoginDiv from '../Login/login'
 import RegisterDiv from '../Login/register'
 import UserSubMenu from '../Login/userSubmenu'
 import $ from 'jquery'
 import messageJson from './../../common/message.json'
-var  del=123;
 class App extends Component {
     state = {
-        current: '/',
         showMask: false,
         showLoginDiv: false,
         showRegisterDiv: false,
-        username:null
-    }
-    handleClick = (e) => {
-        console.log('click ', e);
-        this.setState({
-            current: e.key,
-        });
+        username:null,
+        showPhoneMenu:false
     }
     componentWillMount = ()=> {
         const username=localStorage.getItem('username') ||sessionStorage.getItem('username')  ;
-        const currentMenu = this.props.location.pathname.replace('/', '') || '/';
         this.setState({
-            current: currentMenu,
             username:username
         });
+    }
+    componentDidMount=()=>{
+        console.log("mount");
+        const nav_list=document.querySelector('.nav>ul');
+        window.addEventListener("resize", function () {
+            const clientW=document.documentElement.clientWidth;
+            if(clientW > 620){
+                nav_list.style.display='block'
+            }else{
+                nav_list.style.display='none'
+            }
+        }, false);
+
     }
     showLogin = ()=> {
         this.setState({
@@ -84,27 +88,43 @@ class App extends Component {
         });
 
     }
+    showOrHoidePhoneMenu=()=>{
+        const clientW=document.documentElement.clientWidth
+
+        if(clientW <= 620){
+            $(".nav ul").slideToggle(200);
+        }
+    }
     render() {
         return (
             <div className="App">
                 <div className="header-nav">
                     <div className="header-nav-content">
                         <img src={logo} className="App-logo" alt="logo"/>
-                        <Menu
-                            onClick={this.handleClick}
-                            selectedKeys={[this.state.current]}
-                            mode="horizontal"
-                        >
-                            <Menu.Item key="/">
-                                <Link to="/"><Icon type="mail"/>主页</Link>
-                            </Menu.Item>
-                            <Menu.Item key="page2">
-                                <Link to="/page2"><Icon type="appstore"/>操作一</Link>
-                            </Menu.Item>
-                            <Menu.Item key="page3">
-                                <Link to="/page3">操作二</Link>
-                            </Menu.Item>
-                        </Menu>
+                        <div className="nav">
+                            <ul ref="nav_list">
+                                <li >
+                                    <IndexLink  to="/" onClick={this.showOrHoidePhoneMenu}  activeClassName="actived">网站首页</IndexLink>
+                                </li>
+                                <li >
+                                    <Link to="/page2" onClick={this.showOrHoidePhoneMenu} activeClassName="actived">公司案例</Link>
+                                </li>
+                                <li >
+                                    <Link to="/page3" onClick={this.showOrHoidePhoneMenu} activeClassName="actived">公司相册</Link>
+                                </li>
+                                <li >
+                                    <Link  >团队博客</Link>
+                                </li>
+                                <li >
+                                    <Link >关于我们</Link>
+                                </li>
+                            </ul>
+                            <div className="menu-icon" onClick={this.showOrHoidePhoneMenu}>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
                         <div className="loginOrRegisterBtn">
                             {
                                 this.state.username?<div className="username"><span>{this.state.username}</span> <UserSubMenu showLogin={this.showLogin} loginout={this.loginout}/></div> :
