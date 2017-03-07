@@ -97,14 +97,21 @@
       }
       .username{
         position: relative;
-        min-width: 80px;
+        width: 70px;
         text-align: center;
+
+        span{
+          width: 100%;
+          display: inline-block;
+          white-space:nowrap;
+          overflow:hidden;
+          text-overflow:ellipsis;
+        }
         .userSubMenu{
           background: #dddddd;
           position: absolute;
           left: 0;
-          top: 50px;
-          min-width: 80px;
+          top: $nav-height;
           display: none;
           line-height: normal;
           width: 100%;

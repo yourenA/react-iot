@@ -19,5 +19,8 @@ class SubMenu extends Component {
         );
     }
 }
-
+SubMenu.propTypes = {
+    loginout: React.PropTypes.func,
+    showLogin: React.PropTypes.func,
+};
 export default SubMenu;

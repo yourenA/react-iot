@@ -50,7 +50,11 @@ class NormalLoginForm extends Component {
         );
     }
 }
-
+NormalLoginForm.propTypes = {
+    isHide: React.PropTypes.bool,
+    hideMask: React.PropTypes.func,
+    showLogin: React.PropTypes.func,
+};
 const WrappedNormalLoginForm = Form.create()(NormalLoginForm);
 
 export default WrappedNormalLoginForm;

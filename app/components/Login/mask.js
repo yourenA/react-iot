@@ -16,4 +16,8 @@ class mask extends Component {
     }
 }
 
+mask.propTypes = {
+    hideMask: React.PropTypes.func
+};
+
 export default mask;
