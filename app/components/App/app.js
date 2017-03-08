@@ -7,7 +7,7 @@ import LoginDiv from '../Login/login'
 import RegisterDiv from '../Login/register'
 import UserSubMenu from '../Login/userSubmenu'
 import Nav from './nav'
-import $ from 'jquery'
+import axios from 'axios';
 import messageJson from './../../common/message.json'
 class App extends Component {
     state = {
@@ -64,11 +64,35 @@ class App extends Component {
     }
     loginout=()=>{
         const that=this;
-        $.ajax({
+        // $.ajax({
+        //     url: 'http://local.iothub.com.cn/logout',
+        //     method: 'POST',
+        //     headers:{Authorization:`Bearer ${sessionStorage.getItem('usertoken') ||localStorage.getItem('usertoken')}`},
+        //     success: function(msg){
+        //         sessionStorage.removeItem('username');
+        //         sessionStorage.removeItem('usertoken');
+        //         localStorage.removeItem('username');
+        //         localStorage.removeItem('usertoken');
+        //         message.success(messageJson['sign out success']);
+        //         that.setState({
+        //             username:null
+        //         });
+        //     },
+        // //     error:function (XMLHttpRequest) {
+        //         message.error(`${XMLHttpRequest.responseJSON.message},请重新登陆`);
+        //         that.setState({
+        //             username:null
+        //         });
+        //         that.showLogin()
+        //     }
+        // });
+        axios({
             url: 'http://local.iothub.com.cn/logout',
-            method: 'POST',
-            headers:{Authorization:`Bearer ${localStorage.getItem('usertoken') ||sessionStorage.getItem('usertoken')}`},
-            success: function(msg){
+            method: 'post',
+            headers: {Authorization:`Bearer ${sessionStorage.getItem('usertoken') ||localStorage.getItem('usertoken')}`}
+        })
+            .then(function (response) {
+                console.log(response);
                 sessionStorage.removeItem('username');
                 sessionStorage.removeItem('usertoken');
                 localStorage.removeItem('username');
@@ -77,15 +101,14 @@ class App extends Component {
                 that.setState({
                     username:null
                 });
-            },
-            error:function (XMLHttpRequest) {
-                message.error(`${XMLHttpRequest.responseJSON.message},请重新登陆`);
+            })
+            .catch(function (error) {
+                message.error(`${error.response.data.message},请重新登陆`);
                 that.setState({
                     username:null
                 });
                 that.showLogin()
-            }
-        });
+            });
 
     }
     render() {

@@ -13,6 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "antd": "^2.7.2",
+    "axios": "^0.15.3",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-antd": "^0.5.1",
     "babel-plugin-import": "^1.1.1",
