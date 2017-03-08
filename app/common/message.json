@@ -4,5 +4,5 @@
   "sign out success": "登出成功",
   "user existing": "用户已存在",
   "unknown error":"登录失败，发生未知错误",
-  "sign in fail":"登陆失败"
+  "sign in fail":"用户名或密码错误，登陆失败"
 }

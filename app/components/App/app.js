@@ -8,7 +8,8 @@ import RegisterDiv from '../Login/register'
 import UserSubMenu from '../Login/userSubmenu'
 import Nav from './nav'
 import axios from 'axios';
-import messageJson from './../../common/message.json'
+import messageJson from './../../common/message.json';
+import {removeLoginStorage} from './../../common/common.js'
 class App extends Component {
     state = {
         showMask: false,
@@ -92,17 +93,14 @@ class App extends Component {
             headers: {Authorization:`Bearer ${sessionStorage.getItem('usertoken') ||localStorage.getItem('usertoken')}`}
         })
             .then(function (response) {
-                console.log(response);
-                sessionStorage.removeItem('username');
-                sessionStorage.removeItem('usertoken');
-                localStorage.removeItem('username');
-                localStorage.removeItem('usertoken');
+                removeLoginStorage();
                 message.success(messageJson['sign out success']);
                 that.setState({
                     username:null
                 });
             })
             .catch(function (error) {
+                removeLoginStorage();
                 message.error(`${error.response.data.message},请重新登陆`);
                 that.setState({
                     username:null
