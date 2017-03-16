@@ -7,7 +7,6 @@
     border-bottom: 1px solid #DADADA;
     position: relative;
     .header-nav-content{
-      max-width: $max-width;
       margin: 0 auto;
     }
     .App-logo {
@@ -30,6 +29,7 @@
           position: absolute;
           left: 0;
           top: $nav-height;
+          z-index: 10000;
         }
         li {
           height:$nav-height;
@@ -139,8 +139,6 @@
 
 /*container div*/
 .container{
-  max-width: $max-width;
-  margin: 20px auto;
 }
 
 

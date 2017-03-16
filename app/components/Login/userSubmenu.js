@@ -3,8 +3,8 @@
  */
 import React, {Component} from 'react';
 class SubMenu extends Component {
-    loginout=()=>{
-        this.props.loginout()
+    signout=()=>{
+        this.props.signout()
     }
     ModifyPassword=()=>{
         this.props.showLogin()
@@ -14,7 +14,7 @@ class SubMenu extends Component {
             <ul className="userSubMenu">
                 <li>管理账号</li>
                 <li onClick={this.ModifyPassword}>切换账号</li>
-                <li onClick={this.loginout}>退出</li>
+                <li onClick={this.signout}>退出</li>
             </ul>
         );
     }

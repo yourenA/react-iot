@@ -1,35 +1,21 @@
 import React, {Component} from 'react';
 import logo from './logo.svg';
 import './app.scss'
-import {message} from 'antd';
 import Mask from '../Login/mask';
 import LoginDiv from '../Login/login'
 import RegisterDiv from '../Login/register'
 import UserSubMenu from '../Login/userSubmenu'
 import Nav from './nav'
-import axios from 'axios';
-import messageJson from './../../common/message.json';
-import {removeLoginStorage} from './../../common/common.js'
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import * as LoginActions from '../../actions/checkLogin';
 class App extends Component {
-    state = {
-        showMask: false,
-        showLoginDiv: false,
-        showRegisterDiv: false,
-        username:null,
-        showPhoneMenu:false
-    }
-    componentWillMount = ()=> {
-        const username=localStorage.getItem('username') ||sessionStorage.getItem('username')  ;
-        this.setState({
-            username:username
-        });
-    }
     componentDidMount=()=>{
-        console.log("mount");
+        this.props.checkLogin();
         const nav_list=document.querySelector('.nav>ul');
         window.addEventListener("resize", function () {
             const clientW=document.documentElement.clientWidth;
-            if(clientW > 620){
+            if(clientW > 740){
                 nav_list.style.display='block'
             }else{
                 nav_list.style.display='none'
@@ -37,98 +23,25 @@ class App extends Component {
         }, false);
 
     }
-    showLogin = ()=> {
-        this.setState({
-            showRegisterDiv: false,
-            showMask: true,
-            showLoginDiv: true
-        });
-    }
-    showRegister = ()=> {
-        this.setState({
-            showLoginDiv: false,
-            showMask: true,
-            showRegisterDiv: true
-        });
-    }
-    hideMask = ()=> {
-        this.setState({
-            showMask: false,
-            showLoginDiv: false,
-            showRegisterDiv: false
-        });
-    }
-    login=(username)=>{
-        this.setState({
-            username:username
-        });
-    }
-    loginout=()=>{
-        const that=this;
-        // $.ajax({
-        //     url: 'http://local.iothub.com.cn/logout',
-        //     method: 'POST',
-        //     headers:{Authorization:`Bearer ${sessionStorage.getItem('usertoken') ||localStorage.getItem('usertoken')}`},
-        //     success: function(msg){
-        //         sessionStorage.removeItem('username');
-        //         sessionStorage.removeItem('usertoken');
-        //         localStorage.removeItem('username');
-        //         localStorage.removeItem('usertoken');
-        //         message.success(messageJson['sign out success']);
-        //         that.setState({
-        //             username:null
-        //         });
-        //     },
-        // //     error:function (XMLHttpRequest) {
-        //         message.error(`${XMLHttpRequest.responseJSON.message},请重新登陆`);
-        //         that.setState({
-        //             username:null
-        //         });
-        //         that.showLogin()
-        //     }
-        // });
-        axios({
-            url: 'http://local.iothub.com.cn/logout',
-            method: 'post',
-            headers: {Authorization:`Bearer ${sessionStorage.getItem('usertoken') ||localStorage.getItem('usertoken')}`}
-        })
-            .then(function (response) {
-                removeLoginStorage();
-                message.success(messageJson['sign out success']);
-                that.setState({
-                    username:null
-                });
-            })
-            .catch(function (error) {
-                removeLoginStorage();
-                message.error(`${error.response.data.message},请重新登陆`);
-                that.setState({
-                    username:null
-                });
-                that.showLogin()
-            });
-
-    }
     render() {
+        console.log(this.props)
         return (
             <div className="App">
                 <div className="header-nav">
                     <div className="header-nav-content">
                         <img src={logo} className="App-logo" alt="logo"/>
-                        <Nav />
+                        <Nav {...this.props}/>
                         <div className="loginOrRegisterBtn">
                             {
-                                this.state.username?<div className="username"><span>{this.state.username}</span> <UserSubMenu showLogin={this.showLogin} loginout={this.loginout}/></div> :
-                                    <p> <span className="loginBtn" onClick={this.showLogin}>登录</span> | <span onClick={this.showRegister} className="registerBtn">注册</span></p>
+                                this.props.loginState.username?<div className="username"><span>{this.props.loginState.username}</span> <UserSubMenu showLogin={this.props.showLogin} signout={this.props.signout}/></div> :
+                                    <p> <span className="loginBtn" onClick={this.props.showLogin}>登录</span> | <span onClick={this.props.showRegister} className="registerBtn">注册</span></p>
                             }
                         </div>
                     </div>
-
-
                 </div>
-                <Mask hideMask={this.hideMask} isHide={!this.state.showMask}/>
-                <LoginDiv login={this.login} hideMask={this.hideMask} isHide={!this.state.showLoginDiv}  showRegister={this.showRegister}/>
-                <RegisterDiv isHide={!this.state.showRegisterDiv} showLogin={this.showLogin}/>
+                <Mask hideMask={this.props.hideMask} isHide={!this.props.loginState.showMask}/>
+                <LoginDiv  login={this.props.login} hideMask={this.props.hideMask} isHide={!this.props.loginState.showLoginDiv}  showRegister={this.props.showRegister}/>
+                <RegisterDiv isHide={!this.props.loginState.showRegisterDiv} showLogin={this.props.showLogin}/>
                 <div className="container">
                     {this.props.children }
                 </div>
@@ -136,5 +49,12 @@ class App extends Component {
         );
     }
 }
-
-export default App;
+function mapStateToProps(state){
+    return {
+        loginState:state.loginState
+    };
+}
+function mapDispatchToProps(dispath){
+    return bindActionCreators(LoginActions,dispath);
+}
+export default connect(mapStateToProps,mapDispatchToProps)(App);

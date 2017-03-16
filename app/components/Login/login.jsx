@@ -2,8 +2,7 @@ import React, {Component} from 'react';
 import {Form, Icon, Input, Button, Checkbox,message} from 'antd';
 const FormItem = Form.Item;
 import './login.scss';
-import messageJson from './../../common/message.json'
-import axios from 'axios';
+
 class NormalLoginForm extends Component {
     handleSubmit = (e) => {
         e.preventDefault();
@@ -11,54 +10,7 @@ class NormalLoginForm extends Component {
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 console.log(values);
-                // $.ajax({
-                //     url: 'http://local.iothub.com.cn/login',
-                //     method: 'POST',
-                //     data: {username:values.username,password:values.password},
-                //     success: function(msg){
-                //         // console.log(msg);
-                //         sessionStorage.setItem('username',values.username);
-                //         sessionStorage.setItem('usertoken',msg.token);
-                //         message.success(messageJson['sign in success']);
-                //         if(values.remember === true){
-                //             localStorage.setItem('username',values.username);
-                //             localStorage.setItem('usertoken',msg.token);
-                //         }
-                //         that.props.hideMask();
-                //         that.props.login(values.username)
-                //      },
-                //      error:function (XMLHttpRequest) {
-                //         if(XMLHttpRequest.status === 0){
-                //             message.error(messageJson['unknown error']);
-                //         }else{
-                //             message.error(messageJson['sign in fail']);
-                //         }
-                //     }
-                // });
-                axios.post('http://local.iothub.com.cn/login',  {
-                    username:values.username,
-                    password:values.password
-                })
-                    .then(function (response) {
-                        console.log(response);
-                        sessionStorage.setItem('username',values.username);
-                        sessionStorage.setItem('usertoken',response.data.token);
-                        message.success(messageJson['sign in success']);
-                        if(values.remember === true){
-                            localStorage.setItem('username',values.username);
-                            localStorage.setItem('usertoken',response.data.token);
-                        }
-                        that.props.hideMask();
-                        that.props.login(values.username)
-                    })
-                    .catch(function (error) {
-                        if(error.response.status === 403){
-                            message.error(messageJson['sign in fail']);
-                        }else{
-                            message.error(messageJson['unknown error']);
-                        }
-                    });
-
+                that.props.login(values)
             }
         });
     }

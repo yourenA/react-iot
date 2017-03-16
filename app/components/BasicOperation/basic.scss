@@ -1,0 +1,38 @@
+@charset "UTF-8";
+@import "./../../common/common.scss";
+.basic{
+  display: flex;
+}
+.sidebar{
+  left: 0;
+  transition: left 0.6s;
+  @include respond-to(medium){
+    left: -240px;
+    position: absolute;
+  }
+  &>ul{
+    position: relative;
+    width: 240px;
+    height: calc(100vh - #{$nav-height});
+  }
+  .sidebar-icon{
+    background: url("./../../common/images/sidebar-icon.png");
+    width: 64px;
+    position: absolute;
+    right: -64px;
+    bottom: 0;
+    height: 64px;
+    cursor: pointer;
+    display: none;
+    @include respond-to(medium){
+      display: block;
+    }
+  }
+
+
+}
+.basic-content{
+  width: 100%;
+  height: calc(100vh - #{$nav-height});
+  padding: 5px;
+}
