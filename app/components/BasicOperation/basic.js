@@ -2,20 +2,18 @@
  * Created by Administrator on 2017/2/27.
  */
 import React, {Component} from 'react';
+import {Link,IndexLink,browserHistory } from 'react-router'
 import { Menu, Icon } from 'antd';
 const SubMenu = Menu.SubMenu;
 import './basic.scss'
 class Basic extends React.Component {
     constructor(props){
         super(props);
-        this.state={ current: '1'};
     }
 
     handleClick=(e)=> {
-        console.log('click ', e);
-        this.setState({
-            current: e.key,
-        });
+        const sidebar=document.querySelector('.sidebar');
+        sidebar.style.left='-240px';
     }
     showSidebar=()=>{
         const sidebar=document.querySelector('.sidebar');
@@ -27,6 +25,7 @@ class Basic extends React.Component {
 
     }
     render() {
+        const currentMenu = this.props.location.pathname ;
         return (
             <div className="basic">
                 <div className="sidebar" id="sidebar" ref='sidebar'>
@@ -34,10 +33,11 @@ class Basic extends React.Component {
                         onClick={this.handleClick}
                         defaultOpenKeys={['sub1']}
                         mode="inline"
+                        selectedKeys={[currentMenu]}
                     >
                         <SubMenu key="sub1" title={<span><Icon type="mail" /><span>Navigation One</span></span>}>
-                            <Menu.Item key="1">Option 1</Menu.Item>
-                            <Menu.Item key="2">Option 2</Menu.Item>
+                            <Menu.Item key="/basic"><IndexLink to="/basic" >Option 1</IndexLink></Menu.Item>
+                            <Menu.Item key="/basic/news">  <Link  to="/basic/news" >Option 2</Link></Menu.Item>
                             <Menu.Item key="3">Option 3</Menu.Item>
                             <Menu.Item key="4">Option 4</Menu.Item>
                         </SubMenu>
@@ -61,7 +61,7 @@ class Basic extends React.Component {
                     </div>
                 </div>
                 <div className="basic-content">
-
+                    {this.props.children}
                 </div>
             </div>
         );

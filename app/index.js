@@ -3,32 +3,36 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import configureStore from './store/configureStore';
 import {IndexRoute, Router, Route, hashHistory,browserHistory } from 'react-router';
-import { syncHistoryWithStore } from 'react-router-redux'
 import App from './components/App/app';
 import Home from './components/Home/home';
-import Page2 from './components/Page2/page2';
-import Page3 from './components/Page3/page3';
+import EndPoints from './components/Endpoints/endpoints';
+import News from './components/News/news';
 import Basic from './components/BasicOperation/basic';
 import {message} from 'antd';
+import {showLogin,checkLogin} from './actions/checkLogin'
 const store = configureStore(window.__REDUX_STATE__,window.devToolsExtension && window.devToolsExtension());
-const history = syncHistoryWithStore(browserHistory, store)
 
-function checkLogin(nextState, replace){
+function checkLoginStatus(nextState, replace){
+    store.dispatch(checkLogin());
     const isLogin=store.getState().loginState.login;
-    console.log(isLogin)
+    console.log("isLogin",isLogin)
     if(!isLogin){
         message.error("请先登录");
-        return false;
+        replace('/');
+        store.dispatch(showLogin())
     }
 }
 ReactDOM.render(
     <Provider store={store}>
-        <Router history={history}>
+        <Router history={hashHistory}>
             <Route path="/" component={App}>
                 <IndexRoute component={Home}/>
-                <Route path="page2"  component={Page2}/>
-                <Route path="page3" component={Page3}/>
-                <Route path="/basic" component={Basic}/>
+                <Route path="news"  component={News}/>
+                <Route path="endpoints" onEnter={checkLoginStatus} component={EndPoints}/>
+                <Route path="basic" onEnter={checkLoginStatus} component={Basic}>
+                    <IndexRoute component={EndPoints}/>
+                    <Route path="news" component={News}/>
+                </Route>
             </Route>
         </Router>
     </Provider>,

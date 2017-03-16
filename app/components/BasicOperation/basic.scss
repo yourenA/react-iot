@@ -4,16 +4,24 @@
   display: flex;
 }
 .sidebar{
+  z-index: 999;
   left: 0;
+  top:0;
   transition: left 0.6s;
   @include respond-to(medium){
+    background: #ffffff;
     left: -240px;
-    position: absolute;
+    position: fixed;
+    height: 100%;
   }
   &>ul{
     position: relative;
     width: 240px;
-    height: calc(100vh - #{$nav-height});
+    min-height: calc(100vh - #{$nav-height});
+    height: 100%;
+    @include respond-to(medium){
+      padding-top: $nav-height;
+    }
   }
   .sidebar-icon{
     background: url("./../../common/images/sidebar-icon.png");
@@ -32,7 +40,7 @@
 
 }
 .basic-content{
+  background: rgb(249, 249, 249);
   width: 100%;
-  height: calc(100vh - #{$nav-height});
   padding: 5px;
 }

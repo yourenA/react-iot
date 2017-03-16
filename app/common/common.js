@@ -24,3 +24,10 @@ exports.removeLoginStorage = () => {
     localStorage.removeItem('username');
     localStorage.removeItem('usertoken');
 };
+
+/**
+ * 获取头信息
+ * */
+exports.getHeader = () => {
+    return {Authorization:`Bearer ${sessionStorage.getItem('usertoken') ||localStorage.getItem('usertoken')}`}
+};

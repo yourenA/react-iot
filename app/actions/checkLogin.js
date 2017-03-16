@@ -8,10 +8,11 @@ export const SIGNOUT_FAIL = 'SIGNOUT_FAIL';
 export const SHOWREGISTERDIV='SHOWREGISTERDIV'
 export const SHOWLOGINDIV='SHOWLOGINDIV'
 export const HIDEMASK='HIDEMASK'
+import {browserHistory,hashHistory } from 'react-router'
 import axios from 'axios';
 import {message} from 'antd';
 import messageJson from './../common/message.json';
-import {removeLoginStorage} from './../common/common.js';
+import {removeLoginStorage,getHeader} from './../common/common.js';
 export function checkLogin() {
     return dispatch => {
         const username = localStorage.getItem('username') || sessionStorage.getItem('username');
@@ -64,7 +65,7 @@ export function signout() {
         axios({
             url: 'http://local.iothub.com.cn/logout',
             method: 'post',
-            headers: {Authorization:`Bearer ${sessionStorage.getItem('usertoken') ||localStorage.getItem('usertoken')}`}
+            headers:getHeader()
         })
             .then(function (response) {
                 removeLoginStorage();
@@ -72,7 +73,7 @@ export function signout() {
                 dispatch({
                     type: SIGNOUT_SUCCESS,
                 });
-                window.location = "/"
+                hashHistory.replace('/');
             })
             .catch(function (error) {
                 removeLoginStorage();
@@ -80,7 +81,7 @@ export function signout() {
                 dispatch({
                     type: SIGNOUT_FAIL,
                 });
-                window.location = "/"
+                hashHistory.replace('/');
             });
     }
 }

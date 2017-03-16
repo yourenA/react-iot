@@ -72,9 +72,10 @@
         span{
           display: block;
           width: 100%;
-          height: 2px;
-          background: $nav-fontColor;
-          margin-top: 8px ;
+          height: 5px;
+          border-radius:5px ;
+          background: $theme-blue;
+          margin-top: 5px ;
         }
       }
     }
@@ -108,6 +109,7 @@
           text-overflow:ellipsis;
         }
         .userSubMenu{
+          z-index: 1000;
           background: #dddddd;
           position: absolute;
           left: 0;
