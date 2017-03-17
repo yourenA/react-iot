@@ -6,7 +6,7 @@ export default (state = {page: 1}, action) => {
             return {...state};
         case GET_ENDPOINTS_SUCCEED:
             const _data = {
-                list: action.data.data,
+                data: action.data.data,
                 loaded: true,
                 page:action.page,
                 meta:action.data.meta

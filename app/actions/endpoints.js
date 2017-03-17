@@ -3,6 +3,7 @@ export const GET_ENDPOINTS_REQUEST = 'GET_ENDPOINTS_REQUEST';
 export const GET_ENDPOINTS_SUCCEED = 'GET_ENDPOINTS_SUCCEED';
 export const GET_ENDPOINTS_FAILED = 'GET_ENDPOINTS_FAILED';
 import {getHeader} from './../common/common.js';
+
 exports.fetchEndPoints = (page=1,q='')=> {
     return async(dispatch)=> {
         dispatch(endpointsRequest());
