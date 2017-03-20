@@ -18,16 +18,16 @@ class Nav extends Component {
             <div className="nav">
                 <ul ref="nav_list" onClick={this.showOrHoidePhoneMenu}  >
                     <li >
-                        <IndexLink  to="/"  activeClassName="actived">网站首页</IndexLink>
+                        <IndexLink  to="/"  activeClassName="actived">首页</IndexLink>
                     </li>
                     <li >
-                        <Link  to="/news"  activeClassName="actived">公司案例</Link>
+                        <Link  to="/news"  activeClassName="actived">解决方案</Link>
                     </li>
                     <li >
-                        <Link to="/endpoints"  activeClassName="actived">公司相册</Link>
+                        <Link to="/endpoints"  activeClassName="actived">合作与生态</Link>
                     </li>
                     <li >
-                        <Link to="/basic" activeClassName="actived" >基本操作</Link>
+                        <Link to="/basic" activeClassName="actived" >帮助与支持</Link>
                     </li>
                     <li >
                         <Link >关于我们</Link>

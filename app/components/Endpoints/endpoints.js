@@ -4,10 +4,13 @@
 import React, {Component} from 'react';
 import {fetchEndPoints} from '../../actions/endpoints';
 import {Modal, Input, Icon, Alert, Row, Col, Button, Table, Pagination, Popconfirm,message} from 'antd';
+const Search = Input.Search;
 import {connect} from 'react-redux';
+import Loading from './../Common/loading.js';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import {getHeader} from './../../common/common.js';
+import './index.scss'
 class EditableCell extends Component {
     state = {
         value: this.props.value,
@@ -56,10 +59,10 @@ class EditableCell extends Component {
     state => state.endpoints,
 )
 class EndPoints extends Component {
-    static fetch(state, dispatch, page) {
+    static fetch(state, dispatch, page,q) {
         const fetchTasks = [];
         fetchTasks.push(
-            dispatch(fetchEndPoints(page))
+            dispatch(fetchEndPoints(page,q))
         );
         return fetchTasks
     }
@@ -79,16 +82,17 @@ class EndPoints extends Component {
     }
 
     onPageChange = (page) => {
-        console.log(page);
-        this.constructor.fetch(this.props, this.props.dispatch, page);
+        const { q} = this.props;
+
+        this.constructor.fetch(this.props, this.props.dispatch, page,q);
     };
     changeEndpointName=(e)=>{
         this.setState({
             addEndpointName:e.target.value
         })
     };
-    addEndPoints=()=>{
-        const { page } = this.props;
+    addEndPoint=()=>{
+        const { page,q} = this.props;
         const that=this;
         axios({
             url:'http://local.iothub.com.cn/endpoints',
@@ -105,10 +109,9 @@ class EndPoints extends Component {
                     addEndpointName:''
                 });
                 message.success(messageJson['add endpoint success']);
-                that.constructor.fetch(that.props, that.props.dispatch, page);
+                that.constructor.fetch(that.props, that.props.dispatch, page,q);
             })
             .catch(function (error) {
-                console.log(error.response);
                 if(error.response.status === 422 ){
                     message.error(error.response.data.errors.name[0]);
                 }else if(error.response.status === 401){
@@ -119,9 +122,9 @@ class EndPoints extends Component {
             });
 
     };
-    delEndPoints=(name)=>{
+    delEndPoint=(name)=>{
         console.log("name",name);
-        const { page } = this.props;
+        const { page ,q} = this.props;
         const that=this;
         axios({
             url:`http://local.iothub.com.cn/endpoints/${name}`,
@@ -130,7 +133,7 @@ class EndPoints extends Component {
         })
             .then(function (response) {
                 message.success(messageJson['del endpoint success']);
-                that.constructor.fetch(that.props, that.props.dispatch, page);
+                that.constructor.fetch(that.props, that.props.dispatch, page,q);
             })
             .catch(function (error) {
                 console.log(error.response);
@@ -143,9 +146,12 @@ class EndPoints extends Component {
                 }
             });
 
-    }
+    };
+    searchEndPoint=(value)=>{
+        this.constructor.fetch(this.props, this.props.dispatch, 1,value);
+    };
     render() {
-        const {data = [], page, meta={pagination:{total:0,per_page:0}}} = this.props;
+        const {data = [], page, q,meta={pagination:{total:0,per_page:0}},loaded} = this.props;
         const columns = [{
             title: 'uuid',
             dataIndex: 'uuid',
@@ -161,10 +167,11 @@ class EndPoints extends Component {
         }, {
             title: '操作',
             key: 'action',
+            width:70,
             render: (text, record, index) => {
                 return (
                     <div>
-                        <Popconfirm title={'Sure to delete ' + record.uuid} onConfirm={this.delEndPoints.bind(this,record.name)}>
+                        <Popconfirm   placement="topRight" title={'Sure to delete ' + record.uuid} onConfirm={this.delEndPoint.bind(this,record.name)}>
                             <button className="ant-btn ant-btn-primary" data-id={record.uuid}
                             >Delete
                             </button>
@@ -178,8 +185,17 @@ class EndPoints extends Component {
             <div className="Home">
                 <Row>
                     <div style={{marginTop: '30px'}}>
-                        <Button type="primary" icon="plus" onClick={()=>{this.setState({addModal:true})}}>新建实例</Button>
-                        <Table rowKey="uuid" columns={columns} dataSource={data} pagination={false}/>
+                        <div>
+                            <Search
+                                defaultValue={q}
+                                placeholder="input search text"
+                                style={{ width: 200 }}
+                                onSearch={value => this.searchEndPoint(value)}
+                            />
+                            <Button className="search-btn" type="primary" icon="plus" onClick={()=>{this.setState({addModal:true})}}>新建实例</Button>
+                        </div>
+                        <Loading show={loaded} />
+                        <Table style={{display:loaded? 'block':'none'}} rowKey="uuid" columns={columns} dataSource={data} pagination={false}/>
                         <Pagination total={meta.pagination.total  } current={page} pageSize={meta.pagination.per_page}
                                     style={{marginTop: '10px'}} onChange={this.onPageChange}/>
 
@@ -192,7 +208,7 @@ class EndPoints extends Component {
                         footer={[
                             <Button key="back" type="ghost" size="large"
                                     onClick={()=>{this.setState({addModal:false})}}>取消</Button>,
-                            <Button key="submit" type="primary" size="large" onClick={this.addEndPoints}>
+                            <Button key="submit" type="primary" size="large" onClick={this.addEndPoint}>
                                 确定
                             </Button>,
                         ]}

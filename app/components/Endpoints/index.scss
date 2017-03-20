@@ -1,0 +1,10 @@
+@charset "UTF-8";
+@import "./../../common/common.scss";
+.search-btn{
+  margin-left: 10px;
+}
+.ant-popover-buttons button{
+  @include respond-to(medium){
+    margin-left: 2px;
+  }
+}

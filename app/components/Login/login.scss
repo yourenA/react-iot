@@ -10,7 +10,7 @@
   bottom: 0;
   opacity: 0;
   background: rgb(0, 0, 0);
-  z-index: 100;
+  z-index: 1000;
   &.show{
     display: block;
     animation: fadeIn 0.3s linear;
@@ -32,11 +32,11 @@
 }
 
 #components-form-demo-normal-login {
-  z-index: 101;
+  z-index: 1001;
   width: 100%;
   height: 100%;
   .login-form {
-    z-index: 101;
+    z-index: 1002;
     padding: 30px;
     background: #dddddd;
     position: absolute;

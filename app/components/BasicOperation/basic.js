@@ -35,25 +35,25 @@ class Basic extends React.Component {
                         mode="inline"
                         selectedKeys={[currentMenu]}
                     >
-                        <SubMenu key="sub1" title={<span><Icon type="mail" /><span>Navigation One</span></span>}>
-                            <Menu.Item key="/basic"><IndexLink to="/basic" >Option 1</IndexLink></Menu.Item>
-                            <Menu.Item key="/basic/news">  <Link  to="/basic/news" >Option 2</Link></Menu.Item>
+                        <SubMenu key="sub0" title={<span><Icon type="mail" /><span>账号设置</span></span>}>
+                            <Menu.Item key="/basic"><IndexLink to="/basic" >密码修改</IndexLink></Menu.Item>
+                            <Menu.Item key="/basic/news">  <Link  to="/basic/news" >账号安全</Link></Menu.Item>
+                            <Menu.Item key="/basic/news">  <Link  to="/basic/news" >资料修改</Link></Menu.Item>
                             <Menu.Item key="3">Option 3</Menu.Item>
                             <Menu.Item key="4">Option 4</Menu.Item>
                         </SubMenu>
-                        <SubMenu key="sub2" title={<span><Icon type="appstore" /><span>Navigtion Two</span></span>}>
-                            <Menu.Item key="5">Option 5</Menu.Item>
-                            <Menu.Item key="6">Option 6</Menu.Item>
-                            <SubMenu key="sub3" title="Submenu">
-                                <Menu.Item key="7">Option 7</Menu.Item>
-                                <Menu.Item key="8">Option 8</Menu.Item>
-                            </SubMenu>
+                        <Menu.Item key="3"><span><Icon type="mail" /><span>信息概况</span></span></Menu.Item>
+                        <SubMenu key="sub1" title={<span><Icon type="mail" /><span>接入管理</span></span>}>
+                            <Menu.Item key="/basic"><IndexLink to="/basic" >设备管理</IndexLink></Menu.Item>
+                            <Menu.Item key="/basic/news">  <Link  to="/basic/news" >策略管理</Link></Menu.Item>
+                            <Menu.Item key="3">分组管理</Menu.Item>
+                            <Menu.Item key="4">分类管理</Menu.Item>
                         </SubMenu>
-                        <SubMenu key="sub4" title={<span><Icon type="setting" /><span>Navigation Three</span></span>}>
-                            <Menu.Item key="9">Option 9</Menu.Item>
-                            <Menu.Item key="10">Option 10</Menu.Item>
-                            <Menu.Item key="11">Option 11</Menu.Item>
-                            <Menu.Item key="12">Option 12</Menu.Item>
+                        <SubMenu key="sub2" title={<span><Icon type="appstore" /><span>应用</span></span>}>
+                            <Menu.Item key="5">数据统计</Menu.Item>
+                        </SubMenu>
+                        <SubMenu key="sub4" title={<span><Icon type="setting" /><span>后台管理</span></span>}>
+                            <Menu.Item key="9">安全认证参数</Menu.Item>
                         </SubMenu>
                     </Menu>
                     <div className="sidebar-icon" onClick={this.showSidebar}>
