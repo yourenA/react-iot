@@ -40,7 +40,7 @@ class App extends Component {
                 </div>
                 <Mask hideMask={this.props.hideMask} isHide={!this.props.loginState.showMask}/>
                 <LoginDiv  login={this.props.login} hideMask={this.props.hideMask} isHide={!this.props.loginState.showLoginDiv}  showRegister={this.props.showRegister}/>
-                <RegisterDiv isHide={!this.props.loginState.showRegisterDiv} showLogin={this.props.showLogin}/>
+                <RegisterDiv hideMask={this.props.hideMask}  isHide={!this.props.loginState.showRegisterDiv} showLogin={this.props.showLogin}/>
                 <div className="container">
                     {this.props.children }
                 </div>
