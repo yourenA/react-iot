@@ -13,5 +13,7 @@
   "add endpoint fail":"名称必须介于3-32个字符之间",
   "add endpoint success":"添加实例成功",
   "del endpoint success":"删除实例成功",
-  "del endpoint fail":"记录不存在"
+  "del endpoint fail":"记录不存在",
+  "edit endpoint desc success":"修改描述成功",
+  "edit endpoint desc fail":"描述不能大于200个字符"
 }

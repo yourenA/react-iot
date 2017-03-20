@@ -27,11 +27,16 @@ class Nav extends Component {
                         <Link to="/endpoints"  activeClassName="actived">合作与生态</Link>
                     </li>
                     <li >
-                        <Link to="/basic" activeClassName="actived" >帮助与支持</Link>
+                        <Link>帮助与支持</Link>
                     </li>
-                    <li >
-                        <Link >关于我们</Link>
-                    </li>
+                    {
+                        this.props.loginState.username?
+                            <li >
+                                <Link to="/basic" activeClassName="actived">管理控制台</Link>
+                            </li>:
+                            null
+                    }
+
                 </ul>
                 <div className="menu-icon" onClick={this.showOrHoidePhoneMenu}>
                     <span></span>

@@ -70,7 +70,12 @@ class EndPoints extends Component {
         super(props);
         this.state = {
             addModal:false,
-            addEndpointName:''
+            editDescModal:false,
+            addEndpointName:'',
+            addEndpointDesc:'',
+            editDescName:'',
+            editDescuuid:'',
+            editDesc:'',
         };
     }
     componentDidMount() {
@@ -91,6 +96,52 @@ class EndPoints extends Component {
             addEndpointName:e.target.value
         })
     };
+    changeEndpointDesc=(e)=>{
+        this.setState({
+            addEndpointDesc:e.target.value
+        })
+    };
+    changeEditDesc=(e)=>{
+        this.setState({
+            editDesc:e.target.value
+        })
+    };
+    showEditDesc=(uuid,name,desc)=>{
+        this.setState({
+            editDescModal:true,
+            editDescName:name,
+            editDesc:desc,
+            editDescuuid:uuid
+        })
+    };
+    handleEditDescOk=()=>{
+        const { page,q} = this.props;
+        const that=this;
+        axios({
+            url:`http://local.iothub.com.cn/endpoints/${this.state.editDescuuid}`,
+            method: 'put',
+            data: {
+                description: this.state.editDesc,
+            },
+            headers:getHeader()
+        })
+            .then(function (response) {
+                console.log(response);
+                that.setState({
+                    editDescModal:false,
+                    editDescuuid:null
+                });
+                message.success(messageJson['edit endpoint desc success']);
+                that.constructor.fetch(that.props, that.props.dispatch, page,q);
+            })
+            .catch(function (error) {
+                if(error.response.status === 422 ){
+                    message.error(messageJson['edit endpoint desc fail']);
+                }else{
+                    message.error(messageJson['unknown error']);
+                }
+            });
+    }
     addEndPoint=()=>{
         const { page,q} = this.props;
         const that=this;
@@ -99,6 +150,7 @@ class EndPoints extends Component {
             method: 'post',
             data: {
                 name: this.state.addEndpointName,
+                description: this.state.addEndpointDesc,
             },
             headers:getHeader()
         })
@@ -106,7 +158,8 @@ class EndPoints extends Component {
                 console.log(response);
                 that.setState({
                     addModal:false,
-                    addEndpointName:''
+                    addEndpointName:'',
+                    addEndpointDesc:'',
                 });
                 message.success(messageJson['add endpoint success']);
                 that.constructor.fetch(that.props, that.props.dispatch, page,q);
@@ -122,12 +175,12 @@ class EndPoints extends Component {
             });
 
     };
-    delEndPoint=(name)=>{
-        console.log("name",name);
+    delEndPoint=(uuid)=>{
+        console.log("uuid",uuid);
         const { page ,q} = this.props;
         const that=this;
         axios({
-            url:`http://local.iothub.com.cn/endpoints/${name}`,
+            url:`http://local.iothub.com.cn/endpoints/${uuid}`,
             method: 'delete',
             headers:getHeader()
         })
@@ -153,15 +206,35 @@ class EndPoints extends Component {
     render() {
         const {data = [], page, q,meta={pagination:{total:0,per_page:0}},loaded} = this.props;
         const columns = [{
-            title: 'uuid',
-            dataIndex: 'uuid',
-            key: 'uuid',
-        }, {
-            title: 'name',
+            title: '域名称',
             dataIndex: 'name',
             key: 'name',
+        },{
+            title: '描述',
+            dataIndex: 'description',
+            key: 'description',
+            render: (text, record, index) => {
+                return (
+                    <div className="line-clamp3 line-edit">
+                        <span>{text}</span><Icon type="edit" onClick={this.showEditDesc.bind(this,record.uuid,record.name,record.description)}/>
+                    </div>
+
+                )
+            }
         }, {
-            title: '创建于',
+            title: '接入地址',
+            dataIndex: 'websocket_hostname',
+            key: 'websocket_hostname',
+        },  {
+            title: '设备总数',
+            dataIndex: 'device_count',
+            key: 'device_count',
+        },  {
+            title: '在线设备数',
+            dataIndex: 'device_online_count',
+            key: 'device_online_count',
+        },{
+            title: '创建时间',
             dataIndex: 'created_at',
             key: 'created_at',
         }, {
@@ -171,7 +244,7 @@ class EndPoints extends Component {
             render: (text, record, index) => {
                 return (
                     <div>
-                        <Popconfirm   placement="topRight" title={'Sure to delete ' + record.uuid} onConfirm={this.delEndPoint.bind(this,record.name)}>
+                        <Popconfirm   placement="topRight" title={'Sure to delete ' + record.uuid} onConfirm={this.delEndPoint.bind(this,record.uuid)}>
                             <button className="ant-btn ant-btn-primary" data-id={record.uuid}
                             >Delete
                             </button>
@@ -192,7 +265,7 @@ class EndPoints extends Component {
                                 style={{ width: 200 }}
                                 onSearch={value => this.searchEndPoint(value)}
                             />
-                            <Button className="search-btn" type="primary" icon="plus" onClick={()=>{this.setState({addModal:true})}}>新建实例</Button>
+                            <Button className="search-btn" type="primary" icon="plus" onClick={()=>{this.setState({addModal:true})}}>创建域</Button>
                         </div>
                         <Loading show={loaded} />
                         <Table style={{display:loaded? 'block':'none'}} rowKey="uuid" columns={columns} dataSource={data} pagination={false}/>
@@ -202,7 +275,7 @@ class EndPoints extends Component {
                     </div>
                     <Modal
                         visible={this.state.addModal}
-                        title="新增实例"
+                        title="创建新域"
                         onOk={this.handleOk}
                         onCancel={()=>{this.setState({addModal:false})}}
                         footer={[
@@ -213,7 +286,24 @@ class EndPoints extends Component {
                             </Button>,
                         ]}
                     >
-                        <Input onChange={this.changeEndpointName} defaultValue={this.state.addEndpointName} placeholder="实例名称(不能与现有实例名称重复)" />
+                        <Input style={{marginBottom:'15px'}} onChange={this.changeEndpointName} value={this.state.addEndpointName} placeholder="名称:长度3-32个字符" />
+                        <Input  onChange={this.changeEndpointDesc} value={this.state.addEndpointDesc} type="textarea" placeholder="描述" autosize={{ minRows: 2, maxRows: 6 }} />
+                        <p>说明：名称只能由英文字母、数字、“_”(下划线)、“-”（即中横线）构成。“-” 不能单独或连续使用，不能放在开头或结尾。</p>
+                    </Modal>
+                    <Modal
+                        visible={this.state.editDescModal}
+                        title="修改描述"
+                        onCancel={()=>{this.setState({editDescModal:false})}}
+                        footer={[
+                            <Button key="back" type="ghost" size="large"
+                                    onClick={()=>{this.setState({editDescModal:false})}}>取消</Button>,
+                            <Button key="submit" type="primary" size="large" onClick={this.handleEditDescOk}>
+                                确定
+                            </Button>,
+                        ]}
+                    >
+                        <h3 style={{marginBottom:'10px'}}>名称 : {this.state.editDescName}</h3>
+                        <Input  onChange={this.changeEditDesc} value={this.state.editDesc} type="textarea"  autosize={{ minRows: 2, maxRows: 6 }} />
                     </Modal>
                 </Row>
             </div>
