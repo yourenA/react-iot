@@ -6,6 +6,7 @@ import {IndexRoute, Router, Route, hashHistory,browserHistory } from 'react-rout
 import App from './components/App/app';
 import Home from './components/Home/home';
 import EndPoints from './components/Endpoints/endpoints';
+import EndPointDetail from './components/Endpoints/endpointDetail';
 import Device_categories from './components/Device_categories/device_categories';
 import Device_groups from './components/Device_groups/index';
 import News from './components/News/news';
@@ -33,6 +34,9 @@ ReactDOM.render(
                 <Route path="endpoints" onEnter={checkLoginStatus} component={EndPoints}/>
                 <Route path="basic" onEnter={checkLoginStatus} component={Basic}>
                     <IndexRoute component={EndPoints}/>
+                    <Route component={EndPointDetail}>
+                        <Route path="endpoints/:uuid" component={EndPointDetail} />
+                    </Route>
                     <Route path="news" component={News}/>
                     <Route path="device_categories" component={Device_categories}/>
                     <Route path="device_groups" component={Device_groups}/>

@@ -2,104 +2,34 @@
  * Created by Administrator on 2017/2/27.
  */
 import React, {Component} from 'react';
-import {fetchEndPoints} from '../../actions/endpoints';
 import {Modal, Input, Icon, Breadcrumb, Row, Col, Button, Table, Pagination, Popconfirm,message} from 'antd';
 const Search = Input.Search;
 import {Link} from 'react-router'
-import {connect} from 'react-redux';
 import Loading from './../Common/loading.js';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import {getHeader} from './../../common/common.js';
 import './index.scss'
 
-@connect(
-    state => state.endpoints,
-)
-class EndPoints extends Component {
-    static fetch(state, dispatch, page,q) {
-        const fetchTasks = [];
-        fetchTasks.push(
-            dispatch(fetchEndPoints(page,q))
-        );
-        return fetchTasks
-    }
+class EndPointDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            data:[],
+            loaded:false,
+            q:'',
+            page:0,
+            meta:{pagination:{total:0,per_page:0}},
             addModal:false,
-            editDescModal:false,
             addEndpointName:'',
-            addEndpointDesc:'',
-            editDescName:'',
-            editDescuuid:'',
-            editDesc:'',
         };
     }
     componentDidMount() {
-        /*通过设置loaded，切换路由的时候就不会重复发送请求*/
-        const {loaded} = this.props;
-        if (!loaded) {
-            this.constructor.fetch(this.props, this.props.dispatch)
-        }
     }
 
     onPageChange = (page) => {
-        const { q} = this.props;
 
-        this.constructor.fetch(this.props, this.props.dispatch, page,q);
     };
-    changeEndpointName=(e)=>{
-        this.setState({
-            addEndpointName:e.target.value
-        })
-    };
-    changeEndpointDesc=(e)=>{
-        this.setState({
-            addEndpointDesc:e.target.value
-        })
-    };
-    changeEditDesc=(e)=>{
-        this.setState({
-            editDesc:e.target.value
-        })
-    };
-    showEditDesc=(uuid,name,desc)=>{
-        this.setState({
-            editDescModal:true,
-            editDescName:name,
-            editDesc:desc,
-            editDescuuid:uuid
-        })
-    };
-    handleEditDescOk=()=>{
-        const { page,q} = this.props;
-        const that=this;
-        axios({
-            url:`http://local.iothub.com.cn/endpoints/${this.state.editDescuuid}`,
-            method: 'put',
-            data: {
-                description: this.state.editDesc,
-            },
-            headers:getHeader()
-        })
-            .then(function (response) {
-                console.log(response);
-                that.setState({
-                    editDescModal:false,
-                    editDescuuid:null
-                });
-                message.success(messageJson['edit endpoint desc success']);
-                that.constructor.fetch(that.props, that.props.dispatch, page,q);
-            })
-            .catch(function (error) {
-                if(error.response.status === 422 ){
-                    message.error(messageJson['edit endpoint desc fail']);
-                }else{
-                    message.error(messageJson['unknown error']);
-                }
-            });
-    }
     addEndPoint=()=>{
         const { page,q} = this.props;
         const that=this;
@@ -162,14 +92,15 @@ class EndPoints extends Component {
         this.constructor.fetch(this.props, this.props.dispatch, 1,value);
     };
     render() {
-        const {data = [], page, q,meta={pagination:{total:0,per_page:0}},loaded} = this.props;
+        const {data, page, q,meta,loaded} = this.state;
+        console.log(meta)
         const columns = [{
             title: '域名称',
             dataIndex: 'name',
             key: 'name',
             render: (text, record, index) => {
                 return (
-                        <Link to={'/basic/endpoints/'+record.uuid} title={text}>{text}</Link>
+                    <Link to={'/basic/endpoints/'+record.uuid} title={text}>{text}</Link>
 
                 )
             }
@@ -209,7 +140,7 @@ class EndPoints extends Component {
                 return (
                     <div>
                         <Popconfirm   placement="topRight" title={'Sure to delete ' + record.uuid} onConfirm={this.delEndPoint.bind(this,record.uuid)}>
-                            <button className="ant-btn ant-btn-danger " data-id={record.uuid}
+                            <button className="ant-btn ant-btn-primary" data-id={record.uuid}
                             >删除
                             </button>
                         </Popconfirm>
@@ -224,7 +155,8 @@ class EndPoints extends Component {
                     <div style={{marginTop: '20px'}}>
                         <Breadcrumb separator=">">
                             <Breadcrumb.Item>接入管理</Breadcrumb.Item>
-                            <Breadcrumb.Item >设备域</Breadcrumb.Item>
+                            <Breadcrumb.Item ><Link to='/basic'>设备域</Link></Breadcrumb.Item>
+                            <Breadcrumb.Item >设备</Breadcrumb.Item>
                         </Breadcrumb>
                         <div className="operate-box">
                             <Search
@@ -258,24 +190,9 @@ class EndPoints extends Component {
                         <Input  onChange={this.changeEndpointDesc} value={this.state.addEndpointDesc} type="textarea" placeholder="描述" autosize={{ minRows: 2, maxRows: 6 }} />
                         <p>说明：名称只能由英文字母、数字、“_”(下划线)、“-”（即中横线）构成。“-” 不能单独或连续使用，不能放在开头或结尾。</p>
                     </Modal>
-                    <Modal
-                        visible={this.state.editDescModal}
-                        title="修改描述"
-                        onCancel={()=>{this.setState({editDescModal:false})}}
-                        footer={[
-                            <Button key="back" type="ghost" size="large"
-                                    onClick={()=>{this.setState({editDescModal:false})}}>取消</Button>,
-                            <Button key="submit" type="primary" size="large" onClick={this.handleEditDescOk}>
-                                确定
-                            </Button>,
-                        ]}
-                    >
-                        <h3 style={{marginBottom:'10px'}}>名称 : {this.state.editDescName}</h3>
-                        <Input  onChange={this.changeEditDesc} value={this.state.editDesc} type="textarea"  autosize={{ minRows: 2, maxRows: 6 }} />
-                    </Modal>
                 </Row>
             </div>
         );
     }
 }
-export default EndPoints;
+export default EndPointDetail;

@@ -3,7 +3,7 @@
  */
 import React, {Component} from 'react';
 import {fetchDevice_categories} from '../../actions/device_categories';
-import {Modal, Input, Icon, Alert, Row, Col, Button, Table, Pagination, Popconfirm,message} from 'antd';
+import {Modal, Input, Icon, Breadcrumb, Row, Col, Button, Table, Pagination, Popconfirm,message} from 'antd';
 const Search = Input.Search;
 import {connect} from 'react-redux';
 import Loading from './../Common/loading.js';
@@ -216,7 +216,7 @@ class DeviceCategories extends Component {
                         <span className="ant-divider" />
 
                         <Popconfirm   placement="topRight" title={'Sure to delete ' + record.uuid} onConfirm={this.delEndPoint.bind(this,record.uuid)}>
-                            <button className="ant-btn ant-btn-primary" data-id={record.uuid}
+                            <button className="ant-btn ant-btn-danger" data-id={record.uuid}
                             >删除
                             </button>
                         </Popconfirm>
@@ -228,8 +228,12 @@ class DeviceCategories extends Component {
         return (
             <div className="Home">
                 <Row>
-                    <div style={{marginTop: '30px'}}>
-                        <div>
+                    <div style={{marginTop: '20px'}}>
+                        <Breadcrumb separator=">">
+                            <Breadcrumb.Item>接入管理</Breadcrumb.Item>
+                            <Breadcrumb.Item >分类管理</Breadcrumb.Item>
+                        </Breadcrumb>
+                        <div className="operate-box">
                             <Search
                                 defaultValue={q}
                                 placeholder="input search text"

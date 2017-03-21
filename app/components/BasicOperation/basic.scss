@@ -46,7 +46,10 @@
   }
   background: rgb(249, 249, 249);
   width: 100%;
-  padding: 5px;
+  @include respond-to(medium){
+    padding: 5px;
+  }
+  padding: 25px;
 }
 
 @import "./../../common/common.scss";
@@ -60,9 +63,10 @@
 }
 .line-clamp3{
   width: auto;
-  @include respond-to(medium){
-    max-width: 80px;
-  }
+
+}
+.operate-box{
+  margin: 15px 0;
 }
 .line-edit{
   span{
@@ -72,6 +76,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    @include respond-to(medium){
+      max-width: 80px;
+    }
   }
   i {
     cursor: pointer;

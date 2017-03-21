@@ -35,15 +35,13 @@ class Basic extends React.Component {
                         mode="inline"
                         selectedKeys={[currentMenu]}
                     >
-                        <SubMenu key="sub0" title={<span><Icon type="mail" /><span>账号设置</span></span>}>
-                            <Menu.Item key="/basic"><IndexLink to="/basic" >密码修改</IndexLink></Menu.Item>
-                            <Menu.Item key="/basic/news">  <Link  to="/basic/news" >账号安全</Link></Menu.Item>
-                            <Menu.Item key="/basic/news">  <Link  to="/basic/news" >资料修改</Link></Menu.Item>
-                            <Menu.Item key="3">Option 3</Menu.Item>
-                            <Menu.Item key="4">Option 4</Menu.Item>
+                        <SubMenu key="sub0" title={<span><Icon type="user" /><span>账号设置</span></span>}>
+                            <Menu.Item key="/basic0"><IndexLink to="/basic" >密码修改</IndexLink></Menu.Item>
+                            <Menu.Item key="/basic/news0">  <Link  to="/basic/news" >账号安全</Link></Menu.Item>
+                            <Menu.Item key="/basic/news00">  <Link  to="/basic/news" >资料修改</Link></Menu.Item>
                         </SubMenu>
-                        <Menu.Item key="3"><span><Icon type="mail" /><span>信息概况</span></span></Menu.Item>
-                        <SubMenu key="sub1" title={<span><Icon type="mail" /><span>接入管理</span></span>}>
+                        <Menu.Item key="3"><span><Icon type="info-circle-o" /><span>信息概况</span></span></Menu.Item>
+                        <SubMenu key="sub1" title={<span><Icon type="cloud" /><span>接入管理</span></span>}>
                             <Menu.Item key="/basic"><IndexLink to="/basic" >设备管理</IndexLink></Menu.Item>
                             <Menu.Item key="/basic/news">  <Link  to="/basic/news" >策略管理</Link></Menu.Item>
                             <Menu.Item key="/basic/device_groups"> <Link  to="/basic/device_groups" >分组管理</Link></Menu.Item>
