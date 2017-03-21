@@ -44,7 +44,7 @@
     max-width: 1200px;
     margin: 0 auto;
   }
-  background: rgb(249, 249, 249);
+  background: #ffffff;
   width: 100%;
   @include respond-to(medium){
     padding: 5px;
@@ -83,5 +83,35 @@
   i {
     cursor: pointer;
     vertical-align: text-top;
+  }
+}
+
+
+.dynamic-delete-button{
+  cursor: pointer;
+  &:hover{
+    color: red;
+  }
+}
+.expandRowRender-box{
+  position: relative;
+
+  .expandRowRender-table {
+    max-width: 600px;
+    &>table tr td:first-child{
+      text-align: right;
+      vertical-align: top;
+    }
+    &>table  td{
+      padding: 5px;
+    }
+    .ant-table-body table{
+      padding: 0;
+    }
+  }
+  .expandRowRender-operate{
+    position: absolute;
+    right: 0;
+    top: 0;
   }
 }
