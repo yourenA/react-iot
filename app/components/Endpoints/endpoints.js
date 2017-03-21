@@ -173,7 +173,7 @@ class EndPoints extends Component {
             render: (text, record, index) => {
                 return (
                     <div className="line-clamp3 line-edit">
-                        <span>{text}</span><Icon type="edit" onClick={this.showEditDesc.bind(this,record.uuid,record.name,record.description)}/>
+                        <span title={text}>{text}</span><Icon type="edit" onClick={this.showEditDesc.bind(this,record.uuid,record.name,record.description)}/>
                     </div>
 
                 )
@@ -203,7 +203,7 @@ class EndPoints extends Component {
                     <div>
                         <Popconfirm   placement="topRight" title={'Sure to delete ' + record.uuid} onConfirm={this.delEndPoint.bind(this,record.uuid)}>
                             <button className="ant-btn ant-btn-primary" data-id={record.uuid}
-                            >Delete
+                            >删除
                             </button>
                         </Popconfirm>
                     </div>

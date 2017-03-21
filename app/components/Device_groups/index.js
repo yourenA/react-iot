@@ -102,7 +102,11 @@ class DeviceGroups extends Component {
             })
             .catch(function (error) {
                 if(error.response.status === 422 ){
-                    message.error(error.response.data.errors.name[0]);
+                    if(error.response.data.errors.name && error.response.data.errors.name[0]){
+                        message.error(error.response.data.errors.name[0]);
+                    }else if(error.response.data.errors.description && error.response.data.errors.description[0]){
+                        message.error(error.response.data.errors.description[0]);
+                    }
                 }else{
                     message.error(messageJson['unknown error']);
                 }
@@ -140,7 +144,11 @@ class DeviceGroups extends Component {
                     addBtnCanClick:true
                 });
                 if(error.response.status === 422 ){
-                    message.error(error.response.data.errors.name[0]);
+                    if(error.response.data.errors.name && error.response.data.errors.name[0]){
+                        message.error(error.response.data.errors.name[0]);
+                    }else if(error.response.data.errors.description && error.response.data.errors.description[0]){
+                        message.error(error.response.data.errors.description[0]);
+                    }
                 }else if(error.response.status === 401){
                     message.error(messageJson['token fail']);
                 }else{
@@ -190,7 +198,7 @@ class DeviceGroups extends Component {
             render: (text, record, index) => {
                 return (
                     <div className="line-clamp3 line-edit">
-                        <span>{text}</span><Icon type="edit" onClick={this.showEditDesc.bind(this,record.uuid,record.name,record.description)}/>
+                        <span  title={text}>{text}</span><Icon type="edit" onClick={this.showEditDesc.bind(this,record.uuid,record.name,record.description)}/>
                     </div>
 
                 )
@@ -198,7 +206,7 @@ class DeviceGroups extends Component {
         },{
             title: '操作',
             key: 'action',
-            width:145,
+            width:70,
             render: (text, record, index) => {
                 return (
                     <div>
