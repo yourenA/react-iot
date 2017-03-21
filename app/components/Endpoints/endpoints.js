@@ -225,7 +225,7 @@ class EndPoints extends Component {
                             <Button className="search-btn" type="primary" icon="plus" onClick={()=>{this.setState({addModal:true})}}>创建域</Button>
                         </div>
                         <Loading show={loaded} />
-                        <Table style={{display:loaded? 'block':'none'}} rowKey="uuid" columns={columns} dataSource={data} pagination={false}/>
+                        <Table bordered  style={{display:loaded? 'block':'none'}} rowKey="uuid" columns={columns} dataSource={data} pagination={false}/>
                         <Pagination total={meta.pagination.total  } current={page} pageSize={meta.pagination.per_page}
                                     style={{marginTop: '10px'}} onChange={this.onPageChange}/>
 

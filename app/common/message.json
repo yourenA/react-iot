@@ -20,5 +20,10 @@
   "del device_categories success":"删除设备分类成功",
   "del device_categories fail":"记录不存在",
   "edit device_categories desc success":"修改描述成功",
-  "edit device_categories desc fail":"描述不能大于200个字符"
+  "edit device_categories desc fail":"描述不能大于200个字符",
+  "add device_groups success":"添加设备组成功",
+  "del device_groups success":"删除设备组成功",
+  "del device_groups fail":"记录不存在",
+  "edit device_groups desc success":"修改描述成功",
+  "edit device_groups desc fail":"描述不能大于200个字符"
 }

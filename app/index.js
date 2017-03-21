@@ -7,6 +7,7 @@ import App from './components/App/app';
 import Home from './components/Home/home';
 import EndPoints from './components/Endpoints/endpoints';
 import Device_categories from './components/Device_categories/device_categories';
+import Device_groups from './components/Device_groups/index';
 import News from './components/News/news';
 import Basic from './components/BasicOperation/basic';
 import {message} from 'antd';
@@ -34,6 +35,7 @@ ReactDOM.render(
                     <IndexRoute component={EndPoints}/>
                     <Route path="news" component={News}/>
                     <Route path="device_categories" component={Device_categories}/>
+                    <Route path="device_groups" component={Device_groups}/>
                 </Route>
             </Route>
         </Router>

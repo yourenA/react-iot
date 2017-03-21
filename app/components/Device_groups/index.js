@@ -2,7 +2,7 @@
  * Created by Administrator on 2017/2/27.
  */
 import React, {Component} from 'react';
-import {fetchDevice_categories} from '../../actions/device_categories';
+import {fetchDevice_groups} from '../../actions/device_groups';
 import {Modal, Input, Icon, Alert, Row, Col, Button, Table, Pagination, Popconfirm,message} from 'antd';
 const Search = Input.Search;
 import {connect} from 'react-redux';
@@ -12,13 +12,13 @@ import messageJson from './../../common/message.json';
 import {getHeader} from './../../common/common.js';
 
 @connect(
-    state => state.device_categories,
+    state => state.device_groups,
 )
-class DeviceCategories extends Component {
+class DeviceGroups extends Component {
     static fetch(state, dispatch, page,q) {
         const fetchTasks = [];
         fetchTasks.push(
-            dispatch(fetchDevice_categories(page,q))
+            dispatch(fetchDevice_groups(page,q))
         );
         return fetchTasks
     }
@@ -27,8 +27,8 @@ class DeviceCategories extends Component {
         this.state = {
             addModal:false,
             editDescModal:false,
-            addDeviceCategoryName:'',
-            addDeviceCategoryDesc:'',
+            addDeviceGroupName:'',
+            addDeviceGroupDesc:'',
             addBtnCanClick:true,
             delBtnCanClick:true,
             editDescName:'',
@@ -51,12 +51,12 @@ class DeviceCategories extends Component {
     };
     changeDeviceCategoryName=(e)=>{
         this.setState({
-            addDeviceCategoryName:e.target.value
+            addDeviceGroupName:e.target.value
         })
     };
     changeDeviceCategoryDesc=(e)=>{
         this.setState({
-            addDeviceCategoryDesc:e.target.value
+            addDeviceGroupDesc:e.target.value
         })
     };
     changeEditDescName=(e)=>{
@@ -81,7 +81,7 @@ class DeviceCategories extends Component {
         const { page,q} = this.props;
         const that=this;
         axios({
-            url:`http://local.iothub.com.cn/device_categories/${this.state.editDescuuid}`,
+            url:`http://local.iothub.com.cn/device_groups/${this.state.editDescuuid}`,
             method: 'put',
             data: {
                 name:this.state.editDescName,
@@ -97,7 +97,7 @@ class DeviceCategories extends Component {
                     editDescModal:false,
                     editDescuuid:null
                 });
-                message.success(messageJson['edit device_categories desc success']);
+                message.success(messageJson['edit device_groups desc success']);
                 that.constructor.fetch(that.props, that.props.dispatch, page,q);
             })
             .catch(function (error) {
@@ -115,11 +115,11 @@ class DeviceCategories extends Component {
         });
         const that=this;
         axios({
-            url:'http://local.iothub.com.cn/device_categories',
+            url:'http://local.iothub.com.cn/device_groups',
             method: 'post',
             data: {
-                name: this.state.addDeviceCategoryName,
-                description: this.state.addDeviceCategoryDesc,
+                name: this.state.addDeviceGroupName,
+                description: this.state.addDeviceGroupDesc,
             },
             headers:getHeader()
         })
@@ -128,10 +128,10 @@ class DeviceCategories extends Component {
                 that.setState({
                     addBtnCanClick:true,
                     addModal:false,
-                    addDeviceCategoryName:'',
-                    addDeviceCategoryDesc:'',
+                    addDeviceGroupName:'',
+                    addDeviceGroupDesc:'',
                 });
-                message.success(messageJson['add device_categories success']);
+                message.success(messageJson['add device_groups success']);
                 that.constructor.fetch(that.props, that.props.dispatch, page,q);
 
             })
@@ -154,18 +154,18 @@ class DeviceCategories extends Component {
         const { page ,q} = this.props;
         const that=this;
         axios({
-            url:`http://local.iothub.com.cn/device_categories/${uuid}`,
+            url:`http://local.iothub.com.cn/device_groups/${uuid}`,
             method: 'DELETE',
             headers:getHeader()
         })
             .then(function (response) {
-                message.success(messageJson['del device_categories success']);
+                message.success(messageJson['del device_groups success']);
                 that.constructor.fetch(that.props, that.props.dispatch, page,q);
             })
             .catch(function (error) {
                 console.log(error.response);
                 if(error.response.status === 404 ){
-                    message.error(messageJson['del device_categories fail']);
+                    message.error(messageJson['del device_groups fail']);
                 }else if(error.response.status === 401){
                     message.error(messageJson['token fail']);
                 }else{
@@ -202,10 +202,6 @@ class DeviceCategories extends Component {
             render: (text, record, index) => {
                 return (
                     <div>
-                        <button className="ant-btn ant-btn-primary" data-id={record.uuid}
-                        >启用
-                        </button>
-                        <span className="ant-divider" />
 
                         <Popconfirm   placement="topRight" title={'Sure to delete ' + record.uuid} onConfirm={this.delEndPoint.bind(this,record.uuid)}>
                             <button className="ant-btn ant-btn-primary" data-id={record.uuid}
@@ -228,7 +224,7 @@ class DeviceCategories extends Component {
                                 style={{ width: 200 }}
                                 onSearch={value => this.searchEndPoint(value)}
                             />
-                            <Button className="search-btn" type="primary" icon="plus" onClick={()=>{this.setState({addModal:true})}}>增加新类型</Button>
+                            <Button className="search-btn" type="primary" icon="plus" onClick={()=>{this.setState({addModal:true})}}>增加新设备组</Button>
                         </div>
                         <Loading show={loaded} />
                         <Table bordered  style={{display:loaded? 'block':'none'}} rowKey="uuid" columns={columns} dataSource={data} pagination={false}/>
@@ -238,7 +234,7 @@ class DeviceCategories extends Component {
                     </div>
                     <Modal
                         visible={this.state.addModal}
-                        title="创建设备分类"
+                        title="创建新设备组"
                         onOk={this.handleOk}
                         onCancel={()=>{this.setState({addModal:false})}}
                         footer={[
@@ -249,8 +245,8 @@ class DeviceCategories extends Component {
                             </Button>,
                         ]}
                     >
-                        <Input style={{marginBottom:'15px'}} onChange={this.changeDeviceCategoryName} value={this.state.addDeviceCategoryName} placeholder="名称:长度3-32个字符" />
-                        <Input  onChange={this.changeDeviceCategoryDesc} value={this.state.addDeviceCategoryDesc} type="textarea" placeholder="描述" autosize={{ minRows: 2, maxRows: 6 }} />
+                        <Input style={{marginBottom:'15px'}} onChange={this.changeDeviceCategoryName} value={this.state.addDeviceGroupName} placeholder="名称:长度3-32个字符" />
+                        <Input  onChange={this.changeDeviceCategoryDesc} value={this.state.addDeviceGroupDesc} type="textarea" placeholder="描述" autosize={{ minRows: 2, maxRows: 6 }} />
                     </Modal>
                     <Modal
                         visible={this.state.editDescModal}
@@ -272,4 +268,4 @@ class DeviceCategories extends Component {
         );
     }
 }
-export default DeviceCategories;
+export default DeviceGroups;
