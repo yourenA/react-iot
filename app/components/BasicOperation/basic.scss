@@ -48,3 +48,32 @@
   width: 100%;
   padding: 5px;
 }
+
+@import "./../../common/common.scss";
+.search-btn{
+  margin-left: 10px;
+}
+.ant-popover-buttons button{
+  @include respond-to(medium){
+    margin-left: 2px;
+  }
+}
+.line-clamp3{
+  width: auto;
+  @include respond-to(medium){
+    max-width: 80px;
+  }
+}
+.line-edit{
+  span{
+    max-width: 200px;
+    display: inline-block;
+    margin-right: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  i {
+    cursor: pointer;
+  }
+}

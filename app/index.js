@@ -6,6 +6,7 @@ import {IndexRoute, Router, Route, hashHistory,browserHistory } from 'react-rout
 import App from './components/App/app';
 import Home from './components/Home/home';
 import EndPoints from './components/Endpoints/endpoints';
+import Device_categories from './components/Device_categories/device_categories';
 import News from './components/News/news';
 import Basic from './components/BasicOperation/basic';
 import {message} from 'antd';
@@ -32,6 +33,7 @@ ReactDOM.render(
                 <Route path="basic" onEnter={checkLoginStatus} component={Basic}>
                     <IndexRoute component={EndPoints}/>
                     <Route path="news" component={News}/>
+                    <Route path="device_categories" component={Device_categories}/>
                 </Route>
             </Route>
         </Router>

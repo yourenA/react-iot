@@ -15,5 +15,10 @@
   "del endpoint success":"删除实例成功",
   "del endpoint fail":"记录不存在",
   "edit endpoint desc success":"修改描述成功",
-  "edit endpoint desc fail":"描述不能大于200个字符"
+  "edit endpoint desc fail":"描述不能大于200个字符",
+  "add device_categories success":"添加设备分类成功",
+  "del device_categories success":"删除设备分类成功",
+  "del device_categories fail":"记录不存在",
+  "edit device_categories desc success":"修改描述成功",
+  "edit device_categories desc fail":"描述不能大于200个字符"
 }

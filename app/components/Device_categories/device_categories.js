@@ -2,7 +2,7 @@
  * Created by Administrator on 2017/2/27.
  */
 import React, {Component} from 'react';
-import {fetchEndPoints} from '../../actions/endpoints';
+import {fetchDevice_categories} from '../../actions/device_categories';
 import {Modal, Input, Icon, Alert, Row, Col, Button, Table, Pagination, Popconfirm,message} from 'antd';
 const Search = Input.Search;
 import {connect} from 'react-redux';
@@ -10,16 +10,15 @@ import Loading from './../Common/loading.js';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import {getHeader} from './../../common/common.js';
-import './index.scss'
 
 @connect(
-    state => state.endpoints,
+    state => state.device_categories,
 )
 class EndPoints extends Component {
     static fetch(state, dispatch, page,q) {
         const fetchTasks = [];
         fetchTasks.push(
-            dispatch(fetchEndPoints(page,q))
+            dispatch(fetchDevice_categories(page,q))
         );
         return fetchTasks
     }
@@ -28,8 +27,9 @@ class EndPoints extends Component {
         this.state = {
             addModal:false,
             editDescModal:false,
-            addEndpointName:'',
-            addEndpointDesc:'',
+            addDeviceCategoryName:'',
+            addDeviceCategoryDesc:'',
+            addBtnCanClick:true,
             editDescName:'',
             editDescuuid:'',
             editDesc:'',
@@ -48,16 +48,21 @@ class EndPoints extends Component {
 
         this.constructor.fetch(this.props, this.props.dispatch, page,q);
     };
-    changeEndpointName=(e)=>{
+    changeDeviceCategoryName=(e)=>{
         this.setState({
-            addEndpointName:e.target.value
+            addDeviceCategoryName:e.target.value
         })
     };
-    changeEndpointDesc=(e)=>{
+    changeDeviceCategoryDesc=(e)=>{
         this.setState({
-            addEndpointDesc:e.target.value
+            addDeviceCategoryDesc:e.target.value
         })
     };
+    changeEditDescName=(e)=>{
+        this.setState({
+            editDescName:e.target.value
+        })
+    }
     changeEditDesc=(e)=>{
         this.setState({
             editDesc:e.target.value
@@ -75,9 +80,10 @@ class EndPoints extends Component {
         const { page,q} = this.props;
         const that=this;
         axios({
-            url:`http://local.iothub.com.cn/endpoints/${this.state.editDescuuid}`,
+            url:`http://local.iothub.com.cn/device_categories/${this.state.editDescuuid}`,
             method: 'put',
             data: {
+                name:this.state.editDescName,
                 description: this.state.editDesc,
             },
             headers:getHeader()
@@ -85,43 +91,53 @@ class EndPoints extends Component {
             .then(function (response) {
                 console.log(response);
                 that.setState({
+                    name:'',
+                    description: '',
                     editDescModal:false,
                     editDescuuid:null
                 });
-                message.success(messageJson['edit endpoint desc success']);
+                message.success(messageJson['edit device_categories desc success']);
                 that.constructor.fetch(that.props, that.props.dispatch, page,q);
             })
             .catch(function (error) {
                 if(error.response.status === 422 ){
-                    message.error(messageJson['edit endpoint desc fail']);
+                    message.error(error.response.data.errors.name[0]);
                 }else{
                     message.error(messageJson['unknown error']);
                 }
             });
     }
-    addEndPoint=()=>{
+    addDevice_category=()=>{
         const { page,q} = this.props;
+        this.setState({
+            addBtnCanClick:false
+        });
         const that=this;
         axios({
-            url:'http://local.iothub.com.cn/endpoints',
+            url:'http://local.iothub.com.cn/device_categories',
             method: 'post',
             data: {
-                name: this.state.addEndpointName,
-                description: this.state.addEndpointDesc,
+                name: this.state.addDeviceCategoryName,
+                description: this.state.addDeviceCategoryDesc,
             },
             headers:getHeader()
         })
             .then(function (response) {
                 console.log(response);
                 that.setState({
+                    addBtnCanClick:true,
                     addModal:false,
-                    addEndpointName:'',
-                    addEndpointDesc:'',
+                    addDeviceCategoryName:'',
+                    addDeviceCategoryDesc:'',
                 });
-                message.success(messageJson['add endpoint success']);
+                message.success(messageJson['add device_categories success']);
                 that.constructor.fetch(that.props, that.props.dispatch, page,q);
+
             })
             .catch(function (error) {
+                that.setState({
+                    addBtnCanClick:true
+                });
                 if(error.response.status === 422 ){
                     message.error(error.response.data.errors.name[0]);
                 }else if(error.response.status === 401){
@@ -137,18 +153,18 @@ class EndPoints extends Component {
         const { page ,q} = this.props;
         const that=this;
         axios({
-            url:`http://local.iothub.com.cn/endpoints/${uuid}`,
-            method: 'delete',
+            url:`http://local.iothub.com.cn/device_categories/${uuid}`,
+            method: 'DELETE',
             headers:getHeader()
         })
             .then(function (response) {
-                message.success(messageJson['del endpoint success']);
+                message.success(messageJson['del device_categories success']);
                 that.constructor.fetch(that.props, that.props.dispatch, page,q);
             })
             .catch(function (error) {
                 console.log(error.response);
                 if(error.response.status === 404 ){
-                    message.error(messageJson['del endpoint fail']);
+                    message.error(messageJson['del device_categories fail']);
                 }else if(error.response.status === 401){
                     message.error(messageJson['token fail']);
                 }else{
@@ -163,7 +179,7 @@ class EndPoints extends Component {
     render() {
         const {data = [], page, q,meta={pagination:{total:0,per_page:0}},loaded} = this.props;
         const columns = [{
-            title: '域名称',
+            title: '类型名称',
             dataIndex: 'name',
             key: 'name',
         },{
@@ -178,23 +194,7 @@ class EndPoints extends Component {
 
                 )
             }
-        }, {
-            title: '接入地址',
-            dataIndex: 'websocket_hostname',
-            key: 'websocket_hostname',
-        },  {
-            title: '设备总数',
-            dataIndex: 'device_count',
-            key: 'device_count',
-        },  {
-            title: '在线设备数',
-            dataIndex: 'device_online_count',
-            key: 'device_online_count',
         },{
-            title: '创建时间',
-            dataIndex: 'created_at',
-            key: 'created_at',
-        }, {
             title: '操作',
             key: 'action',
             width:70,
@@ -232,20 +232,19 @@ class EndPoints extends Component {
                     </div>
                     <Modal
                         visible={this.state.addModal}
-                        title="创建新域"
+                        title="创建设备分类"
                         onOk={this.handleOk}
                         onCancel={()=>{this.setState({addModal:false})}}
                         footer={[
                             <Button key="back" type="ghost" size="large"
                                     onClick={()=>{this.setState({addModal:false})}}>取消</Button>,
-                            <Button key="submit" type="primary" size="large" onClick={this.addEndPoint}>
+                            <Button key="submit" type="primary" size="large" onClick={this.addDevice_category} disabled={!this.state.addBtnCanClick}>
                                 确定
                             </Button>,
                         ]}
                     >
-                        <Input style={{marginBottom:'15px'}} onChange={this.changeEndpointName} value={this.state.addEndpointName} placeholder="名称:长度3-32个字符" />
-                        <Input  onChange={this.changeEndpointDesc} value={this.state.addEndpointDesc} type="textarea" placeholder="描述" autosize={{ minRows: 2, maxRows: 6 }} />
-                        <p>说明：名称只能由英文字母、数字、“_”(下划线)、“-”（即中横线）构成。“-” 不能单独或连续使用，不能放在开头或结尾。</p>
+                        <Input style={{marginBottom:'15px'}} onChange={this.changeDeviceCategoryName} value={this.state.addDeviceCategoryName} placeholder="名称:长度3-32个字符" />
+                        <Input  onChange={this.changeDeviceCategoryDesc} value={this.state.addDeviceCategoryDesc} type="textarea" placeholder="描述" autosize={{ minRows: 2, maxRows: 6 }} />
                     </Modal>
                     <Modal
                         visible={this.state.editDescModal}
@@ -259,7 +258,7 @@ class EndPoints extends Component {
                             </Button>,
                         ]}
                     >
-                        <h3 style={{marginBottom:'10px'}}>名称 : {this.state.editDescName}</h3>
+                        <Input  onChange={this.changeEditDescName} value={this.state.editDescName}  style={{marginBottom:'10px'}}/>
                         <Input  onChange={this.changeEditDesc} value={this.state.editDesc} type="textarea"  autosize={{ minRows: 2, maxRows: 6 }} />
                     </Modal>
                 </Row>

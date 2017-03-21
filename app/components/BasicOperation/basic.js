@@ -47,7 +47,7 @@ class Basic extends React.Component {
                             <Menu.Item key="/basic"><IndexLink to="/basic" >设备管理</IndexLink></Menu.Item>
                             <Menu.Item key="/basic/news">  <Link  to="/basic/news" >策略管理</Link></Menu.Item>
                             <Menu.Item key="3">分组管理</Menu.Item>
-                            <Menu.Item key="4">分类管理</Menu.Item>
+                            <Menu.Item key="/basic/device_categories"> <Link  to="/basic/device_categories" >分类管理</Link></Menu.Item>
                         </SubMenu>
                         <SubMenu key="sub2" title={<span><Icon type="appstore" /><span>应用</span></span>}>
                             <Menu.Item key="5">数据统计</Menu.Item>
