@@ -2,7 +2,7 @@
  * Created by Administrator on 2017/2/27.
  */
 import React, {Component} from 'react';
-import {fetchEndPoints} from '../../actions/policies';
+import {fetchPolicies} from '../../actions/policies';
 import {Modal, Input, Icon, Breadcrumb, Row, Col, Button, Table, Pagination, Popconfirm,message} from 'antd';
 const Search = Input.Search;
 import {connect} from 'react-redux';
@@ -19,7 +19,7 @@ class Policies extends Component {
     static fetch(state, dispatch, page,q) {
         const fetchTasks = [];
         fetchTasks.push(
-            dispatch(fetchEndPoints(page,q))
+            dispatch(fetchPolicies(page,q))
         );
         return fetchTasks
     }

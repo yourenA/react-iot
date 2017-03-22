@@ -9,7 +9,6 @@ import Loading from './../Common/loading.js';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import {getHeader} from './../../common/common.js';
-import './index.scss'
 import AddDetailForm from './addDetailForm.js'
 const datasource=[{
     uuid:'daxpopd-fa-ff00',

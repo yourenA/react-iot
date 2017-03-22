@@ -6,7 +6,7 @@ import {getHeader} from './../common/common.js';
 import messageJson from './../common/message.json';
 import configJson from './../../config.json';
 import {message} from 'antd';
-exports.fetchEndPoints = (page=1,q='')=> {
+exports.fetchPolicies = (page=1,q='')=> {
     return async(dispatch)=> {
         dispatch(policiesRequest());
         try {

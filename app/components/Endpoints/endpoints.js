@@ -11,6 +11,7 @@ import Loading from './../Common/loading.js';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import configJson from './../../../config.json';
+
 import {getHeader} from './../../common/common.js';
 
 @connect(
