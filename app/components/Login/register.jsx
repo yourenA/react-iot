@@ -19,7 +19,7 @@ class NormalLoginForm extends Component {
             if (!err) {
                 console.log('Received values of form: ', values);
                 axios({
-                    url:'http://local.iothub.com.cn//register',
+                    url:'http://test.iothub.com.cn//register',
                     method: 'post',
                     data: values
                 })
@@ -67,7 +67,7 @@ class NormalLoginForm extends Component {
         const that=this;
         if( this.state.emailState && this.state.email !==''){
             axios({
-                url:'http://local.iothub.com.cn/register/verify_code',
+                url:'http://test.iothub.com.cn/register/verify_code',
                 method: 'post',
                 data: {
                     username: this.state.email,

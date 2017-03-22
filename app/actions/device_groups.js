@@ -4,13 +4,14 @@ export const GET_DEVICE_GROUPS_SUCCEED = 'GET_DEVICE_GROUPS_SUCCEED';
 export const GET_DEVICE_GROUPS_FAILED = 'GET_DEVICE_GROUPS_FAILED';
 import {getHeader} from './../common/common.js';
 import messageJson from './../common/message.json';
+import configJson from './../../config.json';
 import {message} from 'antd';
 exports.fetchDevice_groups = (page=1,q='')=> {
     return async(dispatch)=> {
         dispatch(device_groupsRequest());
         try {
             let response = await axios({
-                url:'http://local.iothub.com.cn/device_groups',
+                url:`${configJson.prefix}/device_groups`,
                 method: 'get',
                 params: {
                     page:page,

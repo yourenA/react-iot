@@ -2,7 +2,7 @@
  * Created by Administrator on 2017/2/27.
  */
 import React, {Component} from 'react';
-import {fetchDevice_groups} from '../../actions/device_groups';
+import {fetchEndPoints} from '../../actions/policies';
 import {Modal, Input, Icon, Breadcrumb, Row, Col, Button, Table, Pagination, Popconfirm,message} from 'antd';
 const Search = Input.Search;
 import {connect} from 'react-redux';
@@ -10,17 +10,16 @@ import Loading from './../Common/loading.js';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import configJson from './../../../config.json';
-
 import {getHeader} from './../../common/common.js';
 
 @connect(
-    state => state.device_groups,
+    state => state.policies,
 )
-class DeviceGroups extends Component {
+class Policies extends Component {
     static fetch(state, dispatch, page,q) {
         const fetchTasks = [];
         fetchTasks.push(
-            dispatch(fetchDevice_groups(page,q))
+            dispatch(fetchEndPoints(page,q))
         );
         return fetchTasks
     }
@@ -29,10 +28,8 @@ class DeviceGroups extends Component {
         this.state = {
             addModal:false,
             editDescModal:false,
-            addDeviceGroupName:'',
-            addDeviceGroupDesc:'',
-            addBtnCanClick:true,
-            delBtnCanClick:true,
+            addEndpointName:'',
+            addEndpointDesc:'',
             editDescName:'',
             editDescuuid:'',
             editDesc:'',
@@ -51,21 +48,16 @@ class DeviceGroups extends Component {
 
         this.constructor.fetch(this.props, this.props.dispatch, page,q);
     };
-    changeDeviceCategoryName=(e)=>{
+    changeEndpointName=(e)=>{
         this.setState({
-            addDeviceGroupName:e.target.value
+            addEndpointName:e.target.value
         })
     };
-    changeDeviceCategoryDesc=(e)=>{
+    changeEndpointDesc=(e)=>{
         this.setState({
-            addDeviceGroupDesc:e.target.value
+            addEndpointDesc:e.target.value
         })
     };
-    changeEditDescName=(e)=>{
-        this.setState({
-            editDescName:e.target.value
-        })
-    }
     changeEditDesc=(e)=>{
         this.setState({
             editDesc:e.target.value
@@ -83,10 +75,9 @@ class DeviceGroups extends Component {
         const { page,q} = this.props;
         const that=this;
         axios({
-            url:`${configJson.prefix}/device_groups/${this.state.editDescuuid}`,
+            url:`${configJson.prefix}/endpoints/${this.state.editDescuuid}`,
             method: 'put',
             data: {
-                name:this.state.editDescName,
                 description: this.state.editDesc,
             },
             headers:getHeader()
@@ -94,63 +85,45 @@ class DeviceGroups extends Component {
             .then(function (response) {
                 console.log(response);
                 that.setState({
-                    name:'',
-                    description: '',
                     editDescModal:false,
                     editDescuuid:null
                 });
-                message.success(messageJson['edit device_groups desc success']);
+                message.success(messageJson['edit endpoint desc success']);
                 that.constructor.fetch(that.props, that.props.dispatch, page,q);
             })
             .catch(function (error) {
                 if(error.response.status === 422 ){
-                    if(error.response.data.errors.name && error.response.data.errors.name[0]){
-                        message.error(error.response.data.errors.name[0]);
-                    }else if(error.response.data.errors.description && error.response.data.errors.description[0]){
-                        message.error(error.response.data.errors.description[0]);
-                    }
+                    message.error(messageJson['edit endpoint desc fail']);
                 }else{
                     message.error(messageJson['unknown error']);
                 }
             });
     }
-    addDevice_category=()=>{
+    addEndPoint=()=>{
         const { page,q} = this.props;
-        this.setState({
-            addBtnCanClick:false
-        });
         const that=this;
         axios({
-            url:`${configJson.prefix}/device_groups`,
+            url:`${configJson.prefix}/endpoints`,
             method: 'post',
             data: {
-                name: this.state.addDeviceGroupName,
-                description: this.state.addDeviceGroupDesc,
+                name: this.state.addEndpointName,
+                description: this.state.addEndpointDesc,
             },
             headers:getHeader()
         })
             .then(function (response) {
                 console.log(response);
                 that.setState({
-                    addBtnCanClick:true,
                     addModal:false,
-                    addDeviceGroupName:'',
-                    addDeviceGroupDesc:'',
+                    addEndpointName:'',
+                    addEndpointDesc:'',
                 });
-                message.success(messageJson['add device_groups success']);
+                message.success(messageJson['add endpoint success']);
                 that.constructor.fetch(that.props, that.props.dispatch, page,q);
-
             })
             .catch(function (error) {
-                that.setState({
-                    addBtnCanClick:true
-                });
                 if(error.response.status === 422 ){
-                    if(error.response.data.errors.name && error.response.data.errors.name[0]){
-                        message.error(error.response.data.errors.name[0]);
-                    }else if(error.response.data.errors.description && error.response.data.errors.description[0]){
-                        message.error(error.response.data.errors.description[0]);
-                    }
+                    message.error(error.response.data.errors.name[0]);
                 }else if(error.response.status === 401){
                     message.error(messageJson['token fail']);
                 }else{
@@ -164,18 +137,18 @@ class DeviceGroups extends Component {
         const { page ,q} = this.props;
         const that=this;
         axios({
-            url:`${configJson.prefix}/device_groups/${uuid}`,
-            method: 'DELETE',
+            url:`${configJson.prefix}/endpoints/${uuid}`,
+            method: 'delete',
             headers:getHeader()
         })
             .then(function (response) {
-                message.success(messageJson['del device_groups success']);
+                message.success(messageJson['del endpoint success']);
                 that.constructor.fetch(that.props, that.props.dispatch, page,q);
             })
             .catch(function (error) {
                 console.log(error.response);
                 if(error.response.status === 404 ){
-                    message.error(messageJson['del device_groups fail']);
+                    message.error(messageJson['del endpoint fail']);
                 }else if(error.response.status === 401){
                     message.error(messageJson['token fail']);
                 }else{
@@ -190,7 +163,7 @@ class DeviceGroups extends Component {
     render() {
         const {data = [], page, q,meta={pagination:{total:0,per_page:0}},loaded} = this.props;
         const columns = [{
-            title: '类型名称',
+            title: '域名称',
             dataIndex: 'name',
             key: 'name',
         },{
@@ -200,21 +173,36 @@ class DeviceGroups extends Component {
             render: (text, record, index) => {
                 return (
                     <div className="line-clamp3 line-edit">
-                        <span  title={text}>{text}</span><Icon type="edit" onClick={this.showEditDesc.bind(this,record.uuid,record.name,record.description)}/>
+                        <span title={text}>{text}</span><Icon type="edit" onClick={this.showEditDesc.bind(this,record.uuid,record.name,record.description)}/>
                     </div>
 
                 )
             }
+        }, {
+            title: '接入地址',
+            dataIndex: 'websocket_hostname',
+            key: 'websocket_hostname',
+        },  {
+            title: '设备总数',
+            dataIndex: 'device_count',
+            key: 'device_count',
+        },  {
+            title: '在线设备数',
+            dataIndex: 'device_online_count',
+            key: 'device_online_count',
         },{
+            title: '创建时间',
+            dataIndex: 'created_at',
+            key: 'created_at',
+        }, {
             title: '操作',
             key: 'action',
             width:70,
             render: (text, record, index) => {
                 return (
                     <div>
-
                         <Popconfirm   placement="topRight" title={'Sure to delete ' + record.uuid} onConfirm={this.delEndPoint.bind(this,record.uuid)}>
-                            <button className="ant-btn ant-btn-danger" data-id={record.uuid}
+                            <button className="ant-btn ant-btn-danger " data-id={record.uuid}
                             >删除
                             </button>
                         </Popconfirm>
@@ -229,7 +217,7 @@ class DeviceGroups extends Component {
                     <div style={{marginTop: '20px'}}>
                         <Breadcrumb separator=">">
                             <Breadcrumb.Item>接入管理</Breadcrumb.Item>
-                            <Breadcrumb.Item >分组管理</Breadcrumb.Item>
+                            <Breadcrumb.Item >设备域</Breadcrumb.Item>
                         </Breadcrumb>
                         <div className="operate-box">
                             <Search
@@ -238,7 +226,7 @@ class DeviceGroups extends Component {
                                 style={{ width: 200 }}
                                 onSearch={value => this.searchEndPoint(value)}
                             />
-                            <Button className="search-btn" type="primary" icon="plus" onClick={()=>{this.setState({addModal:true})}}>增加新设备组</Button>
+                            <Button className="search-btn" type="primary" icon="plus" onClick={()=>{this.setState({addModal:true})}}>创建域</Button>
                         </div>
                         <Loading show={loaded} />
                         <Table bordered  style={{display:loaded? 'block':'none'}} rowKey="uuid" columns={columns} dataSource={data} pagination={false}/>
@@ -248,19 +236,20 @@ class DeviceGroups extends Component {
                     </div>
                     <Modal
                         visible={this.state.addModal}
-                        title="创建新设备组"
+                        title="创建新域"
                         onOk={this.handleOk}
                         onCancel={()=>{this.setState({addModal:false})}}
                         footer={[
                             <Button key="back" type="ghost" size="large"
                                     onClick={()=>{this.setState({addModal:false})}}>取消</Button>,
-                            <Button key="submit" type="primary" size="large" onClick={this.addDevice_category} disabled={!this.state.addBtnCanClick}>
+                            <Button key="submit" type="primary" size="large" onClick={this.addEndPoint}>
                                 确定
                             </Button>,
                         ]}
                     >
-                        <Input style={{marginBottom:'15px'}} onChange={this.changeDeviceCategoryName} value={this.state.addDeviceGroupName} placeholder="名称:长度3-32个字符" />
-                        <Input  onChange={this.changeDeviceCategoryDesc} value={this.state.addDeviceGroupDesc} type="textarea" placeholder="描述" autosize={{ minRows: 2, maxRows: 6 }} />
+                        <Input style={{marginBottom:'15px'}} onChange={this.changeEndpointName} value={this.state.addEndpointName} placeholder="名称:长度3-32个字符" />
+                        <Input  onChange={this.changeEndpointDesc} value={this.state.addEndpointDesc} type="textarea" placeholder="描述" autosize={{ minRows: 2, maxRows: 6 }} />
+                        <p>说明：名称只能由英文字母、数字、“_”(下划线)、“-”（即中横线）构成。“-” 不能单独或连续使用，不能放在开头或结尾。</p>
                     </Modal>
                     <Modal
                         visible={this.state.editDescModal}
@@ -274,7 +263,7 @@ class DeviceGroups extends Component {
                             </Button>,
                         ]}
                     >
-                        <Input  onChange={this.changeEditDescName} value={this.state.editDescName}  style={{marginBottom:'15px'}}/>
+                        <h3 style={{marginBottom:'10px'}}>名称 : {this.state.editDescName}</h3>
                         <Input  onChange={this.changeEditDesc} value={this.state.editDesc} type="textarea"  autosize={{ minRows: 2, maxRows: 6 }} />
                     </Modal>
                 </Row>
@@ -282,4 +271,4 @@ class DeviceGroups extends Component {
         );
     }
 }
-export default DeviceGroups;
+export default Policies;

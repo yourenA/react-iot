@@ -158,6 +158,7 @@ class AddDetailForm extends Component {
                         ],
                     })(
                         <Select
+                            onChange={(value)=>{console.log(value)}}
                             tags
                             placeholder="请选择一个设备组或输入选择新建设备组">
                             <Option value="china">China</Option>

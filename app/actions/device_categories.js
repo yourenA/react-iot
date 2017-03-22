@@ -4,13 +4,14 @@ export const GET_DEVICE_CATEGORIES_SUCCEED = 'GET_DEVICE_CATEGORIES_SUCCEED';
 export const GET_DEVICE_CATEGORIES_FAILED = 'GET_DEVICE_CATEGORIES_FAILED';
 import {getHeader} from './../common/common.js';
 import messageJson from './../common/message.json';
+import configJson from './../../config.json';
 import {message} from 'antd';
 exports.fetchDevice_categories = (page=1,q='')=> {
     return async(dispatch)=> {
         dispatch(device_categoriesRequest());
         try {
             let response = await axios({
-                url:'http://local.iothub.com.cn/device_categories',
+                url:`${configJson.prefix}/device_categories`,
                 method: 'get',
                 params: {
                     page:page,

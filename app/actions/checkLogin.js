@@ -12,6 +12,7 @@ import {browserHistory,hashHistory } from 'react-router'
 import axios from 'axios';
 import {message} from 'antd';
 import messageJson from './../common/message.json';
+import configJson from './../../config.json';
 import {removeLoginStorage,getHeader} from './../common/common.js';
 export function checkLogin() {
     return dispatch => {
@@ -31,7 +32,7 @@ export function checkLogin() {
 }
 export function login(user) {
     return dispatch => {
-        axios.post('http://local.iothub.com.cn/login',  {
+        axios.post(`${configJson.prefix}/login`,  {
             username:user.username,
             password:user.password
         })

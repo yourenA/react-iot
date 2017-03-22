@@ -9,6 +9,7 @@ import {connect} from 'react-redux';
 import Loading from './../Common/loading.js';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
+import configJson from './../../../config.json';
 import {getHeader} from './../../common/common.js';
 
 @connect(
@@ -81,7 +82,7 @@ class DeviceCategories extends Component {
         const { page,q} = this.props;
         const that=this;
         axios({
-            url:`http://local.iothub.com.cn/device_categories/${this.state.editDescuuid}`,
+            url:`${configJson.prefix}/device_categories/${this.state.editDescuuid}`,
             method: 'put',
             data: {
                 name:this.state.editDescName,
@@ -119,7 +120,7 @@ class DeviceCategories extends Component {
         });
         const that=this;
         axios({
-            url:'http://local.iothub.com.cn/device_categories',
+            url:`${configJson.prefix}/device_categories`,
             method: 'post',
             data: {
                 name: this.state.addDeviceCategoryName,
@@ -162,7 +163,7 @@ class DeviceCategories extends Component {
         const { page ,q} = this.props;
         const that=this;
         axios({
-            url:`http://local.iothub.com.cn/device_categories/${uuid}`,
+            url:`${configJson.prefix}/device_categories/${uuid}`,
             method: 'DELETE',
             headers:getHeader()
         })

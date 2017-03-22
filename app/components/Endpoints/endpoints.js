@@ -10,8 +10,8 @@ import {connect} from 'react-redux';
 import Loading from './../Common/loading.js';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
+import configJson from './../../../config.json';
 import {getHeader} from './../../common/common.js';
-import './index.scss'
 
 @connect(
     state => state.endpoints,
@@ -76,7 +76,7 @@ class EndPoints extends Component {
         const { page,q} = this.props;
         const that=this;
         axios({
-            url:`http://local.iothub.com.cn/endpoints/${this.state.editDescuuid}`,
+            url:`${configJson.prefix}/endpoints/${this.state.editDescuuid}`,
             method: 'put',
             data: {
                 description: this.state.editDesc,
@@ -104,7 +104,7 @@ class EndPoints extends Component {
         const { page,q} = this.props;
         const that=this;
         axios({
-            url:'http://local.iothub.com.cn/endpoints',
+            url:`${configJson.prefix}/endpoints`,
             method: 'post',
             data: {
                 name: this.state.addEndpointName,
@@ -138,7 +138,7 @@ class EndPoints extends Component {
         const { page ,q} = this.props;
         const that=this;
         axios({
-            url:`http://local.iothub.com.cn/endpoints/${uuid}`,
+            url:`${configJson.prefix}/endpoints/${uuid}`,
             method: 'delete',
             headers:getHeader()
         })
