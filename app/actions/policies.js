@@ -2,16 +2,51 @@ import axios from 'axios';
 export const GET_POLICIES_REQUEST = 'GET_POLICIES_REQUEST';
 export const GET_POLICIES_SUCCEED = 'GET_POLICIES_SUCCEED';
 export const GET_POLICIES_FAILED = 'GET_POLICIES_FAILED';
+export const GET_ALL_ENDPOINTS_SUCCEED = 'GET_ALL_ENDPOINTS_SUCCEED';
+export const GET_ALL_ENDPOINTS_FAILED = 'GET_ALL_ENDPOINTS_FAILED';
 import {getHeader} from './../common/common.js';
 import messageJson from './../common/message.json';
 import configJson from './../../config.json';
 import {message} from 'antd';
-exports.fetchPolicies = (page=1,q='')=> {
+
+exports.fetchAllEndpoints=()=>{
+    return async(dispatch)=> {
+        try {
+            let response = await axios({
+                url:`${configJson.prefix}/endpoints`,
+                method: 'get',
+                headers:getHeader()
+            });
+            let data = await response.data;
+            console.log('get all endpoints',data);
+            dispatch(fetchPolicies(1,'',data.data[0].uuid));
+            return dispatch(getEndpointsSucceed(data))
+
+        } catch (e) {
+            return dispatch(getEndpointsFailed(e));
+        }
+    }
+};
+const getEndpointsSucceed = (data)=>({
+    type: GET_ALL_ENDPOINTS_SUCCEED,
+    endpointsData: data
+});
+
+const getEndpointsFailed = (error)=> {
+    console.log('server state get failed', error);
+    message.error(messageJson['token fail']);
+    return {
+        type: GET_ALL_ENDPOINTS_FAILED,
+        error
+    }
+};
+
+const fetchPolicies = (page=1,q='',endpoint_uuid)=> {
     return async(dispatch)=> {
         dispatch(policiesRequest());
         try {
             let response = await axios({
-                url:`${configJson.prefix}/endpoints`,
+                url:`${configJson.prefix}/endpoints/${endpoint_uuid}/policies`,
                 method: 'get',
                 params: {
                     page:page,
@@ -20,29 +55,29 @@ exports.fetchPolicies = (page=1,q='')=> {
                 headers:getHeader()
             });
             let data = await response.data;
-            console.log('get endpoints',data);
-            return dispatch(policiesSucceed(data,page,q))
+            console.log('get policies',data);
+            return dispatch(policiesSucceed(data,page,q,endpoint_uuid))
 
         } catch (e) {
             return dispatch(policiesFailed(e));
         }
     }
 };
-
+exports.fetchPolicies=fetchPolicies;
 const policiesRequest = ()=>({
     type: GET_POLICIES_REQUEST
 });
 
-const policiesSucceed = (data,page,q)=>({
+const policiesSucceed = (data,page,q,endpoint_uuid)=>({
     type: GET_POLICIES_SUCCEED,
     data: data,
     page:page,
-    q:q
+    q:q,
+    endpoint_uuid:endpoint_uuid
 });
 
 const policiesFailed = (error)=> {
     console.log('server state get failed', error);
-    message.error(messageJson['token fail']);
     return {
         type: GET_POLICIES_FAILED,
         error

@@ -1,7 +1,9 @@
-import {GET_POLICIES_REQUEST,GET_POLICIES_SUCCEED,GET_POLICIES_FAILED} from '../actions/policies';
+import {GET_POLICIES_REQUEST,GET_POLICIES_SUCCEED,GET_POLICIES_FAILED,GET_ALL_ENDPOINTS_SUCCEED,GET_ALL_ENDPOINTS_FAILED} from '../actions/policies';
 
 export default (state = {page: 1}, action) => {
     switch (action.type) {
+        case GET_ALL_ENDPOINTS_SUCCEED:
+            return {...state,...{endpointsData:action.endpointsData.data}};
         case GET_POLICIES_REQUEST:
             return {...state};
         case GET_POLICIES_SUCCEED:
@@ -10,7 +12,8 @@ export default (state = {page: 1}, action) => {
                 loaded: true,
                 page:action.page,
                 meta:action.data.meta,
-                q:action.q
+                q:action.q,
+                endpoint_uuid:action.endpoint_uuid
             };
             return {...state, ..._data};
         case GET_POLICIES_FAILED:

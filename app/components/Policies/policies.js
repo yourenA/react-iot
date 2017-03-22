@@ -2,206 +2,240 @@
  * Created by Administrator on 2017/2/27.
  */
 import React, {Component} from 'react';
-import {fetchPolicies} from '../../actions/policies';
-import {Modal, Input, Icon, Breadcrumb, Row, Col, Button, Table, Pagination, Popconfirm,message} from 'antd';
+import {fetchPolicies, fetchAllEndpoints} from '../../actions/policies';
+import {Modal, Input, Icon, Breadcrumb, Row, Select, Button, Table, Pagination, Popconfirm, message} from 'antd';
 const Search = Input.Search;
+const Option = Select.Option;
 import {connect} from 'react-redux';
 import Loading from './../Common/loading.js';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import configJson from './../../../config.json';
 import {getHeader} from './../../common/common.js';
-
+import AddPoliciesForm from './addPoliciesForm'
 @connect(
     state => state.policies,
 )
 class Policies extends Component {
-    static fetch(state, dispatch, page,q) {
+    static fetch(state, dispatch, page, q, endpoint_uuid) {
         const fetchTasks = [];
         fetchTasks.push(
-            dispatch(fetchPolicies(page,q))
+            dispatch(fetchAllEndpoints()),
+            // dispatch(fetchPolicies(page,q,endpoint_uuid))
         );
         return fetchTasks
     }
+
     constructor(props) {
         super(props);
         this.state = {
-            addModal:false,
-            editDescModal:false,
-            addEndpointName:'',
-            addEndpointDesc:'',
-            editDescName:'',
-            editDescuuid:'',
-            editDesc:'',
+            addModal: false,
+            editDescModal: false,
+            addEndpointName: '',
+            addEndpointDesc: '',
+            editDescName: '',
+            editDescuuid: '',
+            editDesc: '',
         };
     }
-    componentDidMount() {
-        /*通过设置loaded，切换路由的时候就不会重复发送请求*/
-        const {loaded} = this.props;
-        if (!loaded) {
-            this.constructor.fetch(this.props, this.props.dispatch)
-        }
+
+    componentDidMount = () => {
+        this.props.dispatch(fetchAllEndpoints());
+
     }
-
+    changeEndpoint = (e)=> {
+        const endpoint_uuid = e.target.value;
+        this.props.dispatch(fetchPolicies(1, '', endpoint_uuid))
+    }
     onPageChange = (page) => {
-        const { q} = this.props;
-
-        this.constructor.fetch(this.props, this.props.dispatch, page,q);
+        const {q, endpoint_uuid} = this.props;
+        this.props.dispatch(fetchPolicies(page, q, endpoint_uuid))
     };
-    changeEndpointName=(e)=>{
+    changeEndpointName = (e)=> {
         this.setState({
-            addEndpointName:e.target.value
+            addEndpointName: e.target.value
         })
     };
-    changeEndpointDesc=(e)=>{
+    changeEndpointDesc = (e)=> {
         this.setState({
-            addEndpointDesc:e.target.value
+            addEndpointDesc: e.target.value
         })
     };
-    changeEditDesc=(e)=>{
+    changeEditDesc = (e)=> {
         this.setState({
-            editDesc:e.target.value
+            editDesc: e.target.value
         })
     };
-    showEditDesc=(uuid,name,desc)=>{
+    showEditDesc = (uuid, name, desc)=> {
         this.setState({
-            editDescModal:true,
-            editDescName:name,
-            editDesc:desc,
-            editDescuuid:uuid
+            editDescModal: true,
+            editDescName: name,
+            editDesc: desc,
+            editDescuuid: uuid
         })
     };
-    handleEditDescOk=()=>{
-        const { page,q} = this.props;
-        const that=this;
+    handleEditDescOk = ()=> {
+        const {page, q, endpoints_uuid} = this.props;
+        const that = this;
         axios({
-            url:`${configJson.prefix}/endpoints/${this.state.editDescuuid}`,
+            url: `${configJson.prefix}/endpoints/${this.state.editDescuuid}`,
             method: 'put',
             data: {
                 description: this.state.editDesc,
             },
-            headers:getHeader()
+            headers: getHeader()
         })
             .then(function (response) {
                 console.log(response);
                 that.setState({
-                    editDescModal:false,
-                    editDescuuid:null
+                    editDescModal: false,
+                    editDescuuid: null
                 });
                 message.success(messageJson['edit endpoint desc success']);
-                that.constructor.fetch(that.props, that.props.dispatch, page,q);
+                that.constructor.fetch(that.props, that.props.dispatch, page, q, endpoints_uuid);
             })
             .catch(function (error) {
-                if(error.response.status === 422 ){
+                if (error.response.status === 422) {
                     message.error(messageJson['edit endpoint desc fail']);
-                }else{
+                } else {
                     message.error(messageJson['unknown error']);
                 }
             });
     }
-    addEndPoint=()=>{
-        const { page,q} = this.props;
-        const that=this;
+    addPolice = ()=> {
+        const AddPoliciesForm = this.refs.AddPoliciesForm.fields;
+        const addPoliciesDate = {
+            name: AddPoliciesForm.name.value,
+            description: AddPoliciesForm.desc.value,
+            topics: []
+        };
+        for (var k in AddPoliciesForm) {
+            if (k.indexOf('topics') >= 0) {
+                if (AddPoliciesForm.hasOwnProperty(k)) {
+                    if (AddPoliciesForm[k].value.authority == 0) {
+                        addPoliciesDate.topics.push({
+                            name: AddPoliciesForm[k].value.name,
+                            allow_publish: -1,
+                            allow_subscribe: 1
+                        })
+                    } else if (AddPoliciesForm[k].value.authority == 1) {
+                        addPoliciesDate.topics.push({
+                            name: AddPoliciesForm[k].value.name,
+                            allow_publish: 1,
+                            allow_subscribe: -1
+                        })
+                    } else if (AddPoliciesForm[k].value.authority == 2) {
+                        addPoliciesDate.topics.push({
+                            name: AddPoliciesForm[k].value.name,
+                            allow_publish: 1,
+                            allow_subscribe: 1
+                        })
+                    }
+                }
+            }
+        }
+
+        console.log("addPoliciesDate", addPoliciesDate);
+        const {page, q, endpoint_uuid} = this.props;
+        const that = this;
         axios({
-            url:`${configJson.prefix}/endpoints`,
+            url: `${configJson.prefix}/endpoints/${endpoint_uuid}/policies`,
             method: 'post',
-            data: {
-                name: this.state.addEndpointName,
-                description: this.state.addEndpointDesc,
-            },
-            headers:getHeader()
+            data: addPoliciesDate,
+            headers: getHeader()
         })
             .then(function (response) {
                 console.log(response);
+                message.success(messageJson['add policies success']);
+                that.props.dispatch(fetchPolicies(page, q, endpoint_uuid));
                 that.setState({
-                    addModal:false,
-                    addEndpointName:'',
-                    addEndpointDesc:'',
-                });
-                message.success(messageJson['add endpoint success']);
-                that.constructor.fetch(that.props, that.props.dispatch, page,q);
+                    addModal: false
+                })
             })
             .catch(function (error) {
-                if(error.response.status === 422 ){
+                if (error.response.status === 422) {
                     message.error(error.response.data.errors.name[0]);
-                }else if(error.response.status === 401){
+                } else if (error.response.status === 401) {
                     message.error(messageJson['token fail']);
-                }else{
+                } else {
                     message.error(messageJson['unknown error']);
                 }
             });
 
     };
-    delEndPoint=(uuid)=>{
-        console.log("uuid",uuid);
-        const { page ,q} = this.props;
-        const that=this;
+    delPolice = (uuid)=> {
+        console.log("uuid", uuid);
+        const {page, q, endpoint_uuid} = this.props;
+        const that = this;
         axios({
-            url:`${configJson.prefix}/endpoints/${uuid}`,
+            url: `${configJson.prefix}/endpoints/${endpoint_uuid}/policies/${uuid}`,
             method: 'delete',
-            headers:getHeader()
+            headers: getHeader()
         })
             .then(function (response) {
-                message.success(messageJson['del endpoint success']);
-                that.constructor.fetch(that.props, that.props.dispatch, page,q);
+                message.success(messageJson['del policies success']);
+                that.props.dispatch(fetchPolicies(page, q, endpoint_uuid));
             })
             .catch(function (error) {
                 console.log(error.response);
-                if(error.response.status === 404 ){
-                    message.error(messageJson['del endpoint fail']);
-                }else if(error.response.status === 401){
+                if (error.response.status === 404) {
+                    message.error(messageJson['del policies fail']);
+                } else if (error.response.status === 401) {
                     message.error(messageJson['token fail']);
-                }else{
+                } else {
                     message.error(messageJson['unknown error']);
                 }
             });
 
     };
-    searchEndPoint=(value)=>{
-        this.constructor.fetch(this.props, this.props.dispatch, 1,value);
+    searchEndPoint = (value)=> {
+        this.constructor.fetch(this.props, this.props.dispatch, 1, value);
     };
+
     render() {
-        const {data = [], page, q,meta={pagination:{total:0,per_page:0}},loaded} = this.props;
+        const {
+            endpointsData = [], data = [], page, q, meta = {
+            pagination: {
+                total: 0,
+                per_page: 0
+            }
+        }, loaded
+        } = this.props;
         const columns = [{
-            title: '域名称',
+            title: '策略名称',
             dataIndex: 'name',
             key: 'name',
-        },{
-            title: '描述',
-            dataIndex: 'description',
-            key: 'description',
+        }, {
+            title: '设备数',
+            dataIndex: 'device_count',
+            key: 'device_count',
+        }, {
+            title: '主题',
+            dataIndex: 'topics',
+            key: 'topics',
             render: (text, record, index) => {
+                const topics = record.topics.data.map((item, index)=> {
+                    return (
+                        <span key={index} style={{marginRight: '5px'}}>{item.name}</span>
+                    )
+                });
                 return (
-                    <div className="line-clamp3 line-edit">
-                        <span title={text}>{text}</span><Icon type="edit" onClick={this.showEditDesc.bind(this,record.uuid,record.name,record.description)}/>
-                    </div>
-
+                    <p>{topics}</p>
                 )
             }
         }, {
-            title: '接入地址',
-            dataIndex: 'websocket_hostname',
-            key: 'websocket_hostname',
-        },  {
-            title: '设备总数',
-            dataIndex: 'device_count',
-            key: 'device_count',
-        },  {
-            title: '在线设备数',
-            dataIndex: 'device_online_count',
-            key: 'device_online_count',
-        },{
             title: '创建时间',
             dataIndex: 'created_at',
             key: 'created_at',
         }, {
             title: '操作',
             key: 'action',
-            width:70,
+            width: 70,
             render: (text, record, index) => {
                 return (
                     <div>
-                        <Popconfirm   placement="topRight" title={'Sure to delete ' + record.uuid} onConfirm={this.delEndPoint.bind(this,record.uuid)}>
+                        <Popconfirm placement="topRight" title={'Sure to delete ' + record.uuid}
+                                    onConfirm={this.delPolice.bind(this, record.uuid)}>
                             <button className="ant-btn ant-btn-danger " data-id={record.uuid}
                             >删除
                             </button>
@@ -211,60 +245,133 @@ class Policies extends Component {
                 )
             }
         }];
+        const selectOptions = endpointsData.map((item, index)=> {
+            if (index === 0) {
+                return (
+                    <option key={index} value={item.uuid}>{item.name}</option>
+                )
+            } else {
+                return (
+                    <option key={index} value={item.uuid}>{item.name}</option>
+                )
+            }
+
+        });
+        const expandedRowRender = (record)=> {
+            const columns = [{
+                title: '权限',
+                dataIndex: 'allow_publish',
+                key: 'allow_publish',
+                render: (text,record,index)=> {
+                    if (record.allow_publish === 1 && record.allow_subscribe === 1) {
+                        return (
+                            <p>订阅+发布</p>
+                        )
+                    } else if (record.allow_publish === 1 && record.allow_subscribe === -1) {
+                        return (
+                            <p>发布</p>
+                        )
+                    } else if (record.allow_publish === -1 && record.allow_subscribe === 1) {
+                        return(
+                            <p>订阅</p>
+                        )
+                    }else{
+                        return null
+                    }
+
+                }
+            }, {
+                title: '主题',
+                dataIndex: 'name',
+                key: 'name',
+            },];
+
+            return (
+                <div className="expandRowRender-box">
+                    <div className="expandRowRender-table">
+                        <Table
+                            style={{width: '300px'}}
+                            size="small"
+                            rowKey="authority"
+                            columns={columns}
+                            dataSource={record.topics.data}
+                            pagination={false}
+                        />
+                    </div>
+                </div>
+
+            );
+        }
+
         return (
             <div className="Home">
                 <Row>
                     <div style={{marginTop: '20px'}}>
                         <Breadcrumb separator=">">
                             <Breadcrumb.Item>接入管理</Breadcrumb.Item>
-                            <Breadcrumb.Item >设备域</Breadcrumb.Item>
+                            <Breadcrumb.Item >策略管理</Breadcrumb.Item>
                         </Breadcrumb>
                         <div className="operate-box">
+                            <select onChange={this.changeEndpoint} className="ant-input"
+                                    style={{marginRight: '10px', width: 'auto'}}>
+                                {selectOptions}
+                            </select>
                             <Search
                                 defaultValue={q}
                                 placeholder="input search text"
-                                style={{ width: 200 }}
+                                style={{width: 200}}
                                 onSearch={value => this.searchEndPoint(value)}
                             />
-                            <Button className="search-btn" type="primary" icon="plus" onClick={()=>{this.setState({addModal:true})}}>创建域</Button>
+                            <Button className="search-btn" type="primary" icon="plus" onClick={()=> {
+                                this.setState({addModal: true})
+                            }}>创建策略</Button>
                         </div>
-                        <Loading show={loaded} />
-                        <Table bordered  style={{display:loaded? 'block':'none'}} rowKey="uuid" columns={columns} dataSource={data} pagination={false}/>
+                        <Loading show={loaded}/>
+                        <Table bordered expandedRowRender={(record)=>expandedRowRender(record) }
+                               style={{display: loaded ? 'block' : 'none'}} rowKey="uuid" columns={columns}
+                               dataSource={data} pagination={false}/>
                         <Pagination total={meta.pagination.total  } current={page} pageSize={meta.pagination.per_page}
                                     style={{marginTop: '10px'}} onChange={this.onPageChange}/>
 
                     </div>
                     <Modal
                         visible={this.state.addModal}
-                        title="创建新域"
+                        title="创建新策略"
                         onOk={this.handleOk}
-                        onCancel={()=>{this.setState({addModal:false})}}
+                        onCancel={()=> {
+                            this.setState({addModal: false})
+                        }}
                         footer={[
                             <Button key="back" type="ghost" size="large"
-                                    onClick={()=>{this.setState({addModal:false})}}>取消</Button>,
-                            <Button key="submit" type="primary" size="large" onClick={this.addEndPoint}>
+                                    onClick={()=> {
+                                        this.setState({addModal: false})
+                                    }}>取消</Button>,
+                            <Button key="submit" type="primary" size="large" onClick={this.addPolice}>
                                 确定
                             </Button>,
                         ]}
                     >
-                        <Input style={{marginBottom:'15px'}} onChange={this.changeEndpointName} value={this.state.addEndpointName} placeholder="名称:长度3-32个字符" />
-                        <Input  onChange={this.changeEndpointDesc} value={this.state.addEndpointDesc} type="textarea" placeholder="描述" autosize={{ minRows: 2, maxRows: 6 }} />
-                        <p>说明：名称只能由英文字母、数字、“_”(下划线)、“-”（即中横线）构成。“-” 不能单独或连续使用，不能放在开头或结尾。</p>
+                        <AddPoliciesForm ref="AddPoliciesForm"/>
                     </Modal>
                     <Modal
                         visible={this.state.editDescModal}
                         title="修改描述"
-                        onCancel={()=>{this.setState({editDescModal:false})}}
+                        onCancel={()=> {
+                            this.setState({editDescModal: false})
+                        }}
                         footer={[
                             <Button key="back" type="ghost" size="large"
-                                    onClick={()=>{this.setState({editDescModal:false})}}>取消</Button>,
+                                    onClick={()=> {
+                                        this.setState({editDescModal: false})
+                                    }}>取消</Button>,
                             <Button key="submit" type="primary" size="large" onClick={this.handleEditDescOk}>
                                 确定
                             </Button>,
                         ]}
                     >
-                        <h3 style={{marginBottom:'10px'}}>名称 : {this.state.editDescName}</h3>
-                        <Input  onChange={this.changeEditDesc} value={this.state.editDesc} type="textarea"  autosize={{ minRows: 2, maxRows: 6 }} />
+                        <h3 style={{marginBottom: '10px'}}>名称 : {this.state.editDescName}</h3>
+                        <Input onChange={this.changeEditDesc} value={this.state.editDesc} type="textarea"
+                               autosize={{minRows: 2, maxRows: 6}}/>
                     </Modal>
                 </Row>
             </div>
