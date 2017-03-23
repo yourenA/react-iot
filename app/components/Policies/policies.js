@@ -11,8 +11,9 @@ import Loading from './../Common/loading.js';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import configJson from './../../../config.json';
-import {getHeader} from './../../common/common.js';
+import {getHeader,convertFormToData} from './../../common/common.js';
 import AddPoliciesForm from './addPoliciesForm'
+import EditPoliciesForm from './editPoliciesForm'
 @connect(
     state => state.policies,
 )
@@ -30,12 +31,9 @@ class Policies extends Component {
         super(props);
         this.state = {
             addModal: false,
-            editDescModal: false,
-            addEndpointName: '',
-            addEndpointDesc: '',
-            editDescName: '',
-            editDescuuid: '',
-            editDesc: '',
+            editPoliciesModal: false,
+            editPoliciesRecord:{},
+            edituuid:''
         };
     }
 
@@ -51,91 +49,17 @@ class Policies extends Component {
         const {q, endpoint_uuid} = this.props;
         this.props.dispatch(fetchPolicies(page, q, endpoint_uuid))
     };
-    changeEndpointName = (e)=> {
+    showEditPolicies=(record)=>{
         this.setState({
-            addEndpointName: e.target.value
+            editPoliciesModal:true,
+            editPoliciesRecord:record,
+            edituuid:record.uuid
         })
     };
-    changeEndpointDesc = (e)=> {
-        this.setState({
-            addEndpointDesc: e.target.value
-        })
-    };
-    changeEditDesc = (e)=> {
-        this.setState({
-            editDesc: e.target.value
-        })
-    };
-    showEditDesc = (uuid, name, desc)=> {
-        this.setState({
-            editDescModal: true,
-            editDescName: name,
-            editDesc: desc,
-            editDescuuid: uuid
-        })
-    };
-    handleEditDescOk = ()=> {
-        const {page, q, endpoints_uuid} = this.props;
-        const that = this;
-        axios({
-            url: `${configJson.prefix}/endpoints/${this.state.editDescuuid}`,
-            method: 'put',
-            data: {
-                description: this.state.editDesc,
-            },
-            headers: getHeader()
-        })
-            .then(function (response) {
-                console.log(response);
-                that.setState({
-                    editDescModal: false,
-                    editDescuuid: null
-                });
-                message.success(messageJson['edit endpoint desc success']);
-                that.constructor.fetch(that.props, that.props.dispatch, page, q, endpoints_uuid);
-            })
-            .catch(function (error) {
-                if (error.response.status === 422) {
-                    message.error(messageJson['edit endpoint desc fail']);
-                } else {
-                    message.error(messageJson['unknown error']);
-                }
-            });
-    }
     addPolice = ()=> {
-        const AddPoliciesForm = this.refs.AddPoliciesForm.fields;
-        const addPoliciesDate = {
-            name: AddPoliciesForm.name.value,
-            description: AddPoliciesForm.desc.value,
-            topics: []
-        };
-        for (var k in AddPoliciesForm) {
-            if (k.indexOf('topics') >= 0) {
-                if (AddPoliciesForm.hasOwnProperty(k)) {
-                    if (AddPoliciesForm[k].value.authority == 0) {
-                        addPoliciesDate.topics.push({
-                            name: AddPoliciesForm[k].value.name,
-                            allow_publish: -1,
-                            allow_subscribe: 1
-                        })
-                    } else if (AddPoliciesForm[k].value.authority == 1) {
-                        addPoliciesDate.topics.push({
-                            name: AddPoliciesForm[k].value.name,
-                            allow_publish: 1,
-                            allow_subscribe: -1
-                        })
-                    } else if (AddPoliciesForm[k].value.authority == 2) {
-                        addPoliciesDate.topics.push({
-                            name: AddPoliciesForm[k].value.name,
-                            allow_publish: 1,
-                            allow_subscribe: 1
-                        })
-                    }
-                }
-            }
-        }
-
-        console.log("addPoliciesDate", addPoliciesDate);
+        const AddPoliciesForm = this.refs.AddPoliciesForm.getFieldsValue();
+        console.log("AddPoliciesForm",AddPoliciesForm);
+        const addPoliciesDate=convertFormToData(AddPoliciesForm);
         const {page, q, endpoint_uuid} = this.props;
         const that = this;
         axios({
@@ -154,8 +78,12 @@ class Policies extends Component {
             })
             .catch(function (error) {
                 if (error.response.status === 422) {
-                    message.error(error.response.data.errors.name[0]);
-                } else if (error.response.status === 401) {
+                    if(error.response.data.errors.name && error.response.data.errors.name[0]){
+                        message.error(error.response.data.errors.name[0]);
+                    }else {
+                        message.error(messageJson['topic name fail']);
+                    }
+                }else if (error.response.status === 401) {
                     message.error(messageJson['token fail']);
                 } else {
                     message.error(messageJson['unknown error']);
@@ -163,8 +91,42 @@ class Policies extends Component {
             });
 
     };
+    editPolice=()=>{
+        const EditPoliciesForm = this.refs.EditPoliciesForm.getFieldsValue();
+        const editPoliciesDate=convertFormToData(EditPoliciesForm);
+        console.log("editPoliciesDate",editPoliciesDate);
+        const {page, q, endpoint_uuid} = this.props;
+        const that = this;
+        // axios({
+        //     url: `${configJson.prefix}/endpoints/${endpoint_uuid}/policies/${this.state.edituuid}`,
+        //     method: 'put',
+        //     data: editPoliciesDate,
+        //     headers: getHeader()
+        // })
+        //     .then(function (response) {
+        //         console.log(response);
+        //         message.success(messageJson['edit policies success']);
+        //         that.props.dispatch(fetchPolicies(page, q, endpoint_uuid));
+        //         that.setState({
+        //             editPoliciesModal: false
+        //         })
+        //     })
+        //     .catch(function (error) {
+        //         if (error.response.status === 422) {
+        //             if(error.response.data.errors.description && error.response.data.errors.description[0]){
+        //                 message.error(error.response.data.errors.description[0]);
+        //             }else {
+        //                 message.error(messageJson['topic name fail']);
+        //             }
+        //         }else if (error.response.status === 401) {
+        //             message.error(messageJson['token fail']);
+        //         } else {
+        //             message.error(messageJson['unknown error']);
+        //         }
+        //     });
+
+    }
     delPolice = (uuid)=> {
-        console.log("uuid", uuid);
         const {page, q, endpoint_uuid} = this.props;
         const that = this;
         axios({
@@ -189,7 +151,8 @@ class Policies extends Component {
 
     };
     searchEndPoint = (value)=> {
-        this.constructor.fetch(this.props, this.props.dispatch, 1, value);
+        const {page, q, endpoint_uuid} = this.props;
+        this.props.dispatch(fetchPolicies(page, value, endpoint_uuid));
     };
 
     render() {
@@ -216,7 +179,7 @@ class Policies extends Component {
             render: (text, record, index) => {
                 const topics = record.topics.data.map((item, index)=> {
                     return (
-                        <span key={index} style={{marginRight: '5px'}}>{item.name}</span>
+                        <span key={index} style={{marginRight: '5px'}}>{item.name};</span>
                     )
                 });
                 return (
@@ -230,10 +193,14 @@ class Policies extends Component {
         }, {
             title: '操作',
             key: 'action',
-            width: 70,
+            width: 145,
             render: (text, record, index) => {
                 return (
                     <div>
+                        <button onClick={this.showEditPolicies.bind(this, record)} className="ant-btn ant-btn-primary" data-id={record.uuid}
+                        >编辑
+                        </button>
+                        <span className="ant-divider" />
                         <Popconfirm placement="topRight" title={'Sure to delete ' + record.uuid}
                                     onConfirm={this.delPolice.bind(this, record.uuid)}>
                             <button className="ant-btn ant-btn-danger " data-id={record.uuid}
@@ -354,24 +321,22 @@ class Policies extends Component {
                         <AddPoliciesForm ref="AddPoliciesForm"/>
                     </Modal>
                     <Modal
-                        visible={this.state.editDescModal}
-                        title="修改描述"
+                        visible={this.state.editPoliciesModal}
+                        title="修改策略"
                         onCancel={()=> {
-                            this.setState({editDescModal: false})
+                            this.setState({editPoliciesModal: false})
                         }}
                         footer={[
                             <Button key="back" type="ghost" size="large"
                                     onClick={()=> {
-                                        this.setState({editDescModal: false})
+                                        this.setState({editPoliciesModal: false})
                                     }}>取消</Button>,
-                            <Button key="submit" type="primary" size="large" onClick={this.handleEditDescOk}>
+                            <Button key="submit" type="primary" size="large" onClick={this.editPolice}>
                                 确定
                             </Button>,
                         ]}
                     >
-                        <h3 style={{marginBottom: '10px'}}>名称 : {this.state.editDescName}</h3>
-                        <Input onChange={this.changeEditDesc} value={this.state.editDesc} type="textarea"
-                               autosize={{minRows: 2, maxRows: 6}}/>
+                        <EditPoliciesForm  ref="EditPoliciesForm" record={this.state.editPoliciesRecord} />
                     </Modal>
                 </Row>
             </div>

@@ -5,19 +5,29 @@ import React, {Component} from 'react';
 import {Form, Icon, Input, Button, Checkbox, Select} from 'antd';
 const FormItem = Form.Item;
 const Option = Select.Option;
-let uuid = 0;
-class AddPoliciesForm extends Component {
+class EditPoliciesForm extends Component {
     constructor(props) {
         super(props);
-        this.state = {};
+        this.uuid=this.props.record.topics.data.length-1;
+        this.state = {
+            record:this.props.record
+        };
     }
-
+    componentWillReceiveProps(nextProps){
+        this.setState({
+            record:nextProps.record
+        });
+        const {form} = this.props;
+        // form.setFieldsValue({
+        //     desc: nextProps.record.description,
+        // });
+    }
     add = () => {
-        uuid++;
+        this.uuid++;
         const {form} = this.props;
         // can use data-binding to get
         const keys = form.getFieldValue('keys');
-        const nextKeys = keys.concat(uuid);
+        const nextKeys = keys.concat(this.uuid);
         // can use data-binding to set
         // important! notify form to detect changes
         form.setFieldsValue({
@@ -39,6 +49,8 @@ class AddPoliciesForm extends Component {
         });
     }
     render() {
+        const {record}=this.props;
+        console.log('record',record)
         const {getFieldDecorator, getFieldValue} = this.props.form;
         const formItemLayout = {
             labelCol: {
@@ -66,7 +78,11 @@ class AddPoliciesForm extends Component {
                 sm: {span: 18, offset: 6},
             },
         };
-        getFieldDecorator('keys', {initialValue: []});
+        const keysArr=[]
+        for(let k in record.topics.data){
+            keysArr.push(parseInt(k))
+        }
+        getFieldDecorator('keys', {initialValue: keysArr});
         const keys = getFieldValue('keys');
         const formItems = keys.map((k, index) => {
             const layout = index === 0 ? formItemLayoutWithLabel : formItemLayoutWithOutLabel;
@@ -77,7 +93,7 @@ class AddPoliciesForm extends Component {
                     required={false}
                     key={k}>
                     {getFieldDecorator(`topics-${k}`, {
-                        initialValue: { name: '', authority: '0' },
+                        initialValue: record.topics.data[k],
                     })(<ThemeInput />)}
                     <Icon
                         className="dynamic-delete-button"
@@ -88,12 +104,13 @@ class AddPoliciesForm extends Component {
             );
         });
         return (
-            <Form onSubmit={this.handleSubmit}>
+            <Form onSubmit={this.handleSubmit} >
                 <FormItem
                     label="名称"
                     {...formItemLayout}
                 >
                     {getFieldDecorator('name', {
+                        initialValue:record.name || '',
                         rules: [{required: true, message: '名称不能为空'}],
                     })(
                         <Input  />
@@ -102,7 +119,9 @@ class AddPoliciesForm extends Component {
                 <FormItem
                     label="描述"
                     {...formItemLayout}>
-                    {getFieldDecorator('desc', {})(
+                    {getFieldDecorator('desc', {
+                        initialValue:record.description,
+                    })(
                         <Input type="textarea" autosize={{minRows: 2, maxRows: 6}}/>
                     )}
                 </FormItem>
@@ -121,17 +140,20 @@ class ThemeInput extends React.Component {
     constructor(props) {
         super(props);
 
-        const value = this.props.value || {};
+        const value = this.props.value || {name:''};
         this.state = {
             name: value.name || '',
-            authority: value.authority || "0",
+            authority:  value.authority ||(value.allow_publish===1&&value.allow_subscribe===1)?'2': (value.allow_publish===1&&value.allow_subscribe===-1)?'1':'0',
         };
     }
     componentWillReceiveProps(nextProps) {
         // Should be a controlled component.
         if ('value' in nextProps) {
-            const value = nextProps.value;
-            this.setState(value);
+            const value = nextProps.value || {name:''};
+            this.state = {
+                name: value.name || '',
+                authority:value.authority || ((value.allow_publish===1&&value.allow_subscribe===1)?'2': (value.allow_publish===1&&value.allow_subscribe===-1)?'1':'0'),
+            };
         }
     }
     handleNumberChange = (e) => {
@@ -142,7 +164,7 @@ class ThemeInput extends React.Component {
         this.triggerChange({ name });
     }
     handleCurrencyChange = (authority) => {
-        if (!('value' in this.props)) {
+        if ('value' in this.props) {
             this.setState({ authority });
         }
         this.triggerChange({ authority });
@@ -180,5 +202,5 @@ class ThemeInput extends React.Component {
         );
     }
 }
-const AddPoliciesFormWrap = Form.create()(AddPoliciesForm);
-export default AddPoliciesFormWrap;
+const EditPoliciesFormWrap = Form.create()(EditPoliciesForm);
+export default EditPoliciesFormWrap;

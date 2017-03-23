@@ -27,6 +27,8 @@
   "edit device_groups desc success":"修改描述成功",
   "edit device_groups desc fail":"描述不能大于200个字符",
   "add policies success":"添加策略成功",
+  "edit policies success":"修改策略成功",
   "del policies success":"删除策略成功",
-  "del policies fail":"删除策略失败"
+  "del policies fail":"删除策略失败",
+  "topic name fail":"主题只能为字母、数字或下划线"
 }

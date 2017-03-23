@@ -31,3 +31,48 @@ exports.removeLoginStorage = () => {
 exports.getHeader = () => {
     return {Authorization:`Bearer ${sessionStorage.getItem('usertoken') ||localStorage.getItem('usertoken')}`}
 };
+
+/**
+ * 将策略form表单转换为发送数据
+ * */
+exports.convertFormToData  = (form) => {
+    console.log("form",form)
+    const addPoliciesDate = {
+        name: form.name,
+        description: form.desc,
+        topics: []
+    };
+    for (var k in form) {
+        if (k.indexOf('topics') >= 0) {
+            if (form.hasOwnProperty(k)) {
+                if (form[k].authority == 0) {
+                    addPoliciesDate.topics.push({
+                        name: form[k].name,
+                        allow_publish: -1,
+                        allow_subscribe: 1
+                    })
+                } else if (form[k].authority == 1) {
+                    addPoliciesDate.topics.push({
+                        name: form[k].name,
+                        allow_publish: 1,
+                        allow_subscribe: -1
+                    })
+                } else if (form[k].authority == 2) {
+                    addPoliciesDate.topics.push({
+                        name: form[k].name,
+                        allow_publish: 1,
+                        allow_subscribe: 1
+                    })
+                }else{
+                    addPoliciesDate.topics.push({
+                        name: form[k].name,
+                        allow_publish: form[k].allow_publish,
+                        allow_subscribe: form[k].allow_subscribe
+                    })
+                }
+            }
+        }
+    }
+
+    return addPoliciesDate;
+};
