@@ -70,12 +70,15 @@
 }
 .line-edit{
   span{
-    max-width: 100%;
+    max-width: 400px;
     display: inline-block;
     margin-right: 5px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    @include respond-to(large){
+      max-width: 200px;
+    }
     @include respond-to(medium){
       max-width: 80px;
     }
@@ -114,4 +117,9 @@
     right: 0;
     top: 0;
   }
+}
+
+.addDeviceForm-title{
+  text-align: center;
+  margin-top: 10px;
 }

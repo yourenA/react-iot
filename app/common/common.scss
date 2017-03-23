@@ -8,7 +8,7 @@ $nav-fontColor:rgba(0,0,0,.65);
 $breakpoints: (
         small: 320px,
         medium: 740px,
-        large: 980px
+        large: 1200px
 );
 @mixin respond-to($breakpoint) {
   @if map-has-key($breakpoints, $breakpoint) {

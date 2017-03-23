@@ -2,204 +2,210 @@
  * Created by Administrator on 2017/3/21.
  */
 import React, {Component} from 'react';
-import { Form, Icon, Input, Button, Checkbox,Select } from 'antd';
+import {Form, Icon, Input, Button, Checkbox, Select} from 'antd';
+import {formItemLayout, formItemLayoutWithLabel, formItemLayoutWithOutLabel} from './../../common/common';
+import axios from 'axios';
+import AddCategory from './addCategory';
+import AddGroup from './addGroup';
+import AddPolicy from './addpolicy';
+import configJson from './../../../config.json';
+import {getHeader} from './../../common/common.js';
 const FormItem = Form.Item;
 const Option = Select.Option;
-let uuid = 0;
-class AddDetailForm extends Component {
+class AddDeviceForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            newStrategy:false,
+            newCategory: false,
+            newGroup: false,
+            newPolicy: false,
+            categoryArr:[],
+            groupArr:[],
+            policyArr:[]
         };
     }
-    handleSubmit = (e) => {
-        e.preventDefault();
-        this.props.form.validateFields((err, values) => {
-            if (!err) {
-                console.log('Received values of form: ', values);
-            }
+    componentDidMount = () => {
+        const that=this;
+        axios({
+            url:`${configJson.prefix}/device_categories`,
+            method: 'get',
+            headers:getHeader()
+        }).then(function (response) {
+            that.setState({
+                categoryArr:response.data.data
+            })
         });
-    };
-    handleStrategyChange=(value)=>{
+        axios({
+            url:`${configJson.prefix}/device_groups`,
+            method: 'get',
+            headers:getHeader()
+        }).then(function (response) {
+            that.setState({
+                groupArr:response.data.data
+            })
+        });
+        axios({
+            url:`${configJson.prefix}/endpoints/${this.props.endpoint_uuid}/policies`,
+            method: 'get',
+            headers:getHeader()
+        }).then(function (response) {
+            that.setState({
+                policyArr:response.data.data
+            })
+        })
+    }
+    handleChange = (value)=> {
         console.log(value);
-        if(value==='new'){
+        if (value === 'newcategory') {
+            this.setState({
+                newCategory: true,
+                newGroup: false,
+                newPolicy: false
+            })
+        }else if(value === 'newgroup'){
+            this.setState({
+                newCategory: false,
+                newGroup: true,
+                newPolicy: false
+            })
+        } else if(value === 'newpolicy'){
             console.log('新建');
             this.setState({
-                newStrategy:true
+                newCategory: false,
+                newGroup: false,
+                newPolicy: true
             })
-        }else{
+        }else {
             this.setState({
-                newStrategy:false
+                newCategory: false,
+                newGroup: false,
+                newPolicy: false
             })
         }
     };
-    add = () => {
-        uuid++;
-        const { form } = this.props;
-        // can use data-binding to get
-        const keys = form.getFieldValue('keys');
-        const nextKeys = keys.concat(uuid);
-        // can use data-binding to set
-        // important! notify form to detect changes
-        form.setFieldsValue({
-            keys: nextKeys,
-        });
-    };
-    remove = (k) => {
-        const { form } = this.props;
-        // can use data-binding to get
-        const keys = form.getFieldValue('keys');
-        // We need at least one passenger
-        if (keys.length === 1) {
-            return;
+    addNewcb=(type,name,uuid)=>{
+        const {form} = this.props;
+        if(type === 'category'){
+            const categoryArr=this.state.categoryArr;
+            this.setState({
+                newCategory: false,
+                categoryArr:categoryArr.concat([{name:name,uuid:uuid}])
+            })
+            form.setFieldsValue({
+                category: name,
+            });
+        }else if(type === 'group'){
+            const groupArr=this.state.groupArr;
+            this.setState({
+                newGroup: false,
+                categoryArr:groupArr.concat([{name:name,uuid:uuid}])
+            })
+            form.setFieldsValue({
+                group: name,
+            });
+
+        }else if(type === 'policy'){
+
+        }}
+
+    ;
+    render() {
+        const {getFieldDecorator, getFieldValue} = this.props.form;
+        const newformItemsWrap = ()=> {
+            if (this.state.newCategory) {
+                return (
+                    <AddCategory addNewcb={this.addNewcb}/>
+                )
+            }else if(this.state.newGroup){
+                return (
+                    <AddGroup addNewcb={this.addNewcb}/>
+                )
+            }else if(this.state.newPolicy){
+                return(
+                    <AddPolicy endpoint_uuid={this.props.endpoint_uuid} fromOtherPage={true} addNewcb={this.addNewcb}/>
+                )
+            }else{
+                return (
+                    null
+                )
+            }
+
         }
 
-        // can use data-binding to set
-        form.setFieldsValue({
-            keys: keys.filter(key => key !== k),
-        });
-    }
-    render() {
-        const { getFieldDecorator,getFieldValue  } = this.props.form;
-        const formItemLayout = {
-            labelCol: {
-                xs: { span: 24 },
-                sm: { span: 6 },
-            },
-            wrapperCol: {
-                xs: { span: 24 },
-                sm: { span: 14 },
-            },
-        };
-        const formItemLayoutWithLabel = {
-            labelCol: {
-                xs: { span: 24 },
-                sm: { span: 6 },
-            },
-            wrapperCol: {
-                xs: { span: 24 },
-                sm: { span: 18 },
-            },
-        };
-        const formItemLayoutWithOutLabel = {
-            wrapperCol: {
-                xs: { span: 24, offset: 0 },
-                sm: { span: 18, offset: 6 },
-            },
-        };
-        getFieldDecorator('keys', { initialValue: [] });
-        const keys = getFieldValue('keys');
-        const formItems = keys.map((k, index) => {
-            const layout=index ===0?formItemLayoutWithLabel:formItemLayoutWithOutLabel;
-            return (
-                this.state.newStrategy?
-                <FormItem
-                    {...layout}
-                    label={index === 0 ? '主题' : ''}
-                    required={false}
-                    key={k}
-                >
-                    {getFieldDecorator(`names-${k}`, {
-                        validateTrigger: ['onChange', 'onBlur'],
-                        rules: [{
-                            required: true,
-                            whitespace: true,
-                            message: "请输入主题名称",
-                        }],
-                    })(
-                        <Input placeholder="passenger name" style={{ width: '50%', marginRight: 5 }} />
-
-                    )}
-                    <Select
-                        value={'订阅'}
-                        style={{ width: '22%',marginRight:5 }}
-                    >
-                        <Option value="rmb">订阅</Option>
-                        <Option value="dollar">发布</Option>
-                        <Option value="dollarname">订阅+发布</Option>
-                    </Select>
-                    <Icon
-                        className="dynamic-delete-button"
-                        type="minus-circle-o"
-                        onClick={() => this.remove(k)}
-                    />
-                </FormItem>:null
-            );
-        });
         return (
-            <Form onSubmit={this.handleSubmit} className="login-form">
-                <FormItem
-                    label="名称"
-                    {...formItemLayout}
-                >
-                    {getFieldDecorator('name', {
-                        rules: [{ required: true, message: '名称不能为空' }],
-                    })(
-                        <Input  />
-                    )}
-                </FormItem>
-                <FormItem
-                    label="描述"
-                    {...formItemLayout}>
-                    {getFieldDecorator('desc', {
-                    })(
-                        <Input  type="textarea" autosize={{ minRows: 2, maxRows: 6 }} />
-                    )}
-                </FormItem>
-                <FormItem
-                    {...formItemLayout}
-                    label="设备组"
-                    hasFeedback
-                >
-                    {getFieldDecorator('select', {
-                        rules: [
-                            { required: true, message: 'Please select your country!' },
-                        ],
-                    })(
-                        <Select
-                            onChange={(value)=>{console.log(value)}}
-                            tags
-                            placeholder="请选择一个设备组或输入选择新建设备组">
-                            <Option value="china">China</Option>
-                            <Option value="use">U.S.A</Option>
-                        </Select>
-                    )}
-                </FormItem>
-                <FormItem
-                    {...formItemLayout}
-                    label="策略"
-                    hasFeedback
-                >
-                    {getFieldDecorator('strategy', {
-                        rules: [
-                            { required: true, message: 'Please select your country!' },
-                        ],
-                        onChange: this.handleStrategyChange,
-                    })(
-                        <Select
-                            placeholder="请选择一个策略">
-                            <Option value="china">China</Option>
-                            <Option value="use">U.S.A</Option>
-                            <Option value="new">新建</Option>
-                        </Select>
-                    )}
-                </FormItem>
-                {formItems}
-                {this.state.newStrategy?
-                    <FormItem {...formItemLayoutWithOutLabel}>
-                        <Button type="primary" onClick={this.add} style={{ width: '60%' }}>
-                            <Icon type="plus" /> 增加主题
-                        </Button>
+            <div>
+                <Form onSubmit={this.handleSubmit}>
+                    <FormItem
+                        label="名称"
+                        {...formItemLayout}
+                    >
+                        {getFieldDecorator('name', {
+                            rules: [{required: true, message: '名称不能为空'}],
+                        })(
+                            <Input  />
+                        )}
                     </FormItem>
-                :null}
-
-
-
-            </Form>
+                    <FormItem
+                        label="描述"
+                        {...formItemLayout}>
+                        {getFieldDecorator('desc', {})(
+                            <Input type="textarea" autosize={{minRows: 2, maxRows: 6}}/>
+                        )}
+                    </FormItem>
+                    <FormItem
+                        {...formItemLayout}
+                        label="设备分类"
+                    >
+                        {getFieldDecorator('category', {
+                            onChange: this.handleChange,
+                            rules: [
+                                {required: true, message: '请选择设备分类'},
+                            ],
+                        })(
+                            <Select>
+                                { this.state.categoryArr.map(item => <Option key={item.uuid} value={item.uuid}>{item.name}</Option>) }
+                                <Option value='newcategory'>新建</Option>
+                            </Select>
+                        )}
+                    </FormItem>
+                    <FormItem
+                        {...formItemLayout}
+                        label="设备组"
+                    >
+                        {getFieldDecorator('group', {
+                            onChange: this.handleChange,
+                            rules: [
+                                {required: true, message: '请选择设备组'},
+                            ],
+                        })(
+                            <Select>
+                                { this.state.groupArr.map(item => <Option key={item.uuid} value={item.uuid}>{item.name}</Option>) }
+                                <Option value='newgroup'>新建</Option>
+                            </Select>
+                        )}
+                    </FormItem>
+                    <FormItem
+                        {...formItemLayout}
+                        label="策略"
+                    >
+                        {getFieldDecorator('policy', {
+                            rules: [
+                                {required: true, message: '请选择设备策略'},
+                            ],
+                            onChange: this.handleChange,
+                        })(
+                            <Select>
+                                { this.state.policyArr.map(item => <Option key={item.uuid} value={item.uuid}>{item.name}</Option>) }
+                                <Option value='newpolicy'>新建</Option>
+                            </Select>
+                        )}
+                    </FormItem>
+                </Form>
+                {newformItemsWrap()}
+            </div>
         );
     }
 }
 
-const AddDetailFormWrap = Form.create()(AddDetailForm);
-export default AddDetailFormWrap;
+const AddDeviceFormWrap = Form.create()(AddDeviceForm);
+export default AddDeviceFormWrap;

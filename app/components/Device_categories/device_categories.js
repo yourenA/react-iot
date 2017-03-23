@@ -250,6 +250,7 @@ class DeviceCategories extends Component {
 
                     </div>
                     <Modal
+                        key={1+Date.parse(new Date())}
                         visible={this.state.addModal}
                         title="创建设备分类"
                         onOk={this.handleOk}
@@ -266,6 +267,7 @@ class DeviceCategories extends Component {
                         <Input  onChange={this.changeDeviceCategoryDesc} value={this.state.addDeviceCategoryDesc} type="textarea" placeholder="描述" autosize={{ minRows: 2, maxRows: 6 }} />
                     </Modal>
                     <Modal
+                        key={2+Date.parse(new Date())}
                         visible={this.state.editDescModal}
                         title="修改描述"
                         onCancel={()=>{this.setState({editDescModal:false})}}

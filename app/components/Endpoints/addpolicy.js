@@ -2,29 +2,27 @@
  * Created by Administrator on 2017/3/21.
  */
 import React, {Component} from 'react';
-import {Form, Icon, Input, Button, Checkbox, Select} from 'antd';
-import {formItemLayout,formItemLayoutWithLabel,formItemLayoutWithOutLabel} from './../../common/common'
+import {Form, Icon, Input, Button, message, Select} from 'antd';
+import {formItemLayout, formItemLayoutWithLabel, formItemLayoutWithOutLabel} from './../../common/common'
 const FormItem = Form.Item;
 const Option = Select.Option;
-class EditPoliciesForm extends Component {
+import configJson from './../../../config.json';
+import messageJson from './../../common/message.json';
+import axios from 'axios';
+import {getHeader,convertFormToData} from './../../common/common.js';
+let uuid = 0;
+class AddPoliciesForm extends Component {
     constructor(props) {
         super(props);
-        this.uuid=this.props.record.topics.data.length-1;
-        this.state = {
-            record:this.props.record
-        };
+        this.state = {};
     }
-    componentWillReceiveProps(nextProps){
-        this.setState({
-            record:nextProps.record
-        });
-    }
+
     add = () => {
-        this.uuid++;
+        uuid++;
         const {form} = this.props;
         // can use data-binding to get
         const keys = form.getFieldValue('keys');
-        const nextKeys = keys.concat(this.uuid);
+        const nextKeys = keys.concat(uuid);
         // can use data-binding to set
         // important! notify form to detect changes
         form.setFieldsValue({
@@ -36,20 +34,52 @@ class EditPoliciesForm extends Component {
         // can use data-binding to get
         const keys = form.getFieldValue('keys');
         // We need at least one passenger
+        if (keys.length === 1) {
+            return;
+        }
 
         // can use data-binding to set
         form.setFieldsValue({
             keys: keys.filter(key => key !== k),
         });
     }
+    handleSubmitCategory = (e)=> {
+        e.preventDefault();
+        console.log("提交策略");
+        const that=this;
+        this.props.form.validateFields((err, values) => {
+            if (!err) {
+                const addPoliciesDate = convertFormToData(values);
+
+                axios({
+                    url: `${configJson.prefix}/endpoints/${this.props.endpoint_uuid}/policies`,
+                    method: 'post',
+                    data: addPoliciesDate,
+                    headers:getHeader()
+                })
+                    .then(function (response) {
+                        message.success(messageJson['add policies success']);
+                        that.props.addNewcb('policy',response.data.name,response.data.uuid)
+                    })
+                    .catch(function (error) {
+                        if(error.response.status === 422 ){
+                            if(error.response.data.errors.name && error.response.data.errors.name[0]){
+                                message.error(error.response.data.errors.name[0]);
+                            }else if(error.response.data.errors.description && error.response.data.errors.description[0]){
+                                message.error(error.response.data.errors.description[0]);
+                            }
+                        }else if(error.response.status === 401){
+                            message.error(messageJson['token fail']);
+                        }else{
+                            message.error(messageJson['unknown error']);
+                        }
+                    });
+            }
+        });
+    }
     render() {
-        const {record}=this.props;
         const {getFieldDecorator, getFieldValue} = this.props.form;
-        const keysArr=[]
-        for(let k in record.topics.data){
-            keysArr.push(parseInt(k))
-        }
-        getFieldDecorator('keys', {initialValue: keysArr});
+        getFieldDecorator('keys', {initialValue: []});
         const keys = getFieldValue('keys');
         const formItems = keys.map((k, index) => {
             const layout = index === 0 ? formItemLayoutWithLabel : formItemLayoutWithOutLabel;
@@ -60,7 +90,7 @@ class EditPoliciesForm extends Component {
                     required={false}
                     key={k}>
                     {getFieldDecorator(`topics-${k}`, {
-                        initialValue: record.topics.data[k],
+                        initialValue: {name: '', authority: '0'},
                     })(<ThemeInput />)}
                     <Icon
                         className="dynamic-delete-button"
@@ -71,13 +101,13 @@ class EditPoliciesForm extends Component {
             );
         });
         return (
-            <Form onSubmit={this.handleSubmit} >
+            <Form onSubmit={this.handleSubmitCategory}>
+                {this.props.fromOtherPage ? <h3 className="addDeviceForm-title">添加策略</h3> : null}
                 <FormItem
                     label="名称"
                     {...formItemLayout}
                 >
                     {getFieldDecorator('name', {
-                        initialValue:record.name || '',
                         rules: [{required: true, message: '名称不能为空'}],
                     })(
                         <Input  />
@@ -86,9 +116,7 @@ class EditPoliciesForm extends Component {
                 <FormItem
                     label="描述"
                     {...formItemLayout}>
-                    {getFieldDecorator('desc', {
-                        initialValue:record.description,
-                    })(
+                    {getFieldDecorator('desc', {})(
                         <Input type="textarea" autosize={{minRows: 2, maxRows: 6}}/>
                     )}
                 </FormItem>
@@ -98,6 +126,13 @@ class EditPoliciesForm extends Component {
                         <Icon type="plus"/> 增加主题
                     </Button>
                 </FormItem>
+                {this.props.fromOtherPage ? <FormItem
+                    {...formItemLayoutWithOutLabel}
+                >
+                    <Button type="primary" htmlType="submit">
+                        提交
+                    </Button>
+                </FormItem> : null}
             </Form>
         );
     }
@@ -107,34 +142,33 @@ class ThemeInput extends React.Component {
     constructor(props) {
         super(props);
 
-        const value = this.props.value || {name:''};
+        const value = this.props.value || {};
         this.state = {
             name: value.name || '',
-            authority:  value.authority ||(value.allow_publish===1&&value.allow_subscribe===1)?'2': (value.allow_publish===1&&value.allow_subscribe===-1)?'1':'0',
+            authority: value.authority || "0",
         };
     }
+
     componentWillReceiveProps(nextProps) {
         // Should be a controlled component.
         if ('value' in nextProps) {
-            const value = nextProps.value || {name:''};
-            this.state = {
-                name: value.name || '',
-                authority:value.authority || ((value.allow_publish===1&&value.allow_subscribe===1)?'2': (value.allow_publish===1&&value.allow_subscribe===-1)?'1':'0'),
-            };
+            const value = nextProps.value;
+            this.setState(value);
         }
     }
+
     handleNumberChange = (e) => {
-        const name = e.target.value ;
+        const name = e.target.value;
         if (!('value' in this.props)) {
-            this.setState({ name });
+            this.setState({name});
         }
-        this.triggerChange({ name });
+        this.triggerChange({name});
     }
     handleCurrencyChange = (authority) => {
-        if ('value' in this.props) {
-            this.setState({ authority });
+        if (!('value' in this.props)) {
+            this.setState({authority});
         }
-        this.triggerChange({ authority });
+        this.triggerChange({authority});
     }
     triggerChange = (changedValue) => {
         // Should provide an event to pass value to Form.
@@ -143,8 +177,9 @@ class ThemeInput extends React.Component {
             onChange(Object.assign({}, this.state, changedValue));
         }
     }
+
     render() {
-        const { size } = this.props;
+        const {size} = this.props;
         const state = this.state;
         return (
             <span>
@@ -153,12 +188,12 @@ class ThemeInput extends React.Component {
             size={size}
             value={state.name}
             onChange={this.handleNumberChange}
-            style={{ width: '45%', marginRight: '3%' }}
+            style={{width: '45%', marginRight: '3%'}}
         />
         <Select
             value={state.authority}
             size={size}
-            style={{ width: '25%' , marginRight: '2%' }}
+            style={{width: '25%', marginRight: '2%'}}
             onChange={this.handleCurrencyChange}
         >
           <Option value="0">订阅</Option>
@@ -169,5 +204,5 @@ class ThemeInput extends React.Component {
         );
     }
 }
-const EditPoliciesFormWrap = Form.create()(EditPoliciesForm);
-export default EditPoliciesFormWrap;
+const AddPoliciesFormWrap = Form.create()(AddPoliciesForm);
+export default AddPoliciesFormWrap;

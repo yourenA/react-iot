@@ -3,6 +3,7 @@
  */
 import React, {Component} from 'react';
 import {Form, Icon, Input, Button, Checkbox, Select} from 'antd';
+import {formItemLayout,formItemLayoutWithLabel,formItemLayoutWithOutLabel} from './../../common/common'
 const FormItem = Form.Item;
 const Option = Select.Option;
 let uuid = 0;
@@ -40,32 +41,6 @@ class AddPoliciesForm extends Component {
     }
     render() {
         const {getFieldDecorator, getFieldValue} = this.props.form;
-        const formItemLayout = {
-            labelCol: {
-                xs: {span: 24},
-                sm: {span: 6},
-            },
-            wrapperCol: {
-                xs: {span: 24},
-                sm: {span: 14},
-            },
-        };
-        const formItemLayoutWithLabel = {
-            labelCol: {
-                xs: {span: 24},
-                sm: {span: 6},
-            },
-            wrapperCol: {
-                xs: {span: 24},
-                sm: {span: 18},
-            },
-        };
-        const formItemLayoutWithOutLabel = {
-            wrapperCol: {
-                xs: {span: 24, offset: 0},
-                sm: {span: 18, offset: 6},
-            },
-        };
         getFieldDecorator('keys', {initialValue: []});
         const keys = getFieldValue('keys');
         const formItems = keys.map((k, index) => {

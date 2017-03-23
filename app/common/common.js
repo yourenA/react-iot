@@ -1,8 +1,35 @@
 /**
  * Created by Administrator on 2017/3/7.
  */
-import messageJson from './message.json';
-import {message} from 'antd';
+/**
+ * 接入管理表单ItemLayout
+ * */
+exports.formItemLayout={
+    labelCol: {
+        xs: {span: 24},
+        sm: {span: 6},
+    },
+    wrapperCol: {
+        xs: {span: 24},
+        sm: {span: 14},
+    }
+};
+exports.formItemLayoutWithLabel={
+    labelCol: {
+        xs: {span: 24},
+        sm: {span: 6},
+    },
+    wrapperCol: {
+        xs: {span: 24},
+        sm: {span: 18},
+    }
+};
+exports.formItemLayoutWithOutLabel={
+    wrapperCol: {
+        xs: {span: 24, offset: 0},
+        sm: {span: 18, offset: 6},
+    },
+};
 /**
  * 通过storage判断是否登陆
  * */

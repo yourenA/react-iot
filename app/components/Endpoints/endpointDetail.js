@@ -10,6 +10,7 @@ import axios from 'axios';
 import messageJson from './../../common/message.json';
 import {getHeader} from './../../common/common.js';
 import AddDetailForm from './addDetailForm.js'
+import configJson from './../../../config.json';
 const datasource=[{
     uuid:'daxpopd-fa-ff00',
     name:'temp01',
@@ -58,7 +59,7 @@ class EndPointDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            data:datasource,
+            data:[],
             loaded:true,
             q:'',
             page:0,
@@ -68,43 +69,29 @@ class EndPointDetail extends Component {
         };
     }
     componentDidMount() {
+        console.log('param',this.props.params.uuid);
+        const {page, q, endpoint_uuid} = this.state;
+        const that = this;
+        axios({
+            url: `${configJson.prefix}/endpoints/${this.props.params.uuid}/devices`,
+            method: 'get',
+            headers: getHeader()
+        })
+            .then(function (response) {
+                console.log(response);
+                that.setState({
+                    endpoint_uuid:that.props.params.uuid,
+                    data:response.data.data
+                })
+            })
     }
 
     onPageChange = (page) => {
 
     };
-    addEndPoint=()=>{
-        const { page,q} = this.props;
-        const that=this;
-        axios({
-            url:'http://local.iothub.com.cn/endpoints',
-            method: 'post',
-            data: {
-                name: this.state.addEndpointName,
-                description: this.state.addEndpointDesc,
-            },
-            headers:getHeader()
-        })
-            .then(function (response) {
-                console.log(response);
-                that.setState({
-                    addModal:false,
-                    addEndpointName:'',
-                    addEndpointDesc:'',
-                });
-                message.success(messageJson['add endpoint success']);
-                that.constructor.fetch(that.props, that.props.dispatch, page,q);
-            })
-            .catch(function (error) {
-                if(error.response.status === 422 ){
-                    message.error(error.response.data.errors.name[0]);
-                }else if(error.response.status === 401){
-                    message.error(messageJson['token fail']);
-                }else{
-                    message.error(messageJson['unknown error']);
-                }
-            });
-
+    addEndPointDetail=()=>{
+        const AddDetailForm = this.refs.AddDetailForm.getFieldsValue();
+        console.log("AddDetailForm",AddDetailForm)
     };
     delEndPoint=(uuid)=>{
         console.log("uuid",uuid);
@@ -136,35 +123,39 @@ class EndPointDetail extends Component {
     };
     render() {
         const {data, page, q,meta,loaded} = this.state;
-        console.log(meta)
         const columns = [{
             title: '设备名称',
             dataIndex: 'name',
             key: 'name',
         },{
             title: '用户名',
-            dataIndex: 'user',
-            key: 'user'
+            dataIndex: 'username',
+            key: 'username'
         }, {
             title: '描述',
-            dataIndex: 'desc',
-            key: 'desc',
+            dataIndex: 'description',
+            key: 'description',
         },  {
             title: '类型',
-            dataIndex: 'type',
-            key: 'type',
+            dataIndex: 'category',
+            key: 'category',
+            render: (text, record, index) => {
+                return(
+                    <span key={index}>{text.name}</span>
+                )
+            }
         },  {
             title: '状态',
             dataIndex: 'status',
             key: 'status',
         },{
             title: '最后在线时间',
-            dataIndex: 'last_on_time',
-            key: 'last_on_time',
+            dataIndex: 'last_onlined_at',
+            key: 'last_onlined_at',
         },{
             title: '创建时间',
-            dataIndex: 'create_time',
-            key: 'create_time',
+            dataIndex: 'created_at',
+            key: 'created_at',
         }, {
             title: '操作',
             key: 'action',
@@ -250,7 +241,7 @@ class EndPointDetail extends Component {
                                 style={{ width: 200 }}
                                 onSearch={value => this.searchEndPoint(value)}
                             />
-                            <Button className="search-btn" type="primary" icon="plus" onClick={()=>{this.setState({addModal:true})}}>创建域</Button>
+                            <Button className="search-btn" type="primary" icon="plus" onClick={()=>{this.setState({addModal:true})}}>添加设备</Button>
                         </div>
                         <Loading show={loaded} />
                         <Table bordered expandedRowRender={(record)=>expandedRowRender(record ) } style={{display:loaded? 'block':'none'}} rowKey="uuid" columns={columns} dataSource={data} pagination={false}/>
@@ -259,11 +250,21 @@ class EndPointDetail extends Component {
 
                     </div>
                     <Modal
+                        key={1+Date.parse(new Date())}
                         visible={this.state.addModal}
-                        title="创建新域"
+                        title="添加设备"
                         onCancel={()=>{this.setState({addModal:false})}}
+                        footer={[
+                            <Button key="back" type="ghost" size="large"
+                                    onClick={()=> {
+                                        this.setState({addModal: false})
+                                    }}>取消</Button>,
+                            <Button key="submit" type="primary" size="large" onClick={this.addEndPointDetail}>
+                                确定
+                            </Button>,
+                        ]}
                     >
-                        <AddDetailForm />
+                        <AddDetailForm endpoint_uuid={this.props.params.uuid} ref="AddDetailForm"/>
                     </Modal>
                 </Row>
             </div>
