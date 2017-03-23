@@ -1,6 +1,8 @@
 /**
  * Created by Administrator on 2017/3/7.
  */
+import messageJson from './message.json';
+import {message} from 'antd';
 /**
  * 通过storage判断是否登陆
  * */
@@ -36,7 +38,6 @@ exports.getHeader = () => {
  * 将策略form表单转换为发送数据
  * */
 exports.convertFormToData  = (form) => {
-    console.log("form",form)
     const addPoliciesDate = {
         name: form.name,
         description: form.desc,
@@ -45,6 +46,9 @@ exports.convertFormToData  = (form) => {
     for (var k in form) {
         if (k.indexOf('topics') >= 0) {
             if (form.hasOwnProperty(k)) {
+                if(form[k]===undefined){
+                    return false
+                }
                 if (form[k].authority == 0) {
                     addPoliciesDate.topics.push({
                         name: form[k].name,

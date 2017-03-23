@@ -11,7 +11,7 @@ import Loading from './../Common/loading.js';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import configJson from './../../../config.json';
-import {getHeader,convertFormToData} from './../../common/common.js';
+import {getHeader, convertFormToData} from './../../common/common.js';
 import AddPoliciesForm from './addPoliciesForm'
 import EditPoliciesForm from './editPoliciesForm'
 @connect(
@@ -32,14 +32,13 @@ class Policies extends Component {
         this.state = {
             addModal: false,
             editPoliciesModal: false,
-            editPoliciesRecord:{},
-            edituuid:''
+            editPoliciesRecord: {},
+            edituuid: '',
         };
     }
 
     componentDidMount = () => {
         this.props.dispatch(fetchAllEndpoints());
-
     }
     changeEndpoint = (e)=> {
         const endpoint_uuid = e.target.value;
@@ -49,17 +48,17 @@ class Policies extends Component {
         const {q, endpoint_uuid} = this.props;
         this.props.dispatch(fetchPolicies(page, q, endpoint_uuid))
     };
-    showEditPolicies=(record)=>{
+    showEditPolicies = (record)=> {
         this.setState({
-            editPoliciesModal:true,
-            editPoliciesRecord:record,
-            edituuid:record.uuid
+            editPoliciesModal: true,
+            editPoliciesRecord: record,
+            edituuid: record.uuid
         })
     };
     addPolice = ()=> {
         const AddPoliciesForm = this.refs.AddPoliciesForm.getFieldsValue();
-        console.log("AddPoliciesForm",AddPoliciesForm);
-        const addPoliciesDate=convertFormToData(AddPoliciesForm);
+        console.log("AddPoliciesForm", AddPoliciesForm);
+        const addPoliciesDate = convertFormToData(AddPoliciesForm);
         const {page, q, endpoint_uuid} = this.props;
         const that = this;
         axios({
@@ -78,8 +77,46 @@ class Policies extends Component {
             })
             .catch(function (error) {
                 if (error.response.status === 422) {
-                    if(error.response.data.errors.name && error.response.data.errors.name[0]){
+                    if (error.response.data.errors.name && error.response.data.errors.name[0]) {
                         message.error(error.response.data.errors.name[0]);
+                    } else {
+                        message.error(messageJson['topic name fail']);
+                    }
+                } else if (error.response.status === 401) {
+                    message.error(messageJson['token fail']);
+                } else {
+                    message.error(messageJson['unknown error']);
+                }
+            });
+
+    };
+    editPolice = ()=> {
+        const EditPoliciesForm = this.refs.EditPoliciesForm.getFieldsValue();
+        const editPoliciesDate = convertFormToData(EditPoliciesForm);
+        if(editPoliciesDate===false){
+            message.error(messageJson["topic name cant null"]);
+            return false
+        }
+        const {page, q, endpoint_uuid} = this.props;
+        const that = this;
+        axios({
+            url: `${configJson.prefix}/endpoints/${endpoint_uuid}/policies/${this.state.edituuid}`,
+            method: 'put',
+            data: editPoliciesDate,
+            headers: getHeader()
+        })
+            .then(function (response) {
+                console.log(response);
+                message.success(messageJson['edit policies success']);
+                that.props.dispatch(fetchPolicies(page, q, endpoint_uuid));
+                that.setState({
+                    editPoliciesModal: false
+                })
+            })
+            .catch(function (error) {
+                if (error.response.status === 422) {
+                    if(error.response.data.errors.description && error.response.data.errors.description[0]){
+                        message.error(error.response.data.errors.description[0]);
                     }else {
                         message.error(messageJson['topic name fail']);
                     }
@@ -89,41 +126,6 @@ class Policies extends Component {
                     message.error(messageJson['unknown error']);
                 }
             });
-
-    };
-    editPolice=()=>{
-        const EditPoliciesForm = this.refs.EditPoliciesForm.getFieldsValue();
-        const editPoliciesDate=convertFormToData(EditPoliciesForm);
-        console.log("editPoliciesDate",editPoliciesDate);
-        const {page, q, endpoint_uuid} = this.props;
-        const that = this;
-        // axios({
-        //     url: `${configJson.prefix}/endpoints/${endpoint_uuid}/policies/${this.state.edituuid}`,
-        //     method: 'put',
-        //     data: editPoliciesDate,
-        //     headers: getHeader()
-        // })
-        //     .then(function (response) {
-        //         console.log(response);
-        //         message.success(messageJson['edit policies success']);
-        //         that.props.dispatch(fetchPolicies(page, q, endpoint_uuid));
-        //         that.setState({
-        //             editPoliciesModal: false
-        //         })
-        //     })
-        //     .catch(function (error) {
-        //         if (error.response.status === 422) {
-        //             if(error.response.data.errors.description && error.response.data.errors.description[0]){
-        //                 message.error(error.response.data.errors.description[0]);
-        //             }else {
-        //                 message.error(messageJson['topic name fail']);
-        //             }
-        //         }else if (error.response.status === 401) {
-        //             message.error(messageJson['token fail']);
-        //         } else {
-        //             message.error(messageJson['unknown error']);
-        //         }
-        //     });
 
     }
     delPolice = (uuid)=> {
@@ -179,11 +181,11 @@ class Policies extends Component {
             render: (text, record, index) => {
                 const topics = record.topics.data.map((item, index)=> {
                     return (
-                        <span key={index} style={{marginRight: '5px'}}>{item.name};</span>
+                        <i key={index} style={{marginRight: '5px'}} title={item.name}>{item.name};</i>
                     )
                 });
                 return (
-                    <p>{topics}</p>
+                    <p className="line-clamp3 line-edit"><span>{topics}</span></p>
                 )
             }
         }, {
@@ -197,10 +199,11 @@ class Policies extends Component {
             render: (text, record, index) => {
                 return (
                     <div>
-                        <button onClick={this.showEditPolicies.bind(this, record)} className="ant-btn ant-btn-primary" data-id={record.uuid}
+                        <button onClick={this.showEditPolicies.bind(this, record)} className="ant-btn ant-btn-primary"
+                                data-id={record.uuid}
                         >编辑
                         </button>
-                        <span className="ant-divider" />
+                        <span className="ant-divider"/>
                         <Popconfirm placement="topRight" title={'Sure to delete ' + record.uuid}
                                     onConfirm={this.delPolice.bind(this, record.uuid)}>
                             <button className="ant-btn ant-btn-danger " data-id={record.uuid}
@@ -225,11 +228,15 @@ class Policies extends Component {
 
         });
         const expandedRowRender = (record)=> {
-            const columns = [{
+            const columns = [ {
+                title: '主题',
+                dataIndex: 'name',
+                key: 'name',
+            },{
                 title: '权限',
                 dataIndex: 'allow_publish',
                 key: 'allow_publish',
-                render: (text,record,index)=> {
+                render: (text, record, index)=> {
                     if (record.allow_publish === 1 && record.allow_subscribe === 1) {
                         return (
                             <p>订阅+发布</p>
@@ -239,19 +246,15 @@ class Policies extends Component {
                             <p>发布</p>
                         )
                     } else if (record.allow_publish === -1 && record.allow_subscribe === 1) {
-                        return(
+                        return (
                             <p>订阅</p>
                         )
-                    }else{
+                    } else {
                         return null
                     }
 
                 }
-            }, {
-                title: '主题',
-                dataIndex: 'name',
-                key: 'name',
-            },];
+            }];
 
             return (
                 <div className="expandRowRender-box">
@@ -302,6 +305,7 @@ class Policies extends Component {
 
                     </div>
                     <Modal
+                        key={1+Date.parse(new Date())}
                         visible={this.state.addModal}
                         title="创建新策略"
                         onOk={this.handleOk}
@@ -321,6 +325,7 @@ class Policies extends Component {
                         <AddPoliciesForm ref="AddPoliciesForm"/>
                     </Modal>
                     <Modal
+                        key={2+Date.parse(new Date())}
                         visible={this.state.editPoliciesModal}
                         title="修改策略"
                         onCancel={()=> {
@@ -336,7 +341,7 @@ class Policies extends Component {
                             </Button>,
                         ]}
                     >
-                        <EditPoliciesForm  ref="EditPoliciesForm" record={this.state.editPoliciesRecord} />
+                        <EditPoliciesForm ref="EditPoliciesForm" record={this.state.editPoliciesRecord}/>
                     </Modal>
                 </Row>
             </div>

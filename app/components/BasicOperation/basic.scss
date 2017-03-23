@@ -70,7 +70,7 @@
 }
 .line-edit{
   span{
-    max-width: 200px;
+    max-width: 100%;
     display: inline-block;
     margin-right: 5px;
     overflow: hidden;
@@ -80,7 +80,7 @@
       max-width: 80px;
     }
   }
-  i {
+  .anticon-edit {
     cursor: pointer;
     vertical-align: text-top;
   }

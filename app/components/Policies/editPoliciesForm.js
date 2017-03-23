@@ -17,10 +17,6 @@ class EditPoliciesForm extends Component {
         this.setState({
             record:nextProps.record
         });
-        const {form} = this.props;
-        // form.setFieldsValue({
-        //     desc: nextProps.record.description,
-        // });
     }
     add = () => {
         this.uuid++;
@@ -39,9 +35,6 @@ class EditPoliciesForm extends Component {
         // can use data-binding to get
         const keys = form.getFieldValue('keys');
         // We need at least one passenger
-        if (keys.length === 1) {
-            return;
-        }
 
         // can use data-binding to set
         form.setFieldsValue({
@@ -50,7 +43,6 @@ class EditPoliciesForm extends Component {
     }
     render() {
         const {record}=this.props;
-        console.log('record',record)
         const {getFieldDecorator, getFieldValue} = this.props.form;
         const formItemLayout = {
             labelCol: {
