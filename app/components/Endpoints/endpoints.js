@@ -12,7 +12,7 @@ import axios from 'axios';
 import messageJson from './../../common/message.json';
 import configJson from './../../../config.json';
 
-import {getHeader} from './../../common/common.js';
+import {getHeader,converErrorCodeToMsg} from './../../common/common.js';
 
 @connect(
     state => state.endpoints,
@@ -94,11 +94,7 @@ class EndPoints extends Component {
                 that.constructor.fetch(that.props, that.props.dispatch, page,q);
             })
             .catch(function (error) {
-                if(error.response.status === 422 ){
-                    message.error(messageJson['edit endpoint desc fail']);
-                }else{
-                    message.error(messageJson['unknown error']);
-                }
+                converErrorCodeToMsg(error)
             });
     }
     addEndPoint=()=>{
@@ -124,13 +120,7 @@ class EndPoints extends Component {
                 that.constructor.fetch(that.props, that.props.dispatch, page,q);
             })
             .catch(function (error) {
-                if(error.response.status === 422 ){
-                    message.error(error.response.data.errors.name[0]);
-                }else if(error.response.status === 401){
-                    message.error(messageJson['token fail']);
-                }else{
-                    message.error(messageJson['unknown error']);
-                }
+                converErrorCodeToMsg(error)
             });
 
     };
@@ -149,13 +139,7 @@ class EndPoints extends Component {
             })
             .catch(function (error) {
                 console.log(error.response);
-                if(error.response.status === 404 ){
-                    message.error(messageJson['del endpoint fail']);
-                }else if(error.response.status === 401){
-                    message.error(messageJson['token fail']);
-                }else{
-                    message.error(messageJson['unknown error']);
-                }
+                converErrorCodeToMsg(error)
             });
 
     };
@@ -209,7 +193,7 @@ class EndPoints extends Component {
             render: (text, record, index) => {
                 return (
                     <div>
-                        <Popconfirm   placement="topRight" title={'Sure to delete ' + record.uuid} onConfirm={this.delEndPoint.bind(this,record.uuid)}>
+                        <Popconfirm   placement="topRight" title={ `确定要删除 ${record.name} 吗?`} onConfirm={this.delEndPoint.bind(this,record.uuid)}>
                             <button className="ant-btn ant-btn-danger " data-id={record.uuid}
                             >删除
                             </button>

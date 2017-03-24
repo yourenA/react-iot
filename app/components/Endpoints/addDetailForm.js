@@ -29,6 +29,9 @@ class AddDeviceForm extends Component {
         axios({
             url:`${configJson.prefix}/device_categories`,
             method: 'get',
+            params:{
+                return:'all'
+            },
             headers:getHeader()
         }).then(function (response) {
             that.setState({
@@ -38,6 +41,9 @@ class AddDeviceForm extends Component {
         axios({
             url:`${configJson.prefix}/device_groups`,
             method: 'get',
+            params:{
+                return:'all'
+            },
             headers:getHeader()
         }).then(function (response) {
             that.setState({
@@ -47,6 +53,9 @@ class AddDeviceForm extends Component {
         axios({
             url:`${configJson.prefix}/endpoints/${this.props.endpoint_uuid}/policies`,
             method: 'get',
+            params:{
+                return:'all'
+            },
             headers:getHeader()
         }).then(function (response) {
             that.setState({
@@ -56,19 +65,20 @@ class AddDeviceForm extends Component {
     }
     handleChange = (value)=> {
         console.log(value);
-        if (value === 'newcategory') {
+        const selectValue=value.key;
+        if (selectValue === 'newcategory') {
             this.setState({
                 newCategory: true,
                 newGroup: false,
                 newPolicy: false
             })
-        }else if(value === 'newgroup'){
+        }else if(selectValue === 'newgroup'){
             this.setState({
                 newCategory: false,
                 newGroup: true,
                 newPolicy: false
             })
-        } else if(value === 'newpolicy'){
+        } else if(selectValue === 'newpolicy'){
             console.log('新建');
             this.setState({
                 newCategory: false,
@@ -92,7 +102,7 @@ class AddDeviceForm extends Component {
                 categoryArr:categoryArr.concat([{name:name,uuid:uuid}])
             })
             form.setFieldsValue({
-                category: name,
+                category: {key:uuid,label:name},
             });
         }else if(type === 'group'){
             const groupArr=this.state.groupArr;
@@ -101,11 +111,18 @@ class AddDeviceForm extends Component {
                 categoryArr:groupArr.concat([{name:name,uuid:uuid}])
             })
             form.setFieldsValue({
-                group: name,
+                group:  {key:uuid,label:name},
             });
 
         }else if(type === 'policy'){
-
+            const policyArr=this.state.policyArr;
+            this.setState({
+                newPolicy: false,
+                categoryArr:policyArr.concat([{name:name,uuid:uuid}])
+            })
+            form.setFieldsValue({
+                policy:  {key:uuid,label:name},
+            });
         }}
 
     ;
@@ -148,7 +165,7 @@ class AddDeviceForm extends Component {
                     <FormItem
                         label="描述"
                         {...formItemLayout}>
-                        {getFieldDecorator('desc', {})(
+                        {getFieldDecorator('description', {})(
                             <Input type="textarea" autosize={{minRows: 2, maxRows: 6}}/>
                         )}
                     </FormItem>
@@ -162,9 +179,9 @@ class AddDeviceForm extends Component {
                                 {required: true, message: '请选择设备分类'},
                             ],
                         })(
-                            <Select>
-                                { this.state.categoryArr.map(item => <Option key={item.uuid} value={item.uuid}>{item.name}</Option>) }
+                            <Select labelInValue={true}>
                                 <Option value='newcategory'>新建</Option>
+                                { this.state.categoryArr.map(item => <Option key={item.uuid} value={item.uuid}>{item.name}</Option>) }
                             </Select>
                         )}
                     </FormItem>
@@ -178,9 +195,9 @@ class AddDeviceForm extends Component {
                                 {required: true, message: '请选择设备组'},
                             ],
                         })(
-                            <Select>
-                                { this.state.groupArr.map(item => <Option key={item.uuid} value={item.uuid}>{item.name}</Option>) }
+                            <Select labelInValue={true}>
                                 <Option value='newgroup'>新建</Option>
+                                { this.state.groupArr.map(item => <Option key={item.uuid} value={item.uuid}>{item.name}</Option>) }
                             </Select>
                         )}
                     </FormItem>
@@ -194,9 +211,9 @@ class AddDeviceForm extends Component {
                             ],
                             onChange: this.handleChange,
                         })(
-                            <Select>
-                                { this.state.policyArr.map(item => <Option key={item.uuid} value={item.uuid}>{item.name}</Option>) }
+                            <Select labelInValue={true}>
                                 <Option value='newpolicy'>新建</Option>
+                                { this.state.policyArr.map(item => <Option key={item.uuid} value={item.uuid}>{item.name}</Option>) }
                             </Select>
                         )}
                     </FormItem>

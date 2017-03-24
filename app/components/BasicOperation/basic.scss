@@ -108,8 +108,11 @@
     &>table  td{
       padding: 5px;
     }
-    .ant-table-body table{
-      padding: 0;
+  }
+  .ant-table-body table{
+    padding: 0;
+    tr td:first-child{
+      text-align: left;
     }
   }
   .expandRowRender-operate{

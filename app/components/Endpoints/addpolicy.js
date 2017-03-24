@@ -9,7 +9,7 @@ const Option = Select.Option;
 import configJson from './../../../config.json';
 import messageJson from './../../common/message.json';
 import axios from 'axios';
-import {getHeader,convertFormToData} from './../../common/common.js';
+import {getHeader,convertFormToData,converErrorCodeToMsg} from './../../common/common.js';
 let uuid = 0;
 class AddPoliciesForm extends Component {
     constructor(props) {
@@ -62,17 +62,7 @@ class AddPoliciesForm extends Component {
                         that.props.addNewcb('policy',response.data.name,response.data.uuid)
                     })
                     .catch(function (error) {
-                        if(error.response.status === 422 ){
-                            if(error.response.data.errors.name && error.response.data.errors.name[0]){
-                                message.error(error.response.data.errors.name[0]);
-                            }else if(error.response.data.errors.description && error.response.data.errors.description[0]){
-                                message.error(error.response.data.errors.description[0]);
-                            }
-                        }else if(error.response.status === 401){
-                            message.error(messageJson['token fail']);
-                        }else{
-                            message.error(messageJson['unknown error']);
-                        }
+                        converErrorCodeToMsg(error)
                     });
             }
         });

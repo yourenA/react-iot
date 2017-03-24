@@ -8,7 +8,7 @@ import {formItemLayout, formItemLayoutWithLabel, formItemLayoutWithOutLabel} fro
 import configJson from './../../../config.json';
 import messageJson from './../../common/message.json';
 import axios from 'axios';
-import {getHeader} from './../../common/common.js';
+import {getHeader,converErrorCodeToMsg} from './../../common/common.js';
 class AddGroup extends Component {
     constructor(props) {
         super(props);
@@ -32,17 +32,7 @@ class AddGroup extends Component {
                         that.props.addNewcb('group',response.data.name,response.data.uuid)
                     })
                     .catch(function (error) {
-                        if(error.response.status === 422 ){
-                            if(error.response.data.errors.name && error.response.data.errors.name[0]){
-                                message.error(error.response.data.errors.name[0]);
-                            }else if(error.response.data.errors.description && error.response.data.errors.description[0]){
-                                message.error(error.response.data.errors.description[0]);
-                            }
-                        }else if(error.response.status === 401){
-                            message.error(messageJson['token fail']);
-                        }else{
-                            message.error(messageJson['unknown error']);
-                        }
+                        converErrorCodeToMsg(error)
                     });
             }
         });

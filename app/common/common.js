@@ -1,6 +1,8 @@
 /**
  * Created by Administrator on 2017/3/7.
  */
+import {message } from 'antd';
+import messageJson from './message.json';
 /**
  * 接入管理表单ItemLayout
  * */
@@ -107,3 +109,18 @@ exports.convertFormToData  = (form) => {
 
     return addPoliciesDate;
 };
+
+/**
+ *  判断错误码
+ * */
+exports.converErrorCodeToMsg  = (error) => {
+    let first;
+    for ( first in error.response.data.errors) break;
+    if (error.response.status === 401) {
+        message.error(messageJson['token fail']);
+    } else if(error.response.status === 422){
+        message.error(`${error.response.data.errors[first][0]}`)
+    }else {
+        message.error(messageJson['unknown error']);
+    }
+}

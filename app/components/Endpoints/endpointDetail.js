@@ -6,6 +6,7 @@ import {Modal, Input, Icon, Breadcrumb, Row, Col, Button, Table, Pagination, Pop
 const Search = Input.Search;
 import {Link} from 'react-router'
 import Loading from './../Common/loading.js';
+import TopicTable from './../Common/topicTable.js';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import {getHeader} from './../../common/common.js';
@@ -55,61 +56,107 @@ const datasource=[{
             }]
         }
     }]
-class EndPointDetail extends Component {
+class Device extends Component {
     constructor(props) {
         super(props);
         this.state = {
             data:[],
             loaded:true,
             q:'',
-            page:0,
+            page:1,
             meta:{pagination:{total:0,per_page:0}},
             addModal:false,
-            addEndpointName:'',
         };
     }
     componentDidMount() {
-        console.log('param',this.props.params.uuid);
-        const {page, q, endpoint_uuid} = this.state;
+        this.fetchDevices();
+    }
+    fetchDevices=(page=1,q='')=>{
         const that = this;
         axios({
             url: `${configJson.prefix}/endpoints/${this.props.params.uuid}/devices`,
             method: 'get',
+            params: {
+                page:page,
+                q:q
+            },
             headers: getHeader()
         })
             .then(function (response) {
                 console.log(response);
                 that.setState({
-                    endpoint_uuid:that.props.params.uuid,
-                    data:response.data.data
+                    data:response.data.data,
+                    meta:response.data.meta,
+                    page:page
                 })
             })
-    }
-
+            .catch(function (error) {
+                console.log('获取出错')
+            })
+    };
     onPageChange = (page) => {
+        this.fetchDevices(page,this.state.q);
+    };
+    addDevice=()=>{
+        const that=this;
+        const AddDetailForm = this.refs.AddDetailForm.getFieldsValue();
+        console.log(AddDetailForm)
+        if(!AddDetailForm.name || !AddDetailForm.category || !AddDetailForm.group || !AddDetailForm.policy){
+            message.error(messageJson['category group category null']);
+            return false
+        }
+        const addDevicelDate = {
+            name:AddDetailForm.name,
+            description:AddDetailForm.description,
+            category_uuid:AddDetailForm.category.key,
+            group_uuid:AddDetailForm.group.key,
+            policy_uuid:AddDetailForm.policy.key
+        };
+        console.log("addDevicelDate",addDevicelDate);
+        axios({
+            url: `${configJson.prefix}/endpoints/${this.props.params.uuid}/devices`,
+            method: 'post',
+            data: addDevicelDate,
+            headers: getHeader()
+        })
+            .then(function (response) {
+                console.log(response);
+                message.success(messageJson['add device success']);
+                that.setState({
+                    addModal: false
+                });
+                that.fetchDevices(that.state.page,that.state.q)
+            })
+            .catch(function (error) {
+                let first;
+                for ( first in error.response.data.errors) break;
+                if (error.response.status === 401) {
+                    message.error(messageJson['token fail']);
+                } else if(error.response.status === 422){
+                    message.error(`${error.response.data.errors[first][0]}`)
+                }else {
+                    message.error(messageJson['unknown error']);
+                }
+            });
 
     };
-    addEndPointDetail=()=>{
-        const AddDetailForm = this.refs.AddDetailForm.getFieldsValue();
-        console.log("AddDetailForm",AddDetailForm)
-    };
-    delEndPoint=(uuid)=>{
+    delDevice=(uuid)=>{
         console.log("uuid",uuid);
-        const { page ,q} = this.props;
+        const { page ,q} = this.state;
         const that=this;
         axios({
-            url:`http://local.iothub.com.cn/endpoints/${uuid}`,
+            url:`${configJson.prefix}/endpoints/${this.props.params.uuid}/devices/${uuid}`,
             method: 'delete',
             headers:getHeader()
         })
             .then(function (response) {
-                message.success(messageJson['del endpoint success']);
-                that.constructor.fetch(that.props, that.props.dispatch, page,q);
+                message.success(messageJson['del device success']);
+                that.fetchDevices(that.state.page,that.state.q)
             })
             .catch(function (error) {
                 console.log(error.response);
                 if(error.response.status === 404 ){
-                    message.error(messageJson['del endpoint fail']);
+                    message.error(messageJson['del device fail']);
                 }else if(error.response.status === 401){
                     message.error(messageJson['token fail']);
                 }else{
@@ -119,7 +166,7 @@ class EndPointDetail extends Component {
 
     };
     searchEndPoint=(value)=>{
-        this.constructor.fetch(this.props, this.props.dispatch, 1,value);
+        this.fetchDevices(1,value);
     };
     render() {
         const {data, page, q,meta,loaded} = this.state;
@@ -163,8 +210,8 @@ class EndPointDetail extends Component {
             render: (text, record, index) => {
                 return (
                     <div>
-                        <Popconfirm   placement="topRight" title={'Sure to delete ' + record.uuid} onConfirm={this.delEndPoint.bind(this,record.uuid)}>
-                            <button className="ant-btn ant-btn-primary" data-id={record.uuid}
+                        <Popconfirm   placement="topRight" title={`确定要删除 ${record.name} 吗?`} onConfirm={this.delDevice.bind(this,record.uuid)}>
+                            <button className="ant-btn ant-btn-danger" data-id={record.uuid}
                             >删除
                             </button>
                         </Popconfirm>
@@ -174,15 +221,6 @@ class EndPointDetail extends Component {
             }
         }];
         const expandedRowRender=(record)=>{
-            const columns=[{
-                title: '权限',
-                dataIndex: 'authority',
-                key: 'authority',
-            },{
-                title: '主题',
-                dataIndex: 'theme_content',
-                key: 'theme_content',
-            },];
 
             return (
                 <div className="expandRowRender-box">
@@ -191,26 +229,21 @@ class EndPointDetail extends Component {
                             <tbody>
                             <tr>
                                 <td>设备组</td>
-                                <td>{record.meta.group_name}</td>
+                                <td>{record.group.name}</td>
                             </tr>
                             <tr>
                                 <td>描述</td>
-                                <td>{record.meta.desc}</td>
+                                <td>{record.description}</td>
                             </tr>
                             <tr>
                                 <td>策略</td>
-                                <td>{record.meta.strategy}</td>
+                                <td>{record.policy.name}</td>
                             </tr>
                             <tr>
                                 <td>主题</td>
-                                <td><Table
-                                    style={{width:'300px'}}
-                                    size="small"
-                                    rowKey="authority"
-                                    columns={columns}
-                                    dataSource={record.meta.theme}
-                                    pagination={false}
-                                /></td>
+                                <td>
+                                    <TopicTable  dataSource={record.policy.topics.data}  />
+                                </td>
                             </tr>
                             </tbody>
 
@@ -245,7 +278,7 @@ class EndPointDetail extends Component {
                         </div>
                         <Loading show={loaded} />
                         <Table bordered expandedRowRender={(record)=>expandedRowRender(record ) } style={{display:loaded? 'block':'none'}} rowKey="uuid" columns={columns} dataSource={data} pagination={false}/>
-                        <Pagination total={meta.pagination.total  } current={page} pageSize={meta.pagination.per_page}
+                        <Pagination total={meta.pagination.total} current={page} pageSize={meta.pagination.per_page}
                                     style={{marginTop: '10px'}} onChange={this.onPageChange}/>
 
                     </div>
@@ -259,7 +292,7 @@ class EndPointDetail extends Component {
                                     onClick={()=> {
                                         this.setState({addModal: false})
                                     }}>取消</Button>,
-                            <Button key="submit" type="primary" size="large" onClick={this.addEndPointDetail}>
+                            <Button key="submit" type="primary" size="large" onClick={this.addDevice}>
                                 确定
                             </Button>,
                         ]}
@@ -271,4 +304,4 @@ class EndPointDetail extends Component {
         );
     }
 }
-export default EndPointDetail;
+export default Device;

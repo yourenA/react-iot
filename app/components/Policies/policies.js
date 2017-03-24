@@ -8,11 +8,12 @@ const Search = Input.Search;
 const Option = Select.Option;
 import {connect} from 'react-redux';
 import Loading from './../Common/loading.js';
+import TopicTable from './../Common/topicTable';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import configJson from './../../../config.json';
-import {getHeader, convertFormToData} from './../../common/common.js';
-import AddPoliciesForm from './addPoliciesForm'
+import {getHeader, convertFormToData,converErrorCodeToMsg} from './../../common/common.js';
+import AddPoliciesForm from './../Endpoints/addpolicy'
 import EditPoliciesForm from './editPoliciesForm'
 @connect(
     state => state.policies,
@@ -76,17 +77,7 @@ class Policies extends Component {
                 })
             })
             .catch(function (error) {
-                if (error.response.status === 422) {
-                    if (error.response.data.errors.name && error.response.data.errors.name[0]) {
-                        message.error(error.response.data.errors.name[0]);
-                    } else {
-                        message.error(messageJson['topic name fail']);
-                    }
-                } else if (error.response.status === 401) {
-                    message.error(messageJson['token fail']);
-                } else {
-                    message.error(messageJson['unknown error']);
-                }
+                converErrorCodeToMsg(error)
             });
 
     };
@@ -114,17 +105,8 @@ class Policies extends Component {
                 })
             })
             .catch(function (error) {
-                if (error.response.status === 422) {
-                    if(error.response.data.errors.description && error.response.data.errors.description[0]){
-                        message.error(error.response.data.errors.description[0]);
-                    }else {
-                        message.error(messageJson['topic name fail']);
-                    }
-                }else if (error.response.status === 401) {
-                    message.error(messageJson['token fail']);
-                } else {
-                    message.error(messageJson['unknown error']);
-                }
+                converErrorCodeToMsg(error)
+
             });
 
     }
@@ -142,13 +124,8 @@ class Policies extends Component {
             })
             .catch(function (error) {
                 console.log(error.response);
-                if (error.response.status === 404) {
-                    message.error(messageJson['del policies fail']);
-                } else if (error.response.status === 401) {
-                    message.error(messageJson['token fail']);
-                } else {
-                    message.error(messageJson['unknown error']);
-                }
+                converErrorCodeToMsg(error)
+
             });
 
     };
@@ -228,48 +205,11 @@ class Policies extends Component {
 
         });
         const expandedRowRender = (record)=> {
-            const columns = [ {
-                title: '主题',
-                dataIndex: 'name',
-                key: 'name',
-            },{
-                title: '权限',
-                dataIndex: 'allow_publish',
-                key: 'allow_publish',
-                render: (text, record, index)=> {
-                    if (record.allow_publish === 1 && record.allow_subscribe === 1) {
-                        return (
-                            <p>订阅+发布</p>
-                        )
-                    } else if (record.allow_publish === 1 && record.allow_subscribe === -1) {
-                        return (
-                            <p>发布</p>
-                        )
-                    } else if (record.allow_publish === -1 && record.allow_subscribe === 1) {
-                        return (
-                            <p>订阅</p>
-                        )
-                    } else {
-                        return null
-                    }
-
-                }
-            }];
 
             return (
                 <div className="expandRowRender-box">
-                    <div className="expandRowRender-table">
-                        <Table
-                            style={{width: '300px'}}
-                            size="small"
-                            rowKey="authority"
-                            columns={columns}
-                            dataSource={record.topics.data}
-                            pagination={false}
-                        />
-                    </div>
+                    <TopicTable dataSource={record.topics.data}/>
                 </div>
-
             );
         }
 
