@@ -21,10 +21,10 @@ class Nav extends Component {
                         <IndexLink  to="/"  activeClassName="actived">首页</IndexLink>
                     </li>
                     <li >
-                        <Link  to="/news"  activeClassName="actived">解决方案</Link>
+                        <Link   activeClassName="actived">解决方案</Link>
                     </li>
                     <li >
-                        <Link to="/endpoints"  activeClassName="actived">合作与生态</Link>
+                        <Link activeClassName="actived">合作与生态</Link>
                     </li>
                     <li >
                         <Link>帮助与支持</Link>

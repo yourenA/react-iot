@@ -10,7 +10,6 @@ import EndPointDetail from './components/Endpoints/endpointDetail';
 import Device_categories from './components/Device_categories/device_categories';
 import Device_groups from './components/Device_groups/index';
 import Policies from './components/Policies/policies';
-import News from './components/News/news';
 import Basic from './components/BasicOperation/basic';
 import {message} from 'antd';
 import {showLogin,checkLogin} from './actions/checkLogin'
@@ -31,14 +30,12 @@ ReactDOM.render(
         <Router history={hashHistory}>
             <Route path="/" component={App}>
                 <IndexRoute component={Home}/>
-                <Route path="news"  component={News}/>
                 <Route path="endpoints" onEnter={checkLoginStatus} component={EndPoints}/>
                 <Route path="basic" onEnter={checkLoginStatus} component={Basic}>
                     <IndexRoute component={EndPoints}/>
                     <Route component={EndPointDetail}>
                         <Route path="endpoints/:uuid" component={EndPointDetail} />
                     </Route>
-                    <Route path="news" component={News}/>
                     <Route path="device_categories" component={Device_categories}/>
                     <Route path="policies" component={Policies}/>
                     <Route path="device_groups" component={Device_groups}/>

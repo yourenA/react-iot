@@ -145,9 +145,7 @@ class AddDeviceForm extends Component {
                     null
                 )
             }
-
-        }
-
+        };
         return (
             <div>
                 <Form onSubmit={this.handleSubmit}>
