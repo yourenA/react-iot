@@ -7,6 +7,7 @@ import {Modal, Input, Icon, Breadcrumb, Row, Col, Button, Table, Pagination, Pop
 const Search = Input.Search;
 import {connect} from 'react-redux';
 import Loading from './../Common/loading.js';
+import AddOrNameDescForm from './../Common/addOrEditNameDesc'
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import configJson from './../../../config.json';
@@ -29,10 +30,6 @@ class DeviceGroups extends Component {
         this.state = {
             addModal:false,
             editDescModal:false,
-            addDeviceGroupName:'',
-            addDeviceGroupDesc:'',
-            addBtnCanClick:true,
-            delBtnCanClick:true,
             editDescName:'',
             editDescuuid:'',
             editDesc:'',
@@ -51,26 +48,6 @@ class DeviceGroups extends Component {
 
         this.constructor.fetch(this.props, this.props.dispatch, page,q);
     };
-    changeDeviceCategoryName=(e)=>{
-        this.setState({
-            addDeviceGroupName:e.target.value
-        })
-    };
-    changeDeviceCategoryDesc=(e)=>{
-        this.setState({
-            addDeviceGroupDesc:e.target.value
-        })
-    };
-    changeEditDescName=(e)=>{
-        this.setState({
-            editDescName:e.target.value
-        })
-    }
-    changeEditDesc=(e)=>{
-        this.setState({
-            editDesc:e.target.value
-        })
-    };
     showEditDesc=(uuid,name,desc)=>{
         this.setState({
             editDescModal:true,
@@ -80,24 +57,19 @@ class DeviceGroups extends Component {
         })
     };
     handleEditDescOk=()=>{
+        const AddOrEditEndpointForm=this.refs.AddOrEditGroupForm.getFieldsValue();
         const { page,q} = this.props;
         const that=this;
         axios({
             url:`${configJson.prefix}/device_groups/${this.state.editDescuuid}`,
             method: 'put',
-            data: {
-                name:this.state.editDescName,
-                description: this.state.editDesc,
-            },
+            data: AddOrEditEndpointForm,
             headers:getHeader()
         })
             .then(function (response) {
                 console.log(response);
                 that.setState({
-                    name:'',
-                    description: '',
                     editDescModal:false,
-                    editDescuuid:null
                 });
                 message.success(messageJson['edit device_groups desc success']);
                 that.constructor.fetch(that.props, that.props.dispatch, page,q);
@@ -108,27 +80,19 @@ class DeviceGroups extends Component {
             });
     }
     addDevice_category=()=>{
+        const AddOrEditGroupForm=this.refs.AddOrEditGroupForm.getFieldsValue();
         const { page,q} = this.props;
-        this.setState({
-            addBtnCanClick:false
-        });
         const that=this;
         axios({
             url:`${configJson.prefix}/device_groups`,
             method: 'post',
-            data: {
-                name: this.state.addDeviceGroupName,
-                description: this.state.addDeviceGroupDesc,
-            },
+            data: AddOrEditGroupForm,
             headers:getHeader()
         })
             .then(function (response) {
                 console.log(response);
                 that.setState({
-                    addBtnCanClick:true,
                     addModal:false,
-                    addDeviceGroupName:'',
-                    addDeviceGroupDesc:'',
                 });
                 message.success(messageJson['add device_groups success']);
                 that.constructor.fetch(that.props, that.props.dispatch, page,q);
@@ -190,7 +154,7 @@ class DeviceGroups extends Component {
                 return (
                     <div>
 
-                        <Popconfirm   placement="topRight" title={'Sure to delete ' + record.uuid} onConfirm={this.delEndPoint.bind(this,record.uuid)}>
+                        <Popconfirm   placement="topRight" title={ `确定要删除 ${record.name} 吗?`}onConfirm={this.delEndPoint.bind(this,record.uuid)}>
                             <button className="ant-btn ant-btn-danger" data-id={record.uuid}
                             >删除
                             </button>
@@ -224,6 +188,7 @@ class DeviceGroups extends Component {
 
                     </div>
                     <Modal
+                        key={1+Date.parse(new Date())}
                         visible={this.state.addModal}
                         title="创建新设备组"
                         onOk={this.handleOk}
@@ -236,10 +201,10 @@ class DeviceGroups extends Component {
                             </Button>,
                         ]}
                     >
-                        <Input style={{marginBottom:'15px'}} onChange={this.changeDeviceCategoryName} value={this.state.addDeviceGroupName} placeholder="名称:长度3-32个字符" />
-                        <Input  onChange={this.changeDeviceCategoryDesc} value={this.state.addDeviceGroupDesc} type="textarea" placeholder="描述" autosize={{ minRows: 2, maxRows: 6 }} />
+                        <AddOrNameDescForm ref="AddOrEditGroupForm" />
                     </Modal>
                     <Modal
+                        key={2+Date.parse(new Date())}
                         visible={this.state.editDescModal}
                         title="修改描述"
                         onCancel={()=>{this.setState({editDescModal:false})}}
@@ -251,8 +216,7 @@ class DeviceGroups extends Component {
                             </Button>,
                         ]}
                     >
-                        <Input  onChange={this.changeEditDescName} value={this.state.editDescName}  style={{marginBottom:'15px'}}/>
-                        <Input  onChange={this.changeEditDesc} value={this.state.editDesc} type="textarea"  autosize={{ minRows: 2, maxRows: 6 }} />
+                        <AddOrNameDescForm ref="AddOrEditGroupForm" name={this.state.editDescName} description={this.state.editDesc}/>
                     </Modal>
                 </Row>
             </div>

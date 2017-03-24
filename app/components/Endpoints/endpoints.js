@@ -8,6 +8,7 @@ const Search = Input.Search;
 import {Link} from 'react-router'
 import {connect} from 'react-redux';
 import Loading from './../Common/loading.js';
+import AddOrNameDescForm from './../Common/addOrEditNameDesc'
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import configJson from './../../../config.json';
@@ -30,8 +31,6 @@ class EndPoints extends Component {
         this.state = {
             addModal:false,
             editDescModal:false,
-            addEndpointName:'',
-            addEndpointDesc:'',
             editDescName:'',
             editDescuuid:'',
             editDesc:'',
@@ -50,21 +49,6 @@ class EndPoints extends Component {
 
         this.constructor.fetch(this.props, this.props.dispatch, page,q);
     };
-    changeEndpointName=(e)=>{
-        this.setState({
-            addEndpointName:e.target.value
-        })
-    };
-    changeEndpointDesc=(e)=>{
-        this.setState({
-            addEndpointDesc:e.target.value
-        })
-    };
-    changeEditDesc=(e)=>{
-        this.setState({
-            editDesc:e.target.value
-        })
-    };
     showEditDesc=(uuid,name,desc)=>{
         this.setState({
             editDescModal:true,
@@ -76,19 +60,17 @@ class EndPoints extends Component {
     handleEditDescOk=()=>{
         const { page,q} = this.props;
         const that=this;
+        const AddOrEditEndpointForm=this.refs.AddOrEditEndpointForm.getFieldsValue();
         axios({
             url:`${configJson.prefix}/endpoints/${this.state.editDescuuid}`,
             method: 'put',
-            data: {
-                description: this.state.editDesc,
-            },
+            data: AddOrEditEndpointForm,
             headers:getHeader()
         })
             .then(function (response) {
                 console.log(response);
                 that.setState({
                     editDescModal:false,
-                    editDescuuid:null
                 });
                 message.success(messageJson['edit endpoint desc success']);
                 that.constructor.fetch(that.props, that.props.dispatch, page,q);
@@ -100,21 +82,18 @@ class EndPoints extends Component {
     addEndPoint=()=>{
         const { page,q} = this.props;
         const that=this;
+        const AddOrEditEndpointForm=this.refs.AddOrEditEndpointForm.getFieldsValue();
+        console.log("getFieldsValue();",AddOrEditEndpointForm);
         axios({
             url:`${configJson.prefix}/endpoints`,
             method: 'post',
-            data: {
-                name: this.state.addEndpointName,
-                description: this.state.addEndpointDesc,
-            },
+            data: AddOrEditEndpointForm,
             headers:getHeader()
         })
             .then(function (response) {
                 console.log(response);
                 that.setState({
                     addModal:false,
-                    addEndpointName:'',
-                    addEndpointDesc:'',
                 });
                 message.success(messageJson['add endpoint success']);
                 that.constructor.fetch(that.props, that.props.dispatch, page,q);
@@ -227,9 +206,9 @@ class EndPoints extends Component {
 
                     </div>
                     <Modal
+                        key={1+Date.parse(new Date())}
                         visible={this.state.addModal}
                         title="创建新域"
-                        onOk={this.handleOk}
                         onCancel={()=>{this.setState({addModal:false})}}
                         footer={[
                             <Button key="back" type="ghost" size="large"
@@ -239,11 +218,10 @@ class EndPoints extends Component {
                             </Button>,
                         ]}
                     >
-                        <Input style={{marginBottom:'15px'}} onChange={this.changeEndpointName} value={this.state.addEndpointName} placeholder="名称:长度3-32个字符" />
-                        <Input  onChange={this.changeEndpointDesc} value={this.state.addEndpointDesc} type="textarea" placeholder="描述" autosize={{ minRows: 2, maxRows: 6 }} />
-                        <p>说明：名称只能由英文字母、数字、“_”(下划线)、“-”（即中横线）构成。“-” 不能单独或连续使用，不能放在开头或结尾。</p>
+                        <AddOrNameDescForm ref="AddOrEditEndpointForm" type="endpoint"/>
                     </Modal>
                     <Modal
+                        key={2+Date.parse(new Date())}
                         visible={this.state.editDescModal}
                         title="修改描述"
                         onCancel={()=>{this.setState({editDescModal:false})}}
@@ -255,8 +233,7 @@ class EndPoints extends Component {
                             </Button>,
                         ]}
                     >
-                        <h3 style={{marginBottom:'10px'}}>名称 : {this.state.editDescName}</h3>
-                        <Input  onChange={this.changeEditDesc} value={this.state.editDesc} type="textarea"  autosize={{ minRows: 2, maxRows: 6 }} />
+                        <AddOrNameDescForm ref="AddOrEditEndpointForm"   type="endpoint" name={this.state.editDescName} description={this.state.editDesc}/>
                     </Modal>
                 </Row>
             </div>

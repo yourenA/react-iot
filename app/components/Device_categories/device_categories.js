@@ -7,6 +7,7 @@ import {Modal, Input, Icon, Breadcrumb, Row, Col, Button, Table, Pagination, Pop
 const Search = Input.Search;
 import {connect} from 'react-redux';
 import Loading from './../Common/loading.js';
+import AddOrNameDescForm from './../Common/addOrEditNameDesc'
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import configJson from './../../../config.json';
@@ -28,10 +29,6 @@ class DeviceCategories extends Component {
         this.state = {
             addModal:false,
             editDescModal:false,
-            addDeviceCategoryName:'',
-            addDeviceCategoryDesc:'',
-            addBtnCanClick:true,
-            delBtnCanClick:true,
             editDescName:'',
             editDescuuid:'',
             editDesc:'',
@@ -50,26 +47,6 @@ class DeviceCategories extends Component {
 
         this.constructor.fetch(this.props, this.props.dispatch, page,q);
     };
-    changeDeviceCategoryName=(e)=>{
-        this.setState({
-            addDeviceCategoryName:e.target.value
-        })
-    };
-    changeDeviceCategoryDesc=(e)=>{
-        this.setState({
-            addDeviceCategoryDesc:e.target.value
-        })
-    };
-    changeEditDescName=(e)=>{
-        this.setState({
-            editDescName:e.target.value
-        })
-    }
-    changeEditDesc=(e)=>{
-        this.setState({
-            editDesc:e.target.value
-        })
-    };
     showEditDesc=(uuid,name,desc)=>{
         this.setState({
             editDescModal:true,
@@ -79,24 +56,19 @@ class DeviceCategories extends Component {
         })
     };
     handleEditDescOk=()=>{
+        const AddOrEditCategoryForm=this.refs.AddOrEditCategoryForm.getFieldsValue();
         const { page,q} = this.props;
         const that=this;
         axios({
             url:`${configJson.prefix}/device_categories/${this.state.editDescuuid}`,
             method: 'put',
-            data: {
-                name:this.state.editDescName,
-                description: this.state.editDesc,
-            },
+            data:AddOrEditCategoryForm,
             headers:getHeader()
         })
             .then(function (response) {
                 console.log(response);
                 that.setState({
-                    name:'',
-                    description: '',
                     editDescModal:false,
-                    editDescuuid:null
                 });
                 message.success(messageJson['edit device_categories desc success']);
                 that.constructor.fetch(that.props, that.props.dispatch, page,q);
@@ -106,36 +78,25 @@ class DeviceCategories extends Component {
             });
     }
     addDevice_category=()=>{
+        const AddOrEditCategoryForm=this.refs.AddOrEditCategoryForm.getFieldsValue();
         const { page,q} = this.props;
-        this.setState({
-            addBtnCanClick:false
-        });
         const that=this;
         axios({
             url:`${configJson.prefix}/device_categories`,
             method: 'post',
-            data: {
-                name: this.state.addDeviceCategoryName,
-                description: this.state.addDeviceCategoryDesc,
-            },
+            data:AddOrEditCategoryForm,
             headers:getHeader()
         })
             .then(function (response) {
                 console.log(response);
                 that.setState({
-                    addBtnCanClick:true,
                     addModal:false,
-                    addDeviceCategoryName:'',
-                    addDeviceCategoryDesc:'',
                 });
                 message.success(messageJson['add device_categories success']);
                 that.constructor.fetch(that.props, that.props.dispatch, page,q);
 
             })
             .catch(function (error) {
-                that.setState({
-                    addBtnCanClick:true
-                });
                 converErrorCodeToMsg(error)
             });
 
@@ -192,7 +153,7 @@ class DeviceCategories extends Component {
                         </button>
                         <span className="ant-divider" />
 
-                        <Popconfirm   placement="topRight" title={'Sure to delete ' + record.uuid} onConfirm={this.delEndPoint.bind(this,record.uuid)}>
+                        <Popconfirm   placement="topRight" title={ `确定要删除 ${record.name} 吗?`} onConfirm={this.delEndPoint.bind(this,record.uuid)}>
                             <button className="ant-btn ant-btn-danger" data-id={record.uuid}
                             >删除
                             </button>
@@ -234,13 +195,12 @@ class DeviceCategories extends Component {
                         footer={[
                             <Button key="back" type="ghost" size="large"
                                     onClick={()=>{this.setState({addModal:false})}}>取消</Button>,
-                            <Button key="submit" type="primary" size="large" onClick={this.addDevice_category} disabled={!this.state.addBtnCanClick}>
+                            <Button key="submit" type="primary" size="large" onClick={this.addDevice_category}>
                                 确定
                             </Button>,
                         ]}
                     >
-                        <Input style={{marginBottom:'15px'}} onChange={this.changeDeviceCategoryName} value={this.state.addDeviceCategoryName} placeholder="名称:长度3-32个字符" />
-                        <Input  onChange={this.changeDeviceCategoryDesc} value={this.state.addDeviceCategoryDesc} type="textarea" placeholder="描述" autosize={{ minRows: 2, maxRows: 6 }} />
+                        <AddOrNameDescForm ref="AddOrEditCategoryForm" />
                     </Modal>
                     <Modal
                         key={2+Date.parse(new Date())}
@@ -255,8 +215,7 @@ class DeviceCategories extends Component {
                             </Button>,
                         ]}
                     >
-                        <Input  onChange={this.changeEditDescName} value={this.state.editDescName}  style={{marginBottom:'15px'}}/>
-                        <Input  onChange={this.changeEditDesc} value={this.state.editDesc} type="textarea"  autosize={{ minRows: 2, maxRows: 6 }} />
+                        <AddOrNameDescForm ref="AddOrEditCategoryForm" name={this.state.editDescName} description={this.state.editDesc}/>
                     </Modal>
                 </Row>
             </div>

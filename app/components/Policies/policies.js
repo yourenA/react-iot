@@ -181,7 +181,7 @@ class Policies extends Component {
                         >编辑
                         </button>
                         <span className="ant-divider"/>
-                        <Popconfirm placement="topRight" title={'Sure to delete ' + record.uuid}
+                        <Popconfirm placement="topRight" title={ `确定要删除 ${record.name} 吗?`}
                                     onConfirm={this.delPolice.bind(this, record.uuid)}>
                             <button className="ant-btn ant-btn-danger " data-id={record.uuid}
                             >删除

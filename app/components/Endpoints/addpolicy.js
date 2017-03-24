@@ -92,7 +92,7 @@ class AddPoliciesForm extends Component {
         });
         return (
             <Form onSubmit={this.handleSubmitCategory}>
-                {this.props.fromOtherPage ? <h3 className="addDeviceForm-title">添加策略</h3> : null}
+                {this.props.type==='policy' ? <h3 className="addDeviceForm-title">添加策略</h3> : null}
                 <FormItem
                     label="名称"
                     {...formItemLayout}
@@ -116,7 +116,7 @@ class AddPoliciesForm extends Component {
                         <Icon type="plus"/> 增加主题
                     </Button>
                 </FormItem>
-                {this.props.fromOtherPage ? <FormItem
+                {this.props.type==='policy'? <FormItem
                     {...formItemLayoutWithOutLabel}
                 >
                     <Button type="primary" htmlType="submit">

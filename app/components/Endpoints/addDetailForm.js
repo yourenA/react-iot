@@ -6,7 +6,6 @@ import {Form, Icon, Input, Button, Checkbox, Select} from 'antd';
 import {formItemLayout, formItemLayoutWithLabel, formItemLayoutWithOutLabel} from './../../common/common';
 import axios from 'axios';
 import AddCategory from './addCategory';
-import AddGroup from './addGroup';
 import AddPolicy from './addpolicy';
 import configJson from './../../../config.json';
 import {getHeader} from './../../common/common.js';
@@ -131,15 +130,15 @@ class AddDeviceForm extends Component {
         const newformItemsWrap = ()=> {
             if (this.state.newCategory) {
                 return (
-                    <AddCategory addNewcb={this.addNewcb}/>
+                    <AddCategory addNewcb={this.addNewcb}  type='category'/>
                 )
             }else if(this.state.newGroup){
                 return (
-                    <AddGroup addNewcb={this.addNewcb}/>
+                    <AddCategory addNewcb={this.addNewcb}  type='group'/>
                 )
             }else if(this.state.newPolicy){
                 return(
-                    <AddPolicy endpoint_uuid={this.props.endpoint_uuid} fromOtherPage={true} addNewcb={this.addNewcb}/>
+                    <AddPolicy endpoint_uuid={this.props.endpoint_uuid} type='policy' addNewcb={this.addNewcb}/>
                 )
             }else{
                 return (
@@ -213,6 +212,7 @@ class AddDeviceForm extends Component {
                         })(
                             <Select labelInValue={true}>
                                 <Option value='newpolicy'>新建</Option>
+
                                 { this.state.policyArr.map(item => <Option key={item.uuid} value={item.uuid}>{item.name}</Option>) }
                             </Select>
                         )}
