@@ -4,13 +4,14 @@
 import React, {Component} from 'react';
 import {Modal, Input, Icon, Breadcrumb, Row, Col, Button, Table, Pagination, Popconfirm,message} from 'antd';
 const Search = Input.Search;
-import {Link} from 'react-router'
+import {Link} from 'react-router';
+import Clipboard from 'clipboard'
 import Loading from './../Common/loading.js';
 import TopicTable from './../Common/topicTable.js';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
-import {getHeader} from './../../common/common.js';
-import AddDetailForm from './addDetailForm.js'
+import {getHeader,converErrorCodeToMsg} from './../../common/common.js';
+import AddOrEditDetailForm from './addOrEditDetailForm.js'
 import configJson from './../../../config.json';
 const datasource=[{
     uuid:'daxpopd-fa-ff00',
@@ -66,10 +67,19 @@ class Device extends Component {
             page:1,
             meta:{pagination:{total:0,per_page:0}},
             addModal:false,
+            editModal:false,
+            editRecord:{},
+            reGenerateKeyModal:false,
+            newKey:''
         };
     }
     componentDidMount() {
         this.fetchDevices();
+        let clipboard = new Clipboard('.copyKey');
+        clipboard.on('success', function(e) {
+        });
+        clipboard.on('error', function(e) {
+        });
     }
     fetchDevices=(page=1,q='')=>{
         const that = this;
@@ -128,18 +138,44 @@ class Device extends Component {
                 that.fetchDevices(that.state.page,that.state.q)
             })
             .catch(function (error) {
-                let first;
-                for ( first in error.response.data.errors) break;
-                if (error.response.status === 401) {
-                    message.error(messageJson['token fail']);
-                } else if(error.response.status === 422){
-                    message.error(`${error.response.data.errors[first][0]}`)
-                }else {
-                    message.error(messageJson['unknown error']);
-                }
+                converErrorCodeToMsg(error)
             });
 
     };
+    editDevice=()=>{
+        const that=this;
+        const EditDetailForm = this.refs.EditDetailForm.getFieldsValue();
+        if(!EditDetailForm.name || !EditDetailForm.category || !EditDetailForm.group || !EditDetailForm.policy){
+            message.error(messageJson['category group category null']);
+            return false
+        }
+        const editDevicelDate = {
+            name:EditDetailForm.name,
+            description:EditDetailForm.description,
+            category_uuid:EditDetailForm.category.key,
+            group_uuid:EditDetailForm.group.key,
+            policy_uuid:EditDetailForm.policy.key
+        };
+        console.log("addDevicelDate",EditDetailForm);
+        axios({
+            url: `${configJson.prefix}/endpoints/${this.props.params.uuid}/devices/${this.state.edituuid}`,
+            method: 'put',
+            data: editDevicelDate,
+            headers: getHeader()
+        })
+            .then(function (response) {
+                console.log(response);
+                message.success(messageJson['edit device success']);
+                that.setState({
+                    editModal: false
+                });
+                that.fetchDevices(that.state.page,that.state.q)
+            })
+            .catch(function (error) {
+                converErrorCodeToMsg(error)
+            });
+
+    }
     delDevice=(uuid)=>{
         console.log("uuid",uuid);
         const { page ,q} = this.state;
@@ -154,15 +190,34 @@ class Device extends Component {
                 that.fetchDevices(that.state.page,that.state.q)
             })
             .catch(function (error) {
-                console.log(error.response);
-                if(error.response.status === 404 ){
-                    message.error(messageJson['del device fail']);
-                }else if(error.response.status === 401){
-                    message.error(messageJson['token fail']);
-                }else{
-                    message.error(messageJson['unknown error']);
-                }
+                converErrorCodeToMsg(error)
             });
+
+    };
+    reGenerateKey=(uuid)=>{
+        const that=this;
+        axios({
+            url:`${configJson.prefix}/endpoints/${this.props.params.uuid}/policies/${uuid}/password`,
+            method: 'put',
+            headers:getHeader()
+        })
+            .then(function (response) {
+                console.log(response);
+                that.setState({
+                    reGenerateKeyModal:true,
+                    newKey:response.data.password
+                });
+            })
+            .catch(function (error) {
+                console.log(error.response);
+                converErrorCodeToMsg(error)
+            });
+    }
+    copyKey=()=>{
+        message.success(messageJson['key copy success']);
+        this.setState({
+            reGenerateKeyModal:false
+        })
 
     };
     searchEndPoint=(value)=>{
@@ -251,8 +306,8 @@ class Device extends Component {
                     </div>
                     <div className="expandRowRender-operate">
                         <Button type="primary">连通测试</Button> <span className="ant-divider" />
-                        <Button type="primary">修改</Button> <span className="ant-divider" />
-                        <Button type="primary">重新生成秘钥</Button>
+                        <Button type="primary" onClick={()=>{this.setState({editModal:true,edituuid:record.uuid,editRecord:record})}}>修改</Button> <span className="ant-divider" />
+                        <Button type="primary" onClick={this.reGenerateKey.bind(this,record.policy.uuid)}>重新生成秘钥</Button>
                     </div>
                 </div>
 
@@ -297,8 +352,43 @@ class Device extends Component {
                             </Button>,
                         ]}
                     >
-                        <AddDetailForm endpoint_uuid={this.props.params.uuid} ref="AddDetailForm"/>
+                        <AddOrEditDetailForm endpoint_uuid={this.props.params.uuid} ref="AddDetailForm"/>
                     </Modal>
+                    <Modal
+                        key={2+Date.parse(new Date())}
+                        visible={this.state.editModal}
+                        title="修改设备"
+                        onCancel={()=>{this.setState({editModal:false})}}
+                        footer={[
+                            <Button key="back" type="ghost" size="large"
+                                    onClick={()=> {
+                                        this.setState({editModal: false})
+                                    }}>取消</Button>,
+                            <Button key="submit" type="primary" size="large" onClick={this.editDevice}>
+                                确定
+                            </Button>,
+                        ]}
+                    >
+                        <AddOrEditDetailForm endpoint_uuid={this.props.params.uuid} ref="EditDetailForm" editRecord={this.state.editRecord}/>
+                    </Modal>
+                    <Modal
+                        key={3+Date.parse(new Date())}
+                        visible={this.state.reGenerateKeyModal}
+                        title="重新生成密钥成功"
+                        onCancel={()=>{this.setState({reGenerateKeyModal:false})}}
+                        footer={[
+                            <Button key="back" type="ghost" size="large"
+                                    onClick={()=> {
+                                        this.setState({reGenerateKeyModal: false})
+                                    }}>确定</Button>,
+                            <Button className='copyKey' data-clipboard-text={this.state.newKey} key="submit" type="primary" size="large" onClick={this.copyKey}>
+                                复制
+                            </Button>,
+                        ]}
+                    >
+                        <p>{this.state.newKey}</p>
+                    </Modal>
+
                 </Row>
             </div>
         );

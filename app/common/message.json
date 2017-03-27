@@ -17,6 +17,8 @@
   "edit endpoint desc success":"修改描述成功",
   "edit endpoint desc fail":"描述不能大于200个字符",
   "add device success":"添加设备成功",
+  "edit device success":"修改设备成功",
+  "key copy success":"新的策略密码已经复制到剪贴板",
   "category group category null":"名称，分类，分组，策略不能为空",
   "del device success":"删除设备成功",
   "del device fail":"删除设备失败",

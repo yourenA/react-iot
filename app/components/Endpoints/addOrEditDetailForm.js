@@ -61,6 +61,18 @@ class AddDeviceForm extends Component {
                 policyArr:response.data.data
             })
         })
+        const {form,editRecord} = this.props;
+        console.log("是否存在editRecord：",Boolean(editRecord));
+        if(editRecord){
+            form.setFieldsValue({
+                name:editRecord.name,
+                description:editRecord.description,
+                category: {key:editRecord.category.uuid,label:editRecord.category.name},
+                group:  {key:editRecord.group.uuid,label:editRecord.group.name},
+                policy:  {key:editRecord.policy.uuid,label:editRecord.policy.name},
+            });
+        }
+
     }
     handleChange = (value)=> {
         console.log(value);
@@ -156,13 +168,14 @@ class AddDeviceForm extends Component {
                         {getFieldDecorator('name', {
                             rules: [{required: true, message: '名称不能为空'}],
                         })(
-                            <Input  />
+                            <Input  disabled={this.props.editRecord?true:false}/>
                         )}
                     </FormItem>
                     <FormItem
                         label="描述"
                         {...formItemLayout}>
-                        {getFieldDecorator('description', {})(
+                        {getFieldDecorator('description', {
+                        })(
                             <Input type="textarea" autosize={{minRows: 2, maxRows: 6}}/>
                         )}
                     </FormItem>
