@@ -52,7 +52,23 @@
   padding: 25px;
 }
 
-@import "./../../common/common.scss";
+.edit-password{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow:hidden;
+  form{
+    position: relative;
+    min-width: 300px;
+    width: 30%;
+    top: 30%;
+    left: 50%;
+    @include respond-to(medium){
+      top: 50%;
+    }
+    transform:translate(-50%,-50%);
+  }
+}
 .search-btn{
   margin-left: 10px;
 }

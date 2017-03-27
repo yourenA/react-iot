@@ -31,12 +31,12 @@ class Basic extends React.Component {
                 <div className="sidebar" id="sidebar" ref='sidebar'>
                     <Menu
                         onClick={this.handleClick}
-                        defaultOpenKeys={['sub1']}
+                        defaultOpenKeys={['sub0','sub1']}
                         mode="inline"
                         selectedKeys={[currentMenu]}
                     >
                         <SubMenu key="sub0" title={<span><Icon type="user" /><span>账号设置</span></span>}>
-                            <Menu.Item key="/basic0"><IndexLink to="/basic" >密码修改</IndexLink></Menu.Item>
+                            <Menu.Item key="/basic/edit_password"><IndexLink to="/basic/edit_password" >密码修改</IndexLink></Menu.Item>
                             <Menu.Item key="/basic/news0">  <Link  to="/basic/news" >账号安全</Link></Menu.Item>
                             <Menu.Item key="/basic/news00">  <Link  to="/basic/news" >资料修改</Link></Menu.Item>
                         </SubMenu>
