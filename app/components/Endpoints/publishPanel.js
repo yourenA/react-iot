@@ -50,6 +50,7 @@ class PublishPanelForm extends Component {
                                 label="QoS"
                             >
                                 {getFieldDecorator('QoS', {
+                                    initialValue: '0',
                                     rules: [{required: true, message: 'QoS不能为空'}],
                                 })(
                                     <Select placeholder="">

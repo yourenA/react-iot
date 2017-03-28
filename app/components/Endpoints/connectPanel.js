@@ -32,35 +32,6 @@ class ConnectPanelForm extends Component {
             <div>
                 <Form onSubmit={this.handleSubmit}>
                     <Row gutter={10}>
-                        <Col span={14}>
-                            <FormItem
-                                {...hostNameLayout}
-                                label="主机名称"
-                            >
-                                {getFieldDecorator('host', {
-                                    initialValue: localStorage.getItem('connect_host') || '',
-                                    rules: [{required: true, message: '主机名称不能为空'}],
-                                })(
-                                    <Input  />
-                                )}
-                            </FormItem>
-                        </Col>
-                        <Col span={10}>
-                            <FormItem
-                                {...portLayout}
-                                label="端口"
-                            >
-                                {getFieldDecorator('port', {
-                                    initialValue: localStorage.getItem('connect_port') || '',
-                                    rules: [{required: true, message: '端口不能为空'}],
-                                })(
-                                    <Input />
-                                )}
-
-                            </FormItem>
-                    </Col>
-                    </Row>
-                    <Row gutter={10}>
                         <Col span={12}>
                             <FormItem
                                 {...usernameLayout}

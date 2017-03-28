@@ -38,5 +38,6 @@
   "del policies success":"删除策略成功",
   "del policies fail":"删除策略失败",
   "topic name fail":"主题只能为1-32个字符的字母、数字或下划线，并且不能为空",
-  "topic name cant null":"主题不能为空"
+  "topic name cant null":"主题不能为空",
+  "connect success":"连接成功"
 }

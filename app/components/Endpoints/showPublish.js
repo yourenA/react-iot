@@ -9,7 +9,10 @@ class ShowPublicInfo extends Component {
         super(props);
         this.state = {};
     }
-
+    componentDidMount=()=>{
+        let info = document.querySelector("#info");
+        info.scrollTop = info.scrollHeight;
+    }
     render() {
         const {getFieldDecorator, getFieldValue} = this.props.form;
         const infoLayout = {
@@ -17,23 +20,28 @@ class ShowPublicInfo extends Component {
             wrapperCol: {span: 20},
         };
         return (
-            <div>
-                <Form onSubmit={this.handleSubmit}>
-                    <Row gutter={10}>
-                        <Col span={24}>
-                            <FormItem
-                                {...infoLayout}
-                                label="发布的信息"
-                            >
-                                {getFieldDecorator('hostname', {
-                                })(
-                                    <Input  type="textarea"  autosize={{ minRows: 10, maxRows: 10 }}/>
-                                )}
-                            </FormItem>
-                        </Col>
-                    </Row>
-                </Form>
-            </div>
+            <Row gutter={10}>
+                <Col span={4}>
+                    发布的信息
+                </Col>
+                <Col span={20}>
+                    <div id="info" style={{
+                        width: '100%',
+                        padding: '10px',
+                        height: '300px',
+                        border: '1px solid #d9d9d9',
+                        borderRadius: '4px',
+                        marginBottom: '10px',
+                        overflowY: 'scroll'
+                    }}>
+                        {this.props.publishInfo.map((item,index)=>{
+                            return(
+                                <p key={index}><span>{item.name }:say </span><span>{item.message}</span><span>{item.date}</span></p>
+                            )
+                        })}
+                    </div>
+                </Col>
+            </Row>
         )
     }
 }

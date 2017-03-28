@@ -109,6 +109,21 @@ exports.convertFormToData  = (form) => {
 
     return addPoliciesDate;
 };
+/**
+ * 将订阅主题表单转换为发送数据
+ * */
+exports.convertSubFormToData  = (form) => {
+    const topics= {}
+    for (var k in form) {
+        if (k.indexOf('topics') >= 0) {
+            if (form.hasOwnProperty(k)) {
+                topics[`'${form[k].theme}'`]=parseInt(form[k].QoS);
+            }
+        }
+    }
+
+    return topics;
+};
 
 /**
  *  判断错误码

@@ -11,29 +11,21 @@ class subPanelForm extends Component {
     }
 
     render() {
-        const {getFieldDecorator, getFieldValue} = this.props.form;
-        const retainLayout = {
-            wrapperCol: {span: 24},
-        };
         return (
-            <div>
-                <Form onSubmit={this.handleSubmit}>
-                    <Row gutter={10}>
-                        <Col span={24}>
-                            <FormItem
-                                {...retainLayout}
-                            >
-                                {getFieldDecorator('info', {
-                                })(
-                                    <Input  type="textarea"  autosize={{ minRows: 18, maxRows: 18 }}/>
-                                )}
-                            </FormItem>
-                        </Col>
-                    </Row>
-                </Form>
-            </div>
+            <Row gutter={10}>
+                <Col span={24}>
+                    <div style={{
+                        width: '100%',
+                        padding: '10px',
+                        height: '350px',
+                        border: '1px solid #d9d9d9',
+                        borderRadius: '4px',
+                        marginBottom: '10px',
+                        overflowY:'scroll'
+                    }}></div>
+                </Col>
+            </Row>
         )
-            ;
     }
 }
 const subPanelFormPanel = Form.create()(subPanelForm);

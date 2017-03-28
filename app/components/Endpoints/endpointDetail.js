@@ -13,50 +13,6 @@ import messageJson from './../../common/message.json';
 import {getHeader, converErrorCodeToMsg} from './../../common/common.js';
 import AddOrEditDetailForm from './addOrEditDetailForm.js'
 import configJson from './../../../config.json';
-const datasource = [{
-    uuid: 'daxpopd-fa-ff00',
-    name: 'temp01',
-    user: 'user01',
-    desc: 'desc',
-    status: 1,
-    type: 2,
-    last_on_time: '2017-3-21 16:32:45',
-    create_time: '2017-3-21 16:32:45',
-    meta: {
-        group_name: 'toyota',
-        desc: 'desc',
-        strategy: 'strategy',
-        theme: [{
-            authority: '0',
-            theme_content: 'endpoints/node-001/temp/action'
-        }, {
-            authority: '2',
-            theme_content: 'endpoints/node-001/temp/action'
-        }]
-    }
-},
-    {
-        uuid: 'daxpopd-fa-f56f00',
-        name: 'temp01',
-        user: 'user01',
-        desc: 'desc',
-        status: 1,
-        type: 2,
-        last_on_time: '2017-3-21 16:32:45',
-        create_time: '2017-3-21 16:32:45',
-        meta: {
-            group_name: 'toyota',
-            desc: 'desc',
-            strategy: 'strategy',
-            theme: [{
-                authority: '0',
-                theme_content: 'endpoints/node-001/temp/action'
-            }, {
-                authority: '2',
-                theme_content: 'endpoints/node-001/temp/action'
-            }]
-        }
-    }]
 class Device extends Component {
     constructor(props) {
         super(props);
