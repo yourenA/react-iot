@@ -148,14 +148,13 @@ class DeviceCategories extends Component {
             render: (text, record, index) => {
                 return (
                     <div>
-                        <button className="ant-btn ant-btn-primary" data-id={record.uuid}
+                        <button className="ant-btn  btn-info"
                         >启用
                         </button>
                         <span className="ant-divider" />
 
                         <Popconfirm   placement="topRight" title={ `确定要删除 ${record.name} 吗?`} onConfirm={this.delEndPoint.bind(this,record.uuid)}>
-                            <button className="ant-btn ant-btn-danger" data-id={record.uuid}
-                            >删除
+                            <button className="ant-btn ant-btn-danger">删除
                             </button>
                         </Popconfirm>
                     </div>

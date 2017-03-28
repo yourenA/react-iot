@@ -125,6 +125,10 @@ class EndPoints extends Component {
     searchEndPoint=(value)=>{
         this.constructor.fetch(this.props, this.props.dispatch, 1,value);
     };
+    setConnetUrl=(url)=>{
+        localStorage.setItem('connect_host',url.split(':')[0]+':'+url.split(':')[1]);
+        localStorage.setItem('connect_port',url.split(':')[2]);
+    }
     render() {
         const {data = [], page, q,meta={pagination:{total:0,per_page:0}},loaded} = this.props;
         const columns = [{
@@ -133,7 +137,7 @@ class EndPoints extends Component {
             key: 'name',
             render: (text, record, index) => {
                 return (
-                        <Link to={'/basic/endpoints/'+record.uuid} title={text}>{text}</Link>
+                        <Link onClick={this.setConnetUrl.bind(this,record.websocket_hostname)} to={'/basic/endpoints/'+record.uuid} title={text}>{text}</Link>
 
                 )
             }
@@ -153,6 +157,14 @@ class EndPoints extends Component {
             title: '接入地址',
             dataIndex: 'websocket_hostname',
             key: 'websocket_hostname',
+            render:(text,record,index)=>{
+                return(
+                    <div>
+                        <p>{text}</p>
+                        <p>{record.mqtt_hostname}</p>
+                    </div>
+                )
+            }
         },  {
             title: '设备总数',
             dataIndex: 'device_count',
