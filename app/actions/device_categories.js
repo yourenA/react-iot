@@ -1,11 +1,10 @@
 import axios from 'axios';
+import {converErrorCodeToMsg} from './../common/common.js';
 export const GET_DEVICE_CATEGORIES_REQUEST = 'GET_DEVICE_CATEGORIES_REQUEST';
 export const GET_DEVICE_CATEGORIES_SUCCEED = 'GET_DEVICE_CATEGORIES_SUCCEED';
 export const GET_DEVICE_CATEGORIES_FAILED = 'GET_DEVICE_CATEGORIES_FAILED';
 import {getHeader} from './../common/common.js';
-import messageJson from './../common/message.json';
 import configJson from './../../config.json';
-import {message} from 'antd';
 exports.fetchDevice_categories = (page=1,q='')=> {
     return async(dispatch)=> {
         dispatch(device_categoriesRequest());
@@ -42,7 +41,7 @@ const device_categoriesSucceed = (data,page,q)=>({
 
 const device_categoriesFailed = (error)=> {
     console.log('server state get failed', error);
-    message.error(messageJson['token fail']);
+    converErrorCodeToMsg(error)
     return {
         type: GET_DEVICE_CATEGORIES_FAILED,
         error

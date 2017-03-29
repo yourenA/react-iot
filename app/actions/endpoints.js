@@ -1,11 +1,10 @@
 import axios from 'axios';
+import {converErrorCodeToMsg} from './../common/common.js';
 export const GET_ENDPOINTS_REQUEST = 'GET_ENDPOINTS_REQUEST';
 export const GET_ENDPOINTS_SUCCEED = 'GET_ENDPOINTS_SUCCEED';
 export const GET_ENDPOINTS_FAILED = 'GET_ENDPOINTS_FAILED';
 import {getHeader} from './../common/common.js';
-import messageJson from './../common/message.json';
 import configJson from './../../config.json';
-import {message} from 'antd';
 exports.fetchEndPoints = (page=1,q='')=> {
     return async(dispatch)=> {
         dispatch(endpointsRequest());
@@ -42,7 +41,7 @@ const endpointsSucceed = (data,page,q)=>({
 
 const endpointsFailed = (error)=> {
     console.log('server state get failed', error);
-    message.error(messageJson['token fail']);
+    converErrorCodeToMsg(error)
     return {
         type: GET_ENDPOINTS_FAILED,
         error

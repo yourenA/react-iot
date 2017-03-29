@@ -1,13 +1,12 @@
 import axios from 'axios';
+import {converErrorCodeToMsg} from './../common/common.js';
 export const GET_POLICIES_REQUEST = 'GET_POLICIES_REQUEST';
 export const GET_POLICIES_SUCCEED = 'GET_POLICIES_SUCCEED';
 export const GET_POLICIES_FAILED = 'GET_POLICIES_FAILED';
 export const GET_ALL_ENDPOINTS_SUCCEED = 'GET_ALL_ENDPOINTS_SUCCEED';
 export const GET_ALL_ENDPOINTS_FAILED = 'GET_ALL_ENDPOINTS_FAILED';
 import {getHeader} from './../common/common.js';
-import messageJson from './../common/message.json';
 import configJson from './../../config.json';
-import {message} from 'antd';
 
 exports.fetchAllEndpoints=()=>{
     return async(dispatch)=> {
@@ -18,8 +17,10 @@ exports.fetchAllEndpoints=()=>{
                 headers:getHeader()
             });
             let data = await response.data;
-            console.log('get all endpoints',data);
-            dispatch(fetchPolicies(1,'',data.data[0].uuid));
+            console.log('get all polices',data);
+            if(data.data.length>0){
+                dispatch(fetchPolicies(1,'',data.data[0].uuid));
+            }
             return dispatch(getEndpointsSucceed(data))
 
         } catch (e) {
@@ -34,7 +35,7 @@ const getEndpointsSucceed = (data)=>({
 
 const getEndpointsFailed = (error)=> {
     console.log('server state get failed', error);
-    message.error(messageJson['token fail']);
+    converErrorCodeToMsg(error);
     return {
         type: GET_ALL_ENDPOINTS_FAILED,
         error
@@ -78,6 +79,7 @@ const policiesSucceed = (data,page,q,endpoint_uuid)=>({
 
 const policiesFailed = (error)=> {
     console.log('server state get failed', error);
+    converErrorCodeToMsg(error)
     return {
         type: GET_POLICIES_FAILED,
         error

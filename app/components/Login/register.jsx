@@ -4,6 +4,9 @@ const FormItem = Form.Item;
 import './login.scss';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
+import configJson from './../../../config.json';
+import {getHeader,converErrorCodeToMsg} from './../../common/common.js';
+
 class NormalLoginForm extends Component {
     constructor(props) {
         super(props);
@@ -19,7 +22,7 @@ class NormalLoginForm extends Component {
             if (!err) {
                 console.log('Received values of form: ', values);
                 axios({
-                    url:'http://test.iothub.com.cn//register',
+                    url:`${configJson.prefix}/register`,
                     method: 'post',
                     data: values
                 })
@@ -30,18 +33,7 @@ class NormalLoginForm extends Component {
                     })
                     .catch(function (error) {
                         console.log(error.response.data);
-                        if(error.response.status === 422 ){
-                            if(error.response.data.errors.username && error.response.data.errors.username.length){
-                                message.error(error.response.data.errors.username[0]);
-                            }else if(error.response.data.errors.password && error.response.data.errors.password.length){
-                                message.error(error.response.data.errors.password[0]);
-
-                            }else if(error.response.data.errors.verify_code && error.response.data.errors.verify_code.length){
-                                message.error(error.response.data.errors.verify_code[0]);
-                            }
-                        }else{
-                            message.error(messageJson['unknown error']);
-                        }
+                        converErrorCodeToMsg(error)
                     });
             }
 
@@ -67,7 +59,7 @@ class NormalLoginForm extends Component {
         const that=this;
         if( this.state.emailState && this.state.email !==''){
             axios({
-                url:'http://test.iothub.com.cn/register/verify_code',
+                url:`${configJson.prefix}/register/verify_code`,
                 method: 'post',
                 data: {
                     username: this.state.email,
@@ -79,13 +71,7 @@ class NormalLoginForm extends Component {
                 })
                 .catch(function (error) {
                     console.log(error.response.data.message);
-                    if(error.response.status === 422 ){
-                        message.error(messageJson['send email fail']);
-                    }else if(error.response.status === 429){
-                        message.error(error.response.data.message);
-                    }else{
-                        message.error(messageJson['unknown error']);
-                    }
+                    converErrorCodeToMsg(error)
                 });
         }else{
             message.error(messageJson['send email fail']);

@@ -14,15 +14,7 @@ class subPanelForm extends Component {
         return (
             <Row gutter={10}>
                 <Col span={24}>
-                    <div style={{
-                        width: '100%',
-                        padding: '10px',
-                        height: '350px',
-                        border: '1px solid #d9d9d9',
-                        borderRadius: '4px',
-                        marginBottom: '10px',
-                        overflowY:'scroll'
-                    }}>
+                    <div className="subPanel" >
                         {this.props.hadSubTopics.map((item,index)=>{
                             return(
                                 <p key={index}><span >时间:{item.dateTime } </span><span>主题{item.topic}</span><span>QoS:{item.qos}</span></p>

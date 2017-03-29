@@ -62,9 +62,10 @@ export function login(user) {
 }
 
 export function signout() {
+    console.log("执行退出");
     return dispatch => {
         axios({
-            url: 'http://local.iothub.com.cn/logout',
+            url: `${configJson.prefix}/logout`,
             method: 'post',
             headers:getHeader()
         })
