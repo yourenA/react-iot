@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import logo from './logo.svg';
+import logo from './car.svg';
 import './app.scss'
 import Mask from '../Login/mask';
 import LoginDiv from '../Login/login'
@@ -29,6 +29,7 @@ class App extends Component {
                 <div className="header-nav">
                     <div className="header-nav-content">
                         <img src={logo} className="App-logo" alt="logo"/>
+                        <span className="logo-text">C-IoT</span>
                         <Nav {...this.props}/>
                         <div className="loginOrRegisterBtn">
                             {

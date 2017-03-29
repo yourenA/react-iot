@@ -9,10 +9,27 @@
     .header-nav-content{
       margin: 0 auto;
     }
+    .logo-text{
+      position: relative;
+      left: 20px;
+      display: inline-block;
+      vertical-align: 32px;
+      color: $theme-blue - 101;
+      font-size: 20px;
+      font-weight: 500;
+      @include respond-to(medium){
+        left: 0;
+      }
+    }
     .App-logo {
-      animation: App-logo-spin infinite 20s linear;
-      height: $nav-height;
-      width: $nav-height;
+      position: relative;
+      left: 20px;
+      @include respond-to(medium){
+        left: 0;
+      }
+      transform:rotateY(180deg);
+      height: $nav-height+10px;
+      width: $nav-height+10px;
     }
     .nav {
       vertical-align: top;
@@ -67,7 +84,7 @@
         @include respond-to(medium){
           display: inline-block;
           position: absolute;
-          right: 80px;
+          right: 135px;
         }
         span{
           display: block;
@@ -98,7 +115,7 @@
       }
       .username{
         position: relative;
-        width: 70px;
+        width: 115px;
         text-align: center;
 
         span{

@@ -19,6 +19,8 @@
     width: 240px;
     min-height: calc(100vh - #{$nav-height});
     height: 100%;
+    background: url("./iot.svg") no-repeat left bottom;
+    //filter: blur(15px);
     @include respond-to(medium){
       padding-top: $nav-height;
     }

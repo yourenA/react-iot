@@ -172,7 +172,7 @@ class Policies extends Component {
         }, {
             title: '操作',
             key: 'action',
-            width: 145,
+            width: 150,
             render: (text, record, index) => {
                 return (
                     <div>
