@@ -7,7 +7,8 @@ export const GET_ALL_ENDPOINTS_SUCCEED = 'GET_ALL_ENDPOINTS_SUCCEED';
 export const GET_ALL_ENDPOINTS_FAILED = 'GET_ALL_ENDPOINTS_FAILED';
 import {getHeader} from './../common/common.js';
 import configJson from './../../config.json';
-
+import {browserHistory,hashHistory } from 'react-router'
+import {message} from 'antd'
 exports.fetchAllEndpoints=()=>{
     return async(dispatch)=> {
         try {
@@ -20,6 +21,9 @@ exports.fetchAllEndpoints=()=>{
             console.log('get all polices',data);
             if(data.data.length>0){
                 dispatch(fetchPolicies(1,'',data.data[0].uuid));
+            }else{
+                message.error("请先新建设备域");
+                hashHistory.replace('/basic');
             }
             return dispatch(getEndpointsSucceed(data))
 

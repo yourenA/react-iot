@@ -52,8 +52,10 @@ exports.isLogin = () => {
 exports.removeLoginStorage = () => {
     sessionStorage.removeItem('username');
     sessionStorage.removeItem('usertoken');
+    sessionStorage.clear();
     localStorage.removeItem('username');
     localStorage.removeItem('usertoken');
+    localStorage.clear();
 };
 
 /**
