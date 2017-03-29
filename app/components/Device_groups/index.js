@@ -99,9 +99,6 @@ class DeviceGroups extends Component {
 
             })
             .catch(function (error) {
-                that.setState({
-                    addBtnCanClick:true
-                });
                 converErrorCodeToMsg(error)
             });
 
@@ -196,7 +193,7 @@ class DeviceGroups extends Component {
                         footer={[
                             <Button key="back" type="ghost" size="large"
                                     onClick={()=>{this.setState({addModal:false})}}>取消</Button>,
-                            <Button key="submit" type="primary" size="large" onClick={this.addDevice_category} disabled={!this.state.addBtnCanClick}>
+                            <Button key="submit" type="primary" size="large" onClick={this.addDevice_category} >
                                 确定
                             </Button>,
                         ]}
@@ -216,7 +213,7 @@ class DeviceGroups extends Component {
                             </Button>,
                         ]}
                     >
-                        <AddOrNameDescForm ref="AddOrEditGroupForm" name={this.state.editDescName} description={this.state.editDesc}/>
+                        <AddOrNameDescForm ref="AddOrEditGroupForm" name={this.state.editDescName} type='group'  description={this.state.editDesc}/>
                     </Modal>
                 </Row>
             </div>

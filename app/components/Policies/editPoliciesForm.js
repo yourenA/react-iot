@@ -78,9 +78,8 @@ class EditPoliciesForm extends Component {
                 >
                     {getFieldDecorator('name', {
                         initialValue:record.name || '',
-                        rules: [{required: true, message: '名称不能为空'}],
                     })(
-                        <Input  />
+                        <Input disabled={true} />
                     )}
                 </FormItem>
                 <FormItem

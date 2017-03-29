@@ -214,7 +214,7 @@ class DeviceCategories extends Component {
                             </Button>,
                         ]}
                     >
-                        <AddOrNameDescForm ref="AddOrEditCategoryForm" name={this.state.editDescName} description={this.state.editDesc}/>
+                        <AddOrNameDescForm ref="AddOrEditCategoryForm" name={this.state.editDescName}  type='category' description={this.state.editDesc}/>
                     </Modal>
                 </Row>
             </div>

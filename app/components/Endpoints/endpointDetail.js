@@ -69,7 +69,7 @@ class Device extends Component {
         const that = this;
         const AddDetailForm = this.refs.AddDetailForm.getFieldsValue();
         console.log(AddDetailForm)
-        if (!AddDetailForm.name || !AddDetailForm.category || !AddDetailForm.group || !AddDetailForm.policy) {
+        if (!AddDetailForm.name || !AddDetailForm.category || !AddDetailForm.policy) {
             message.error(messageJson['category group category null']);
             return false
         }
@@ -77,7 +77,7 @@ class Device extends Component {
             name: AddDetailForm.name,
             description: AddDetailForm.description,
             category_uuid: AddDetailForm.category.key,
-            group_uuid: AddDetailForm.group.key,
+            group_uuid: AddDetailForm.group ? AddDetailForm.group.key : '',
             policy_uuid: AddDetailForm.policy.key
         };
         console.log("addDevicelDate", addDevicelDate);
@@ -103,7 +103,7 @@ class Device extends Component {
     editDevice = ()=> {
         const that = this;
         const EditDetailForm = this.refs.EditDetailForm.getFieldsValue();
-        if (!EditDetailForm.name || !EditDetailForm.category || !EditDetailForm.group || !EditDetailForm.policy) {
+        if (!EditDetailForm.name || !EditDetailForm.category || !EditDetailForm.policy) {
             message.error(messageJson['category group category null']);
             return false
         }
@@ -111,7 +111,7 @@ class Device extends Component {
             name: EditDetailForm.name,
             description: EditDetailForm.description,
             category_uuid: EditDetailForm.category.key,
-            group_uuid: EditDetailForm.group.key,
+            group_uuid: EditDetailForm.group ? EditDetailForm.group.key : '',
             policy_uuid: EditDetailForm.policy.key
         };
         console.log("addDevicelDate", EditDetailForm);
@@ -134,8 +134,8 @@ class Device extends Component {
             });
 
     };
-    reStartDevice=(uuid)=>{
-        console.log("重启",uuid)
+    reStartDevice = (uuid)=> {
+        console.log("重启", uuid)
     }
     delDevice = (uuid)=> {
         console.log("uuid", uuid);
@@ -184,9 +184,10 @@ class Device extends Component {
     searchEndPoint = (value)=> {
         this.fetchDevices(1, value);
     };
-    setConnetUser=(username)=>{
-        localStorage.setItem('connect_user',username);
+    setConnetUser = (username)=> {
+        localStorage.setItem('connect_user', username);
     }
+
     render() {
         const {data, page, q, meta, loaded} = this.state;
         const columns = [{
@@ -231,7 +232,7 @@ class Device extends Component {
                     <div>
                         <Popconfirm placement="topRight" title={`确定要重启 ${record.name} 吗?`}
                                     onConfirm={this.reStartDevice.bind(this, record.uuid)}>
-                            <button className="ant-btn btn-info" >
+                            <button className="ant-btn btn-info">
                                 重启
                             </button>
                         </Popconfirm>
@@ -248,16 +249,17 @@ class Device extends Component {
             }
         }];
         const expandedRowRender = (record)=> {
-
             return (
                 <div className="expandRowRender-box">
                     <div className="expandRowRender-table">
                         <table>
                             <tbody>
-                            <tr>
-                                <td>设备组</td>
-                                <td>{record.group.name}</td>
-                            </tr>
+                            {record.group ?
+                                <tr>
+                                    <td>设备组</td>
+                                    <td>{record.group.name }</td>
+                                </tr> : null}
+
                             <tr>
                                 <td>描述</td>
                                 <td>{record.description}</td>
@@ -277,7 +279,9 @@ class Device extends Component {
                         </table>
                     </div>
                     <div className="expandRowRender-operate">
-                        <Link onClick={this.setConnetUser.bind(this,record.username)} to={`/basic/endpoints/${this.props.params.uuid}/connect_test`}><Button type="primary">  连通测试</Button></Link> <span className="ant-divider"/>
+                        <Link onClick={this.setConnetUser.bind(this, record.username)}
+                              to={`/basic/endpoints/${this.props.params.uuid}/connect_test`}><Button type="primary">
+                            连通测试</Button></Link> <span className="ant-divider"/>
                         <Button type="primary" onClick={()=> {
                             this.setState({editModal: true, edituuid: record.uuid, editRecord: record})
                         }}>修改</Button> <span className="ant-divider"/>

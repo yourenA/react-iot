@@ -13,9 +13,9 @@ class AddOrEditNamedescForm extends React.Component {
                 <FormItem>
                     {getFieldDecorator('name', {
                         initialValue: this.props.name || '',
-                        rules: [{required: true, message: 'Please input your username!'}],
+                        rules: [{required: true, message: '请输入名称'}],
                     })(
-                        <Input disabled={this.props.name ? true : false} placeholder="名称:长度3-32个字符"/>
+                        <Input disabled={this.props.type === 'endpoint' ? true : false} placeholder="名称:长度3-32个字符"/>
                     )}
                 </FormItem>
                 <FormItem>

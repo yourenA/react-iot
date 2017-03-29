@@ -68,7 +68,7 @@ class AddDeviceForm extends Component {
                 name:editRecord.name,
                 description:editRecord.description,
                 category: {key:editRecord.category.uuid,label:editRecord.category.name},
-                group:  {key:editRecord.group.uuid,label:editRecord.group.name},
+                group:  editRecord.group?{key:editRecord.group.uuid,label:editRecord.group.name}:{key:'',label:''},
                 policy:  {key:editRecord.policy.uuid,label:editRecord.policy.name},
             });
         }
@@ -76,7 +76,7 @@ class AddDeviceForm extends Component {
     }
     handleChange = (value)=> {
         console.log(value);
-        const selectValue=value.key;
+        const selectValue=value?value.key:'';
         if (selectValue === 'newcategory') {
             this.setState({
                 newCategory: true,
@@ -202,10 +202,9 @@ class AddDeviceForm extends Component {
                         {getFieldDecorator('group', {
                             onChange: this.handleChange,
                             rules: [
-                                {required: true, message: '请选择设备组'},
                             ],
                         })(
-                            <Select labelInValue={true}>
+                            <Select labelInValue={true}  allowClear={true}>
                                 <Option value='newgroup'>新建</Option>
                                 { this.state.groupArr.map(item => <Option key={item.uuid} value={item.uuid}>{item.name}</Option>) }
                             </Select>
