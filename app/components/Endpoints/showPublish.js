@@ -10,8 +10,8 @@ class ShowPublicInfo extends Component {
         this.state = {};
     }
     componentDidMount=()=>{
-        let info = document.querySelector("#info");
-        info.scrollTop = info.scrollHeight;
+        // let info = document.querySelector("#info");
+        // info.scrollTop = info.scrollHeight;
     }
     render() {
         const {getFieldDecorator, getFieldValue} = this.props.form;
@@ -25,18 +25,13 @@ class ShowPublicInfo extends Component {
                     发布的信息
                 </Col>
                 <Col span={20}>
-                    <div id="info" style={{
-                        width: '100%',
-                        padding: '10px',
-                        height: '300px',
-                        border: '1px solid #d9d9d9',
-                        borderRadius: '4px',
-                        marginBottom: '10px',
-                        overflowY: 'scroll'
-                    }}>
-                        {this.props.publishInfo.map((item,index)=>{
+                    <div className="subPanel" >
+                        {this.props.hadPubTopics.map((item,index)=>{
                             return(
-                                <p key={index}><span>{item.name }:say </span><span>{item.message}</span><span>{item.date}</span></p>
+                                <div key={index}>
+                                    <p><span >时间: {item.dateTime } </span><span>主题: {item.topic}</span><span>QoS: {item.QoS}</span></p>
+                                    <p>{item.info}</p>
+                                </div>
                             )
                         })}
                     </div>

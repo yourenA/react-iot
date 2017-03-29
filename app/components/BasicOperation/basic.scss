@@ -151,4 +151,15 @@
   border-radius: 4px;
   margin-bottom: 10px;
   overflow-y:scroll;
+  div{
+    background: #dddddd;
+    margin-bottom: 5px;
+    p{
+      padding: 5px;
+    }
+    span{
+      margin-right: 10px;
+    }
+  }
+
 }

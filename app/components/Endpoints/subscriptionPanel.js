@@ -15,9 +15,12 @@ class subPanelForm extends Component {
             <Row gutter={10}>
                 <Col span={24}>
                     <div className="subPanel" >
-                        {this.props.hadSubTopics.map((item,index)=>{
+                        {this.props.subTopicsInfo.map((item,index)=>{
                             return(
-                                <p key={index}><span >时间:{item.dateTime } </span><span>主题{item.topic}</span><span>QoS:{item.qos}</span></p>
+                                <div key={index}>
+                                    <p key={index}><span >时间: {item.dateTime } </span><span>主题: {item.topic}</span><span>QoS: {item.qos}</span></p>
+                                    <p>{item.info}</p>
+                                </div>
                             )
                         })}
                     </div>

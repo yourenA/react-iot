@@ -21,8 +21,9 @@ class ConnectTest extends Component {
         this.state = {
             connectPanelModal: false,
             addSubscribeModal: false,
-            publishInfo: [],
-            hadSubTopics: []
+            hadPubTopics: [],
+            hadSubTopics: [],
+            subTopicsInfo:[]
         };
     }
 
@@ -30,6 +31,7 @@ class ConnectTest extends Component {
     }
     createConnectPanel = ()=> {
         console.log("ConnectPanel", this.refs.ConnectPanel.getFieldsValue());
+        const that=this;
         const ConnectPanel = this.refs.ConnectPanel.getFieldsValue();
         const hide = message.loading('连线中......', 0);
         const host = `${configJson.MqttServerHost}:${configJson.MqttServerPort}`;
@@ -62,6 +64,10 @@ class ConnectTest extends Component {
         });
         client.on("message", function (topic, payload) {
             console.log("message事件",[topic, payload].join(": "));
+            console.log("payload",payload)
+            that.setState({
+                subTopicsInfo:that.state.subTopicsInfo.concat({topic:topic,info:payload.toString(),dateTime:new Date().toLocaleString()})
+            })
         });
         client.on('error', function (err) {
             console.log('客户端出错:', err);
@@ -70,16 +76,39 @@ class ConnectTest extends Component {
 
     };
     publicTheme = ()=> {
+        console.log("publish client ", client);
+        if(!client){
+            message.error(messageJson['connect first']);
+            return false
+        }
+        const that=this;
         const PublishPanel = this.refs.PublishPanel.getFieldsValue();
         const options = {
             qos: parseInt(PublishPanel.QoS),
             retain: PublishPanel.retain
         };
-        console.log(options)
-        console.log("publish client ", client);
-        client.publish(PublishPanel.topic, PublishPanel.info, options)
+        console.log(PublishPanel);
+        if(!PublishPanel.topic){
+            message.error(messageJson['pub topic must no null']);
+            return false
+        }
+        client.publish(PublishPanel.topic, PublishPanel.info, options,(err)=>{
+            if(err){
+                console.log("发布出错", err)
+                message.error(messageJson['pub topic fail']);
+            }else{
+                that.setState({
+                    hadPubTopics:that.state.hadPubTopics.concat({...PublishPanel,dateTime:new Date().toLocaleString()})
+                })
+            }
+        })
     };
     addSubscribePanel = ()=> {
+        console.log("sub client ", client);
+        if(!client){
+            message.error(messageJson['connect first']);
+            return false
+        }
         const AddSubscribePanel = this.refs.AddSubscribePanel.getFieldsValue();
         const tempArr = [];
         const that=this;
@@ -98,16 +127,17 @@ class ConnectTest extends Component {
         console.log("AddSubscribePanel", AddSubscribeDate);
         client.subscribe(AddSubscribeDate, (err, granted)=> {
             if (err) {
-                console.log("订阅出错", err)
+                console.log("订阅出错", err);
+                message.error(messageJson['sub topic fail']);
             }else{
-                granted.forEach((item,index)=>{
-                    item.dateTime=new Date().toLocaleString()
-                    return item;
-                });
-                that.setState({
-                    hadSubTopics:granted
-                })
-                console.log("订阅的主题", granted);
+                message.success(messageJson['sub topic success']);
+                // granted.forEach((item,index)=>{
+                //     item.dateTime=new Date().toLocaleString()
+                //     return item;
+                // });
+                // that.setState({
+                //     hadSubTopics:granted
+                // })
 
             }
 
@@ -134,7 +164,7 @@ class ConnectTest extends Component {
                 <Row gutter={20}>
                     <Col xs={24} sm={24} md={14} lg={14}>
                         <Card title="发布面板">
-                            <ShowPublishPanel publishInfo={this.state.publishInfo} ref="ShowPublishPanel"/>
+                            <ShowPublishPanel hadPubTopics={this.state.hadPubTopics} ref="ShowPublishPanel"/>
                             <PublishPanel ref="PublishPanel"/>
                             <Row type="flex" justify="end ">
                                 <Button onClick={this.publicTheme} type="primary" htmlType="submit" className="">
@@ -145,7 +175,7 @@ class ConnectTest extends Component {
                     </Col>
                     <Col xs={24} sm={24} md={10} lg={10}>
                         <Card title="订阅面板">
-                            <SubscriptionPanel hadSubTopics={this.state.hadSubTopics}/>
+                            <SubscriptionPanel subTopicsInfo={this.state.subTopicsInfo}/>
                             <Row type="flex" justify="end ">
                                 <Button onClick={()=> {
                                     this.setState({addSubscribeModal: true})
