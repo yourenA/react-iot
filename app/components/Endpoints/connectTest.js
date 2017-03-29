@@ -62,11 +62,11 @@ class ConnectTest extends Component {
         client.on('offline', function () {
             console.log('客户端离线:' + clientId);
         });
-        client.on("message", function (topic, payload) {
+        client.on("message", function (topic, payload,packet) {
             console.log("message事件",[topic, payload].join(": "));
-            console.log("payload",payload)
+            console.log("packet",packet)
             that.setState({
-                subTopicsInfo:that.state.subTopicsInfo.concat({topic:topic,info:payload.toString(),dateTime:new Date().toLocaleString()})
+                subTopicsInfo:that.state.subTopicsInfo.concat({qos:packet.qos,topic:topic,info:payload.toString(),dateTime:new Date().toLocaleString()})
             })
         });
         client.on('error', function (err) {
@@ -87,11 +87,11 @@ class ConnectTest extends Component {
             qos: parseInt(PublishPanel.QoS),
             retain: PublishPanel.retain
         };
-        console.log(PublishPanel);
         if(!PublishPanel.topic){
             message.error(messageJson['pub topic must no null']);
             return false
         }
+        console.log(options);
         client.publish(PublishPanel.topic, PublishPanel.info, options,(err)=>{
             if(err){
                 console.log("发布出错", err)
@@ -131,13 +131,6 @@ class ConnectTest extends Component {
                 message.error(messageJson['sub topic fail']);
             }else{
                 message.success(messageJson['sub topic success']);
-                // granted.forEach((item,index)=>{
-                //     item.dateTime=new Date().toLocaleString()
-                //     return item;
-                // });
-                // that.setState({
-                //     hadSubTopics:granted
-                // })
 
             }
 
