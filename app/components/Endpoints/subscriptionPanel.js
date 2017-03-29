@@ -22,7 +22,13 @@ class subPanelForm extends Component {
                         borderRadius: '4px',
                         marginBottom: '10px',
                         overflowY:'scroll'
-                    }}></div>
+                    }}>
+                        {this.props.hadSubTopics.map((item,index)=>{
+                            return(
+                                <p key={index}><span >时间:{item.dateTime } </span><span>主题{item.topic}</span><span>QoS:{item.qos}</span></p>
+                            )
+                        })}
+                    </div>
                 </Col>
             </Row>
         )

@@ -9,7 +9,7 @@ import {formItemLayout} from './../../common/common'
 class AddSubPanelForm extends Component {
     constructor(props) {
         super(props);
-        this.uuid=0
+        this.uuid=this.props.hadSubTopics.length-1;
         this.state = {};
     }
 
@@ -42,7 +42,12 @@ class AddSubPanelForm extends Component {
 
     render() {
         const {getFieldDecorator, getFieldValue} = this.props.form;
-        getFieldDecorator('keys', {initialValue: []});
+        const keysArr=[];
+        const hadSubTopicsLen=this.props.hadSubTopics.length;
+        for(let k in this.props.hadSubTopics){
+            keysArr.push(parseInt(k))
+        }
+        getFieldDecorator('keys', {initialValue: keysArr});
         const keys = getFieldValue('keys');
         const formItems = keys.map((k, index) => {
             return (
@@ -52,11 +57,14 @@ class AddSubPanelForm extends Component {
                     {getFieldDecorator(`topics-${k}`, {
                         initialValue: {theme: '', QoS: '0'},
                     })(<ThemeInput />)}
-                    <Icon
-                        className="dynamic-delete-button"
-                        type="minus-circle-o"
-                        onClick={() => this.remove(k)}
-                    />
+                    {
+                        k>=hadSubTopicsLen? <Icon
+                            className="dynamic-delete-button"
+                            type="minus-circle-o"
+                            onClick={() => this.remove(k)}
+                        />:null
+                    }
+
                 </FormItem>
             );
         });

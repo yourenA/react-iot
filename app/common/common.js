@@ -117,7 +117,7 @@ exports.convertSubFormToData  = (form) => {
     for (var k in form) {
         if (k.indexOf('topics') >= 0) {
             if (form.hasOwnProperty(k)) {
-                topics[`'${form[k].theme}'`]=parseInt(form[k].QoS);
+                topics[`${form[k].theme}`]=parseInt(form[k].QoS);
             }
         }
     }

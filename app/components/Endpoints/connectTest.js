@@ -10,7 +10,7 @@ import PublishPanel from './publishPanel'
 import ShowPublishPanel from './showPublish'
 import SubscriptionPanel from './subscriptionPanel';
 import AddSubscribePanel from './addSubscribePanel';
-import {getHeader, converErrorCodeToMsg,convertSubFormToData} from './../../common/common.js';
+import {getHeader, converErrorCodeToMsg, convertSubFormToData} from './../../common/common.js';
 import configJson from './../../../config.json';
 import messageJson from './../../common/message.json';
 
@@ -20,8 +20,9 @@ class ConnectTest extends Component {
         super(props);
         this.state = {
             connectPanelModal: false,
-            addSubscribeModal:false,
-            publishInfo:[]
+            addSubscribeModal: false,
+            publishInfo: [],
+            hadSubTopics: []
         };
     }
 
@@ -30,51 +31,87 @@ class ConnectTest extends Component {
     createConnectPanel = ()=> {
         console.log("ConnectPanel", this.refs.ConnectPanel.getFieldsValue());
         const ConnectPanel = this.refs.ConnectPanel.getFieldsValue();
-        const hide = message.loading('连线中..', 0);
-        const  host = `${configJson.MqttServerHost}:${configJson.MqttServerPort}`;
+        const hide = message.loading('连线中......', 0);
+        const host = `${configJson.MqttServerHost}:${configJson.MqttServerPort}`;
         const clientId = 'mqttjs_' + Math.random().toString(16).substr(2, 8);
-        const options={
-            keepalive:parseInt(ConnectPanel.keepalive),//心跳时间
+        const options = {
+            keepalive: parseInt(ConnectPanel.keepalive) || 0,//心跳时间
             username: ConnectPanel.username,//用户名
-            password: ConnectPanel.password,//身份密钥
+            password: ConnectPanel.password || '',//身份密钥
             clientId: clientId,
             clean: true,
             protocolId: 'MQTT',
             reconnectPeriod: 1000,
             connectTimeout: 30 * 1000,
         };
-        client = mqtt.connect(host,options);
+        client = mqtt.connect(host, options);
         client.on('connect', function () {
-            console.log('client connected:' + clientId);
+            console.log('客户端已连接:' + clientId);
             hide();
             message.success(messageJson["connect success"]);
 
-        })
+        });
+        client.on('reconnect', function () {
+            console.log('客户端重新连接:' + clientId);
+        });
+        client.on('close', function () {
+            console.log('客户端已关闭:' + clientId);
+        });
+        client.on('offline', function () {
+            console.log('客户端离线:' + clientId);
+        });
         client.on("message", function (topic, payload) {
-            alert([topic, payload].join(": "));
+            console.log("message事件",[topic, payload].join(": "));
         });
         client.on('error', function (err) {
-            console.log('error',err);
+            console.log('客户端出错:', err);
             client.end()
         })
 
     };
     publicTheme = ()=> {
-        console.log("PublishPanel", this.refs.PublishPanel.getFieldsValue());
         const PublishPanel = this.refs.PublishPanel.getFieldsValue();
-        const options={
+        const options = {
             qos: parseInt(PublishPanel.QoS),
-            retained: PublishPanel.retain
+            retain: PublishPanel.retain
         };
         console.log(options)
-        console.log("publish client ",client);
-        client.publish(PublishPanel.topic, PublishPanel.info,options )
+        console.log("publish client ", client);
+        client.publish(PublishPanel.topic, PublishPanel.info, options)
     };
-    addSubscribePanel=()=>{
-        const AddSubscribePanel=this.refs.AddSubscribePanel.getFieldsValue();
+    addSubscribePanel = ()=> {
+        const AddSubscribePanel = this.refs.AddSubscribePanel.getFieldsValue();
+        const tempArr = [];
+        const that=this;
+        for (var k in AddSubscribePanel) {
+            if (k.indexOf('topics') >= 0) {
+                if (AddSubscribePanel.hasOwnProperty(k)) {
+                    tempArr.push(AddSubscribePanel[k])
+                }
+            }
+        }
+        this.setState({
+            hadSubTopics: tempArr,
+            addSubscribeModal: false,
+        });
         const AddSubscribeDate = convertSubFormToData(AddSubscribePanel);
-        console.log("AddSubscribeDate",AddSubscribeDate);
-        client.subscribe(AddSubscribeDate)
+        console.log("AddSubscribePanel", AddSubscribeDate);
+        client.subscribe(AddSubscribeDate, (err, granted)=> {
+            if (err) {
+                console.log("订阅出错", err)
+            }else{
+                granted.forEach((item,index)=>{
+                    item.dateTime=new Date().toLocaleString()
+                    return item;
+                });
+                that.setState({
+                    hadSubTopics:granted
+                })
+                console.log("订阅的主题", granted);
+
+            }
+
+        })
     }
     goback = ()=> {
         hashHistory.goBack()
@@ -108,9 +145,11 @@ class ConnectTest extends Component {
                     </Col>
                     <Col xs={24} sm={24} md={10} lg={10}>
                         <Card title="订阅面板">
-                            <SubscriptionPanel />
+                            <SubscriptionPanel hadSubTopics={this.state.hadSubTopics}/>
                             <Row type="flex" justify="end ">
-                                <Button onClick={()=>{this.setState({addSubscribeModal:true})}} type="primary" htmlType="submit" className="">
+                                <Button onClick={()=> {
+                                    this.setState({addSubscribeModal: true})
+                                }} type="primary" htmlType="submit" className="">
                                     添加订阅主题
                                 </Button>
                             </Row>
@@ -137,7 +176,6 @@ class ConnectTest extends Component {
                     <ConnectPanel ref="ConnectPanel"/>
                 </Modal>
                 <Modal
-                    key={2 + Date.parse(new Date())}
                     visible={this.state.addSubscribeModal}
                     title="添加订阅主题"
                     width={300}
@@ -154,7 +192,7 @@ class ConnectTest extends Component {
                         </Button>,
                     ]}
                 >
-                    <AddSubscribePanel ref="AddSubscribePanel"/>
+                    <AddSubscribePanel hadSubTopics={this.state.hadSubTopics} ref="AddSubscribePanel"/>
                 </Modal>
             </div>
         );

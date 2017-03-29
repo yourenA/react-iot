@@ -8,8 +8,8 @@ module.exports = {
         hot: true,
         inline: true,
         progress: true,
-    // contentBase: './static',
-        port: 8080
+        port: 7070,
+        host: '0.0.0.0'
 
     },
     entry: {
