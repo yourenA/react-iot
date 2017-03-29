@@ -4,13 +4,11 @@ let OpenBrowserPlugin = require('open-browser-webpack-plugin');
 let autoprefixer=require('autoprefixer');
 module.exports = {
     devServer: {
-        historyApiFallback: true,
         hot: true,
         inline: true,
         progress: true,
         port: 7070,
         host: '0.0.0.0'
-
     },
     entry: {
         index: [
@@ -59,6 +57,7 @@ module.exports = {
     ],
     plugins: [
         new webpack.optimize.CommonsChunkPlugin('vendor', 'vendor.js'),
+        new webpack.HotModuleReplacementPlugin(),
         new webpack.DefinePlugin({
             'process.env': {
                 'NODE_ENV': '"development"'
