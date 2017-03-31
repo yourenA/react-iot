@@ -37,7 +37,7 @@
   "edit policies success":"修改策略成功",
   "del policies success":"删除策略成功",
   "del policies fail":"删除策略失败",
-  "topic name fail":"主题只能为1-32个字符的字母、数字或下划线，并且不能为空",
+  "topic name fail":"主题格式为：字线、数字、分隔符为'/'，并且不能为空",
   "topic name cant null":"主题不能为空",
   "connect success":"连接成功",
   "connect first":"请先连接",

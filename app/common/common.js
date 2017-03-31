@@ -49,7 +49,7 @@ exports.isLogin = () => {
  * 消除登陆状态storage
  * */
 
-exports.removeLoginStorage = () => {
+const removeLoginStorage = () => {
     sessionStorage.removeItem('username');
     sessionStorage.removeItem('usertoken');
     sessionStorage.clear();
@@ -57,7 +57,7 @@ exports.removeLoginStorage = () => {
     localStorage.removeItem('usertoken');
     localStorage.clear();
 };
-
+exports.removeLoginStorage=removeLoginStorage;
 /**
  * 获取头信息
  * */
@@ -135,8 +135,12 @@ exports.converErrorCodeToMsg  = (error) => {
     for ( first in error.response.data.errors) break;
     if (error.response.status === 401) {
         message.error(messageJson['token fail']);
+        removeLoginStorage();
+        setTimeout(()=>{
+            window.location.href='/';
+        },1000)
     } else if(error.response.status === 422){
-        message.error(`${error.response.data.errors[first][0]}`)
+        message.error(`${error.response.data.errors[first][0]}`);
     }else {
         message.error(messageJson['unknown error']);
     }
