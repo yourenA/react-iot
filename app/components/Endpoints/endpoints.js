@@ -3,12 +3,13 @@
  */
 import React, {Component} from 'react';
 import {fetchEndPoints} from '../../actions/endpoints';
-import {Modal, Input, Icon, Breadcrumb, Row, Col, Button, Table, Pagination, Popconfirm,message} from 'antd';
+import {Modal, Input, Icon, Breadcrumb, Row, DatePicker, Button, Table, Pagination, Popconfirm,message} from 'antd';
 const Search = Input.Search;
 import {Link} from 'react-router'
 import {connect} from 'react-redux';
 import Loading from './../Common/loading.js';
-import AddOrNameDescForm from './../Common/addOrEditNameDesc'
+import AddOrNameDescForm from './../Common/addOrEditNameDesc';
+import SearchWrap from './../Common/search';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import configJson from './../../../config.json';
@@ -19,10 +20,10 @@ import {getHeader,converErrorCodeToMsg} from './../../common/common.js';
     state => state.endpoints,
 )
 class EndPoints extends Component {
-    static fetch(state, dispatch, page,q) {
+    static fetch(state, dispatch, page,q,start_at,end_at,order) {
         const fetchTasks = [];
         fetchTasks.push(
-            dispatch(fetchEndPoints(page,q))
+            dispatch(fetchEndPoints(page,q,start_at,end_at,order))
         );
         return fetchTasks
     }
@@ -44,11 +45,7 @@ class EndPoints extends Component {
         }
     }
 
-    onPageChange = (page) => {
-        const { q} = this.props;
 
-        this.constructor.fetch(this.props, this.props.dispatch, page,q);
-    };
     showEditDesc=(uuid,name,desc)=>{
         this.setState({
             editDescModal:true,
@@ -58,7 +55,7 @@ class EndPoints extends Component {
         })
     };
     handleEditDescOk=()=>{
-        const { page,q} = this.props;
+        const { page ,q,start_at,end_at,order} = this.props;
         const that=this;
         const AddOrEditEndpointForm=this.refs.AddOrEditEndpointForm.getFieldsValue();
         axios({
@@ -73,14 +70,14 @@ class EndPoints extends Component {
                     editDescModal:false,
                 });
                 message.success(messageJson['edit endpoint desc success']);
-                that.constructor.fetch(that.props, that.props.dispatch, page,q);
+                that.constructor.fetch(that.props, that.props.dispatch, page,q,start_at,end_at,order);
             })
             .catch(function (error) {
                 converErrorCodeToMsg(error)
             });
     }
     addEndPoint=()=>{
-        const { page,q} = this.props;
+        const { page ,q,start_at,end_at,order} = this.props;
         const that=this;
         const AddOrEditEndpointForm=this.refs.AddOrEditEndpointForm.getFieldsValue();
         console.log("getFieldsValue();",AddOrEditEndpointForm);
@@ -96,7 +93,7 @@ class EndPoints extends Component {
                     addModal:false,
                 });
                 message.success(messageJson['add endpoint success']);
-                that.constructor.fetch(that.props, that.props.dispatch, page,q);
+                that.constructor.fetch(that.props, that.props.dispatch, page,q,start_at,end_at,order);
             })
             .catch(function (error) {
                 converErrorCodeToMsg(error)
@@ -105,7 +102,7 @@ class EndPoints extends Component {
     };
     delEndPoint=(uuid)=>{
         console.log("uuid",uuid);
-        const { page ,q} = this.props;
+        const { page ,q,start_at,end_at,order} = this.props;
         const that=this;
         axios({
             url:`${configJson.prefix}/endpoints/${uuid}`,
@@ -114,7 +111,7 @@ class EndPoints extends Component {
         })
             .then(function (response) {
                 message.success(messageJson['del endpoint success']);
-                that.constructor.fetch(that.props, that.props.dispatch, page,q);
+                that.constructor.fetch(that.props, that.props.dispatch, page,q,start_at,end_at,order);
             })
             .catch(function (error) {
                 console.log(error.response);
@@ -122,13 +119,17 @@ class EndPoints extends Component {
             });
 
     };
-    searchEndPoint=(value)=>{
-        this.constructor.fetch(this.props, this.props.dispatch, 1,value);
-    };
-    setConnetUrl=(url)=>{
-        localStorage.setItem('connect_host',url.split(':')[0]+':'+url.split(':')[1]);
-        localStorage.setItem('connect_port',url.split(':')[2]);
+
+    onChangeSearch=( page ,q,start_at,end_at,order)=>{
+        this.constructor.fetch(this.props, this.props.dispatch,page ,q,start_at,end_at,order);
+
     }
+
+    onPageChange = (page) => {
+        const { q,start_at,end_at,order} = this.props;
+        this.constructor.fetch(this.props, this.props.dispatch, page,q,start_at,end_at,order);
+    };
+
     render() {
         const {data = [], page, q,meta={pagination:{total:0,per_page:0}},loaded} = this.props;
         const columns = [{
@@ -137,7 +138,7 @@ class EndPoints extends Component {
             key: 'name',
             render: (text, record, index) => {
                 return (
-                        <Link onClick={this.setConnetUrl.bind(this,record.websocket_hostname)} to={'/basic/endpoints/'+record.uuid} title={text}>{text}</Link>
+                        <Link  to={'/basic/endpoints/'+record.uuid} title={text}>{text}</Link>
 
                 )
             }
@@ -203,12 +204,7 @@ class EndPoints extends Component {
                             <Breadcrumb.Item >设备域</Breadcrumb.Item>
                         </Breadcrumb>
                         <div className="operate-box">
-                            <Search
-                                defaultValue={q}
-                                placeholder="input search text"
-                                style={{ width: 200 }}
-                                onSearch={value => this.searchEndPoint(value)}
-                            />
+                            <SearchWrap onChangeSearch={this.onChangeSearch} {...this.props} />
                             <Button className="search-btn" type="primary" icon="plus" onClick={()=>{this.setState({addModal:true})}}>创建域</Button>
                         </div>
                         <Loading show={loaded} />

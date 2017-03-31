@@ -131,33 +131,19 @@ exports.convertSubFormToData  = (form) => {
  *  判断错误码(数组)
  * */
 exports.converErrorCodeToMsg  = (error) => {
-    let first;
-    for ( first in error.response.data.errors) break;
     if (error.response.status === 401) {
         message.error(messageJson['token fail']);
         removeLoginStorage();
         setTimeout(()=>{
             window.location.href='/';
         },1000)
+    }else  if(!error.response.data.errors){
+        message.error(error.response.data.message);
     } else if(error.response.status === 422){
+        let first;
+        for ( first in error.response.data.errors) break;
         message.error(`${error.response.data.errors[first][0]}`);
     }else {
         message.error(messageJson['unknown error']);
-    }
-}
-
-/**
- *  判断错误码(单个message)
- * */
-exports.converErrorMsg  = (error) => {
-    let first;
-    if (error.response.status === 401) {
-        message.error(messageJson['token fail']);
-        removeLoginStorage();
-        setTimeout(()=>{
-            window.location.href='/';
-        },1000)
-    } {
-        message.error(error.response.data.message);
     }
 }

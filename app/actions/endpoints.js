@@ -5,7 +5,7 @@ export const GET_ENDPOINTS_SUCCEED = 'GET_ENDPOINTS_SUCCEED';
 export const GET_ENDPOINTS_FAILED = 'GET_ENDPOINTS_FAILED';
 import {getHeader} from './../common/common.js';
 import configJson from './../../config.json';
-exports.fetchEndPoints = (page=1,q='')=> {
+exports.fetchEndPoints = (page=1,q='',start_at='',end_at='',order='asc')=> {
     return async(dispatch)=> {
         dispatch(endpointsRequest());
         try {
@@ -14,13 +14,16 @@ exports.fetchEndPoints = (page=1,q='')=> {
                 method: 'get',
                 params: {
                     page:page,
-                    q:q
+                    q:q,
+                    start_at:start_at,
+                    end_at:end_at,
+                    order:order
                 },
                 headers:getHeader()
             });
             let data = await response.data;
             console.log('get endpoints',data);
-            return dispatch(endpointsSucceed(data,page,q))
+            return dispatch(endpointsSucceed(data,page,q,start_at,end_at,order))
 
         } catch (e) {
             return dispatch(endpointsFailed(e));
@@ -32,11 +35,14 @@ const endpointsRequest = ()=>({
     type: GET_ENDPOINTS_REQUEST
 });
 
-const endpointsSucceed = (data,page,q)=>({
+const endpointsSucceed = (data,page,q,start_at,end_at,order)=>({
     type: GET_ENDPOINTS_SUCCEED,
     data: data,
     page:page,
-    q:q
+    q:q,
+    start_at:start_at,
+    end_at:end_at,
+    order:order
 });
 
 const endpointsFailed = (error)=> {

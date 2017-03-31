@@ -1,11 +1,17 @@
 @charset "UTF-8";
 @import "./../../common/common.scss";
+body {
+  min-height: 100vh;
+  background: url("http://amwares.com/images/home.jpg") 0 / cover fixed;
+}
+
 .App {
   .header-nav{
     width: 100%;
     height: $nav-height;
     border-bottom: 1px solid #DADADA;
     position: relative;
+    background: #ffffff;
     .header-nav-content{
       margin: 0 auto;
     }
@@ -156,6 +162,30 @@
 
 }
 
+
+.Home{
+  .home-info{
+    position: relative;
+    padding: 1em;
+    max-width: 1400px;
+    margin: 10px auto;
+    background: hsla(0,0%,100%,.25) border-box;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 0 0 1px hsla(0,0%,100%,.3) inset,
+    0 .5em 1em rgba(0, 0, 0, 0.6);
+    text-shadow: 0 1px 1px hsla(0,0%,100%,.3);
+    &::before {
+      background: url("http://amwares.com/images/home.jpg") 0 / cover fixed;
+      content: '';
+      position: absolute;
+      top: 0; right: 0; bottom: 0; left: 0;
+      z-index: -1;/*z-indexc:-1才不会挡住文字*/
+      -webkit-filter: blur(20px);
+      filter: blur(20px);
+    }
+  }
+}
 /*container div*/
 .container{
 }

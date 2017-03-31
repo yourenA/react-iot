@@ -10,7 +10,10 @@ export default (state = {page: 1}, action) => {
                 loaded: true,
                 page:action.page,
                 meta:action.data.meta,
-                q:action.q
+                q:action.q,
+                start_at:action.start_at,
+                end_at:action.end_at,
+                order:action.order
             };
             return {...state, ..._data};
         case GET_ENDPOINTS_FAILED:

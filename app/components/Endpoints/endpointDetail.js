@@ -10,7 +10,7 @@ import Loading from './../Common/loading.js';
 import TopicTable from './../Common/topicTable.js';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
-import {getHeader, converErrorCodeToMsg,converErrorMsg} from './../../common/common.js';
+import {getHeader, converErrorCodeToMsg} from './../../common/common.js';
 import AddOrEditDetailForm from './addOrEditDetailForm.js'
 import configJson from './../../../config.json';
 class Device extends Component {
@@ -173,7 +173,7 @@ class Device extends Component {
             })
             .catch(function (error) {
                 console.log(error.response);
-                converErrorMsg(error)
+                converErrorCodeToMsg(error)
             });
     }
     copyKey = ()=> {

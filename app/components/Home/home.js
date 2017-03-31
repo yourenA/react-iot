@@ -5,7 +5,9 @@ class Home extends Component {
     render() {
         return (
             <div className="Home" onClick={this.handleClick}>
-                <a href="www.baidu.com" style={{fontSize:'80px'}}>this is home page</a>
+                <div className="home-info">
+                    <a href="#" style={{fontSize:'80px'}}>this is home page</a>
+                </div>
             </div>
         );
     }
