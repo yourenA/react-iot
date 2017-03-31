@@ -10,7 +10,7 @@ import Loading from './../Common/loading.js';
 import TopicTable from './../Common/topicTable.js';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
-import {getHeader, converErrorCodeToMsg} from './../../common/common.js';
+import {getHeader, converErrorCodeToMsg,converErrorMsg} from './../../common/common.js';
 import AddOrEditDetailForm from './addOrEditDetailForm.js'
 import configJson from './../../../config.json';
 class Device extends Component {
@@ -91,7 +91,9 @@ class Device extends Component {
                 console.log(response);
                 message.success(messageJson['add device success']);
                 that.setState({
-                    addModal: false
+                    addModal: false,
+                    reGenerateKeyModal: true,
+                    newKey: response.data.password
                 });
                 that.fetchDevices(that.state.page, that.state.q)
             })
@@ -158,7 +160,7 @@ class Device extends Component {
     reGenerateKey = (uuid)=> {
         const that = this;
         axios({
-            url: `${configJson.prefix}/endpoints/${this.props.params.uuid}/policies/${uuid}/password`,
+            url: `${configJson.prefix}/endpoints/${this.props.params.uuid}/devices/${uuid}/password`,
             method: 'put',
             headers: getHeader()
         })
@@ -171,7 +173,7 @@ class Device extends Component {
             })
             .catch(function (error) {
                 console.log(error.response);
-                converErrorCodeToMsg(error)
+                converErrorMsg(error)
             });
     }
     copyKey = ()=> {
@@ -213,8 +215,8 @@ class Device extends Component {
             }
         }, {
             title: '状态',
-            dataIndex: 'status',
-            key: 'status',
+            dataIndex: 'online_status',
+            key: 'online_status',
         }, {
             title: '最后在线时间',
             dataIndex: 'last_onlined_at',
@@ -286,7 +288,7 @@ class Device extends Component {
                             this.setState({editModal: true, edituuid: record.uuid, editRecord: record})
                         }}>修改</Button> <span className="ant-divider"/>
                         <Button type="primary"
-                                onClick={this.reGenerateKey.bind(this, record.policy.uuid)}>重新生成秘钥</Button>
+                                onClick={this.reGenerateKey.bind(this, record.uuid)}>重新生成秘钥</Button>
                     </div>
                 </div>
 
@@ -362,7 +364,7 @@ class Device extends Component {
                     <Modal
                         key={3 + Date.parse(new Date())}
                         visible={this.state.reGenerateKeyModal}
-                        title="重新生成密钥成功"
+                        title="生成密钥成功"
                         onCancel={()=> {
                             this.setState({reGenerateKeyModal: false})
                         }}

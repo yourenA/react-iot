@@ -128,7 +128,7 @@ exports.convertSubFormToData  = (form) => {
 };
 
 /**
- *  判断错误码
+ *  判断错误码(数组)
  * */
 exports.converErrorCodeToMsg  = (error) => {
     let first;
@@ -143,5 +143,21 @@ exports.converErrorCodeToMsg  = (error) => {
         message.error(`${error.response.data.errors[first][0]}`);
     }else {
         message.error(messageJson['unknown error']);
+    }
+}
+
+/**
+ *  判断错误码(单个message)
+ * */
+exports.converErrorMsg  = (error) => {
+    let first;
+    if (error.response.status === 401) {
+        message.error(messageJson['token fail']);
+        removeLoginStorage();
+        setTimeout(()=>{
+            window.location.href='/';
+        },1000)
+    } {
+        message.error(error.response.data.message);
     }
 }
