@@ -15,6 +15,9 @@ exports.fetchAllEndpoints=()=>{
             let response = await axios({
                 url:`${configJson.prefix}/endpoints`,
                 method: 'get',
+                params: {
+                    return:'all'
+                },
                 headers:getHeader()
             });
             let data = await response.data;
@@ -46,7 +49,7 @@ const getEndpointsFailed = (error)=> {
     }
 };
 
-const fetchPolicies = (page=1,q='',endpoint_uuid)=> {
+const fetchPolicies = (page=1,q='',endpoint_uuid,start_at='',end_at='',order='asc')=> {
     return async(dispatch)=> {
         dispatch(policiesRequest());
         try {
@@ -55,13 +58,16 @@ const fetchPolicies = (page=1,q='',endpoint_uuid)=> {
                 method: 'get',
                 params: {
                     page:page,
-                    q:q
+                    q:q,
+                    start_at:start_at,
+                    end_at:end_at,
+                    order:order
                 },
                 headers:getHeader()
             });
             let data = await response.data;
             console.log('get policies',data);
-            return dispatch(policiesSucceed(data,page,q,endpoint_uuid))
+            return dispatch(policiesSucceed(data,page,q,endpoint_uuid,start_at,end_at,order))
 
         } catch (e) {
             return dispatch(policiesFailed(e));
@@ -73,12 +79,15 @@ const policiesRequest = ()=>({
     type: GET_POLICIES_REQUEST
 });
 
-const policiesSucceed = (data,page,q,endpoint_uuid)=>({
+const policiesSucceed = (data,page,q,endpoint_uuid,start_at,end_at,order)=>({
     type: GET_POLICIES_SUCCEED,
     data: data,
     page:page,
     q:q,
-    endpoint_uuid:endpoint_uuid
+    endpoint_uuid:endpoint_uuid,
+    start_at:start_at,
+    end_at:end_at,
+    order:order
 });
 
 const policiesFailed = (error)=> {

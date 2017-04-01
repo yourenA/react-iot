@@ -7,6 +7,13 @@ const Search = Input.Search;
 const Option = Select.Option;
 import moment from 'moment';
 class TopicTable extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            q: this.props.q,
+            order:'asc'
+        };
+    }
     onChangeSearchText = (value)=> {
         const {page, q, start_at, end_at, order} = this.props;
         this.props.onChangeSearch(page, value, start_at, end_at, order)
@@ -25,28 +32,45 @@ class TopicTable extends Component {
         console.log(order)
         const {page, q, start_at, end_at} = this.props;
         this.props.onChangeSearch(page, q, start_at, end_at, order)
+        this.setState({
+            order:order
+        })
+    }
+    onChange=(e)=>{
+        this.setState({
+            q:e.target.value
+        })
+    }
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.q !== this.props.q) {
+            this.setState({
+                q:nextProps.q
+            })
+        }
+        if (nextProps.order !== this.props.order) {
+            this.setState({
+                order:nextProps.order
+            })
+        }
     }
     render() {
-        console.log("this.props.start_at", this.props.start_at)
-        const dateFormat = 'YYYY-MM-DD';
+        console.log('q',this.props.q)
         return (
             <div className="search-wrap">
-                <Select defaultValue={this.props.order ? this.props.order : 'asc' } onChange={this.onChangeOrder}>
+                <Select value={this.state.order} onChange={this.onChangeOrder}>
                     <Option value="asc">升序</Option>
                     <Option value="desc">降序</Option>
                 </Select><span className="ant-divider"/>
                 <Search
-                    defaultValue={this.props.q}
+                    value={this.state.q}
                     placeholder="input search text"
                     style={{width: 200}}
+                    onChange={this.onChange}
                     onSearch={value => this.onChangeSearchText(value)}
                 /><span className="ant-divider"/>
                 <span>开始时间: </span><DatePicker
-                defaultValue={moment(this.props.start_at ? this.props.start_at : '2017-1-1', dateFormat)}
                 onChange={this.onChangeStartDate}/><span className="ant-divider"/>
-                <span>结束时间: </span><DatePicker
-                defaultValue={this.props.end_at ?moment( this.props.end_at, dateFormat):moment()}
-                onChange={this.onChangeEndDate}/><span className="ant-divider"/>
+                <span>结束时间: </span><DatePicker onChange={this.onChangeEndDate}/><span className="ant-divider"/>
             </div>
 
         );

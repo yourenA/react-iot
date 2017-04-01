@@ -9,6 +9,7 @@ const Option = Select.Option;
 import {connect} from 'react-redux';
 import Loading from './../Common/loading.js';
 import TopicTable from './../Common/topicTable';
+import SearchWrap from './../Common/searchforPolice';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import configJson from './../../../config.json';
@@ -19,15 +20,6 @@ import EditPoliciesForm from './editPoliciesForm'
     state => state.policies,
 )
 class Policies extends Component {
-    static fetch(state, dispatch, page, q, endpoint_uuid) {
-        const fetchTasks = [];
-        fetchTasks.push(
-            dispatch(fetchAllEndpoints()),
-            // dispatch(fetchPolicies(page,q,endpoint_uuid))
-        );
-        return fetchTasks
-    }
-
     constructor(props) {
         super(props);
         this.state = {
@@ -43,11 +35,11 @@ class Policies extends Component {
     }
     changeEndpoint = (e)=> {
         const endpoint_uuid = e.target.value;
-        this.props.dispatch(fetchPolicies(1, '', endpoint_uuid))
+        this.props.dispatch(fetchPolicies(1, '', endpoint_uuid,'','','asc'))
     }
     onPageChange = (page) => {
-        const {q, endpoint_uuid} = this.props;
-        this.props.dispatch(fetchPolicies(page, q, endpoint_uuid))
+        const {q, endpoint_uuid,start_at,end_at,order} = this.props;
+        this.props.dispatch(fetchPolicies(page, q, endpoint_uuid,start_at,end_at,order));
     };
     showEditPolicies = (record)=> {
         this.setState({
@@ -60,7 +52,7 @@ class Policies extends Component {
         const AddPoliciesForm = this.refs.AddPoliciesForm.getFieldsValue();
         console.log("AddPoliciesForm", AddPoliciesForm);
         const addPoliciesDate = convertFormToData(AddPoliciesForm);
-        const {page, q, endpoint_uuid} = this.props;
+        const {page, q, endpoint_uuid,start_at,end_at,order} = this.props;
         const that = this;
         axios({
             url: `${configJson.prefix}/endpoints/${endpoint_uuid}/policies`,
@@ -71,7 +63,7 @@ class Policies extends Component {
             .then(function (response) {
                 console.log(response);
                 message.success(messageJson['add policies success']);
-                that.props.dispatch(fetchPolicies(page, q, endpoint_uuid));
+                that.props.dispatch(fetchPolicies(page, q, endpoint_uuid,start_at,end_at,order));
                 that.setState({
                     addModal: false
                 })
@@ -88,7 +80,7 @@ class Policies extends Component {
             message.error(messageJson["topic name cant null"]);
             return false
         }
-        const {page, q, endpoint_uuid} = this.props;
+        const {page, q, endpoint_uuid,start_at,end_at,order} = this.props;
         const that = this;
         axios({
             url: `${configJson.prefix}/endpoints/${endpoint_uuid}/policies/${this.state.edituuid}`,
@@ -99,7 +91,7 @@ class Policies extends Component {
             .then(function (response) {
                 console.log(response);
                 message.success(messageJson['edit policies success']);
-                that.props.dispatch(fetchPolicies(page, q, endpoint_uuid));
+                that.props.dispatch(fetchPolicies(page, q, endpoint_uuid,start_at,end_at,order));
                 that.setState({
                     editPoliciesModal: false
                 })
@@ -111,7 +103,7 @@ class Policies extends Component {
 
     }
     delPolice = (uuid)=> {
-        const {page, q, endpoint_uuid} = this.props;
+        const {page, q, endpoint_uuid,start_at,end_at,order} = this.props;
         const that = this;
         axios({
             url: `${configJson.prefix}/endpoints/${endpoint_uuid}/policies/${uuid}`,
@@ -120,7 +112,7 @@ class Policies extends Component {
         })
             .then(function (response) {
                 message.success(messageJson['del policies success']);
-                that.props.dispatch(fetchPolicies(page, q, endpoint_uuid));
+                that.props.dispatch(fetchPolicies(page, q, endpoint_uuid,start_at,end_at,order));
             })
             .catch(function (error) {
                 console.log(error.response);
@@ -129,10 +121,12 @@ class Policies extends Component {
             });
 
     };
-    searchEndPoint = (value)=> {
-        const {page, q, endpoint_uuid} = this.props;
-        this.props.dispatch(fetchPolicies(page, value, endpoint_uuid));
-    };
+
+    onChangeSearch=( page ,q,start_at,end_at,order)=>{
+        const {endpoint_uuid}=this.props;
+        this.props.dispatch(fetchPolicies(page, q, endpoint_uuid,start_at,end_at,order));
+
+    }
 
     render() {
         const {
@@ -143,6 +137,7 @@ class Policies extends Component {
             }
         }, loaded
         } = this.props;
+
         const columns = [{
             title: '策略名称',
             dataIndex: 'name',
@@ -226,12 +221,7 @@ class Policies extends Component {
                                     style={{marginRight: '10px', width: 'auto'}}>
                                 {selectOptions}
                             </select>
-                            <Search
-                                defaultValue={q}
-                                placeholder="input search text"
-                                style={{width: 200}}
-                                onSearch={value => this.searchEndPoint(value)}
-                            />
+                            <SearchWrap type="policy" onChangeSearch={this.onChangeSearch} {...this.props} />
                             <Button className="search-btn" type="primary" icon="plus" onClick={()=> {
                                 this.setState({addModal: true})
                             }}>创建策略</Button>

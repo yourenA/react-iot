@@ -8,6 +8,7 @@ const Search = Input.Search;
 import {connect} from 'react-redux';
 import Loading from './../Common/loading.js';
 import AddOrNameDescForm from './../Common/addOrEditNameDesc'
+import SearchWrap from './../Common/search';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import configJson from './../../../config.json';
@@ -17,10 +18,10 @@ import {getHeader,converErrorCodeToMsg} from './../../common/common.js';
     state => state.device_categories,
 )
 class DeviceCategories extends Component {
-    static fetch(state, dispatch, page,q) {
+    static fetch(state, dispatch, page,q,start_at,end_at,order) {
         const fetchTasks = [];
         fetchTasks.push(
-            dispatch(fetchDevice_categories(page,q))
+            dispatch(fetchDevice_categories(page,q,start_at,end_at,order))
         );
         return fetchTasks
     }
@@ -43,9 +44,8 @@ class DeviceCategories extends Component {
     }
 
     onPageChange = (page) => {
-        const { q} = this.props;
-
-        this.constructor.fetch(this.props, this.props.dispatch, page,q);
+        const { q,start_at,end_at,order} = this.props;
+        this.constructor.fetch(this.props, this.props.dispatch, page,q,start_at,end_at,order);
     };
     showEditDesc=(uuid,name,desc)=>{
         this.setState({
@@ -57,7 +57,7 @@ class DeviceCategories extends Component {
     };
     handleEditDescOk=()=>{
         const AddOrEditCategoryForm=this.refs.AddOrEditCategoryForm.getFieldsValue();
-        const { page,q} = this.props;
+        const { page ,q,start_at,end_at,order} = this.props;
         const that=this;
         axios({
             url:`${configJson.prefix}/device_categories/${this.state.editDescuuid}`,
@@ -71,7 +71,7 @@ class DeviceCategories extends Component {
                     editDescModal:false,
                 });
                 message.success(messageJson['edit device_categories desc success']);
-                that.constructor.fetch(that.props, that.props.dispatch, page,q);
+                that.constructor.fetch(that.props, that.props.dispatch, page,q,start_at,end_at,order);
             })
             .catch(function (error) {
                 converErrorCodeToMsg(error)
@@ -79,7 +79,7 @@ class DeviceCategories extends Component {
     }
     addDevice_category=()=>{
         const AddOrEditCategoryForm=this.refs.AddOrEditCategoryForm.getFieldsValue();
-        const { page,q} = this.props;
+        const { page,q,start_at,end_at,order} = this.props;
         const that=this;
         axios({
             url:`${configJson.prefix}/device_categories`,
@@ -93,7 +93,7 @@ class DeviceCategories extends Component {
                     addModal:false,
                 });
                 message.success(messageJson['add device_categories success']);
-                that.constructor.fetch(that.props, that.props.dispatch, page,q);
+                that.constructor.fetch(that.props, that.props.dispatch, page,q,start_at,end_at,order);
 
             })
             .catch(function (error) {
@@ -103,7 +103,7 @@ class DeviceCategories extends Component {
     };
     delEndPoint=(uuid)=>{
         console.log("uuid",uuid);
-        const { page ,q} = this.props;
+        const { page ,q,start_at,end_at,order} = this.props;
         const that=this;
         axios({
             url:`${configJson.prefix}/device_categories/${uuid}`,
@@ -112,7 +112,7 @@ class DeviceCategories extends Component {
         })
             .then(function (response) {
                 message.success(messageJson['del device_categories success']);
-                that.constructor.fetch(that.props, that.props.dispatch, page,q);
+                that.constructor.fetch(that.props, that.props.dispatch, page,q,start_at,end_at,order);
             })
             .catch(function (error) {
                 console.log(error.response);
@@ -120,6 +120,11 @@ class DeviceCategories extends Component {
             });
 
     };
+
+    onChangeSearch=( page ,q,start_at,end_at,order)=>{
+        this.constructor.fetch(this.props, this.props.dispatch,page ,q,start_at,end_at,order);
+
+    }
     searchEndPoint=(value)=>{
         this.constructor.fetch(this.props, this.props.dispatch, 1,value);
     };
@@ -141,6 +146,10 @@ class DeviceCategories extends Component {
 
                 )
             }
+        },{
+            title: '创建时间',
+            dataIndex: 'created_at',
+            key: 'created_at',
         },{
             title: '操作',
             key: 'action',
@@ -171,12 +180,7 @@ class DeviceCategories extends Component {
                             <Breadcrumb.Item >分类管理</Breadcrumb.Item>
                         </Breadcrumb>
                         <div className="operate-box">
-                            <Search
-                                defaultValue={q}
-                                placeholder="input search text"
-                                style={{ width: 200 }}
-                                onSearch={value => this.searchEndPoint(value)}
-                            />
+                            <SearchWrap onChangeSearch={this.onChangeSearch} {...this.props} />
                             <Button className="search-btn" type="primary" icon="plus" onClick={()=>{this.setState({addModal:true})}}>增加新类型</Button>
                         </div>
                         <Loading show={loaded} />

@@ -11,17 +11,17 @@ import AddOrNameDescForm from './../Common/addOrEditNameDesc'
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import configJson from './../../../config.json';
-
+import SearchWrap from './../Common/search';
 import {getHeader,converErrorCodeToMsg} from './../../common/common.js';
 
 @connect(
     state => state.device_groups,
 )
 class DeviceGroups extends Component {
-    static fetch(state, dispatch, page,q) {
+    static fetch(state, dispatch, page,q,start_at,end_at,order) {
         const fetchTasks = [];
         fetchTasks.push(
-            dispatch(fetchDevice_groups(page,q))
+            dispatch(fetchDevice_groups(page,q,start_at,end_at,order))
         );
         return fetchTasks
     }
@@ -44,9 +44,8 @@ class DeviceGroups extends Component {
     }
 
     onPageChange = (page) => {
-        const { q} = this.props;
-
-        this.constructor.fetch(this.props, this.props.dispatch, page,q);
+        const { q,start_at,end_at,order} = this.props;
+        this.constructor.fetch(this.props, this.props.dispatch, page,q,start_at,end_at,order);
     };
     showEditDesc=(uuid,name,desc)=>{
         this.setState({
@@ -58,7 +57,7 @@ class DeviceGroups extends Component {
     };
     handleEditDescOk=()=>{
         const AddOrEditEndpointForm=this.refs.AddOrEditGroupForm.getFieldsValue();
-        const { page,q} = this.props;
+        const { page ,q,start_at,end_at,order} = this.props;
         const that=this;
         axios({
             url:`${configJson.prefix}/device_groups/${this.state.editDescuuid}`,
@@ -72,7 +71,7 @@ class DeviceGroups extends Component {
                     editDescModal:false,
                 });
                 message.success(messageJson['edit device_groups desc success']);
-                that.constructor.fetch(that.props, that.props.dispatch, page,q);
+                that.constructor.fetch(that.props, that.props.dispatch, page,q,start_at,end_at,order);
             })
             .catch(function (error) {
                 converErrorCodeToMsg(error)
@@ -81,7 +80,7 @@ class DeviceGroups extends Component {
     }
     addDevice_category=()=>{
         const AddOrEditGroupForm=this.refs.AddOrEditGroupForm.getFieldsValue();
-        const { page,q} = this.props;
+        const { page,q,start_at,end_at,order} = this.props;
         const that=this;
         axios({
             url:`${configJson.prefix}/device_groups`,
@@ -95,7 +94,7 @@ class DeviceGroups extends Component {
                     addModal:false,
                 });
                 message.success(messageJson['add device_groups success']);
-                that.constructor.fetch(that.props, that.props.dispatch, page,q);
+                that.constructor.fetch(that.props, that.props.dispatch, page,q,start_at,end_at,order);
 
             })
             .catch(function (error) {
@@ -105,7 +104,7 @@ class DeviceGroups extends Component {
     };
     delEndPoint=(uuid)=>{
         console.log("uuid",uuid);
-        const { page ,q} = this.props;
+        const { page ,q,start_at,end_at,order} = this.props;
         const that=this;
         axios({
             url:`${configJson.prefix}/device_groups/${uuid}`,
@@ -114,7 +113,7 @@ class DeviceGroups extends Component {
         })
             .then(function (response) {
                 message.success(messageJson['del device_groups success']);
-                that.constructor.fetch(that.props, that.props.dispatch, page,q);
+                that.constructor.fetch(that.props, that.props.dispatch, page,q,start_at,end_at,order);
             })
             .catch(function (error) {
                 console.log(error.response);
@@ -122,6 +121,11 @@ class DeviceGroups extends Component {
             });
 
     };
+
+    onChangeSearch=( page ,q,start_at,end_at,order)=>{
+        this.constructor.fetch(this.props, this.props.dispatch,page ,q,start_at,end_at,order);
+
+    }
     searchEndPoint=(value)=>{
         this.constructor.fetch(this.props, this.props.dispatch, 1,value);
     };
@@ -143,6 +147,10 @@ class DeviceGroups extends Component {
 
                 )
             }
+        },{
+            title: '创建时间',
+            dataIndex: 'created_at',
+            key: 'created_at',
         },{
             title: '操作',
             key: 'action',
@@ -170,12 +178,7 @@ class DeviceGroups extends Component {
                             <Breadcrumb.Item >分组管理</Breadcrumb.Item>
                         </Breadcrumb>
                         <div className="operate-box">
-                            <Search
-                                defaultValue={q}
-                                placeholder="input search text"
-                                style={{ width: 200 }}
-                                onSearch={value => this.searchEndPoint(value)}
-                            />
+                            <SearchWrap onChangeSearch={this.onChangeSearch} {...this.props} />
                             <Button className="search-btn" type="primary" icon="plus" onClick={()=>{this.setState({addModal:true})}}>增加新设备组</Button>
                         </div>
                         <Loading show={loaded} />

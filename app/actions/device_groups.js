@@ -5,7 +5,7 @@ export const GET_DEVICE_GROUPS_SUCCEED = 'GET_DEVICE_GROUPS_SUCCEED';
 export const GET_DEVICE_GROUPS_FAILED = 'GET_DEVICE_GROUPS_FAILED';
 import {getHeader} from './../common/common.js';
 import configJson from './../../config.json';
-exports.fetchDevice_groups = (page=1,q='')=> {
+exports.fetchDevice_groups = (page=1,q='',start_at='',end_at='',order='asc')=> {
     return async(dispatch)=> {
         dispatch(device_groupsRequest());
         try {
@@ -14,13 +14,16 @@ exports.fetchDevice_groups = (page=1,q='')=> {
                 method: 'get',
                 params: {
                     page:page,
-                    q:q
+                    q:q,
+                    start_at:start_at,
+                    end_at:end_at,
+                    order:order
                 },
                 headers:getHeader()
             });
             let data = await response.data;
             console.log('get device_groups',data);
-            return dispatch(device_groupsSucceed(data,page,q))
+            return dispatch(device_groupsSucceed(data,page,q,start_at,end_at,order))
 
         } catch (e) {
             return dispatch(device_groupsFailed(e));
@@ -32,11 +35,14 @@ const device_groupsRequest = ()=>({
     type: GET_DEVICE_GROUPS_REQUEST
 });
 
-const device_groupsSucceed = (data,page,q)=>({
+const device_groupsSucceed = (data,page,q,start_at,end_at,order)=>({
     type: GET_DEVICE_GROUPS_SUCCEED,
     data: data,
     page:page,
-    q:q
+    q:q,
+    start_at:start_at,
+    end_at:end_at,
+    order:order
 });
 
 const device_groupsFailed = (error)=> {

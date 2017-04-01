@@ -8,6 +8,7 @@ import {Link} from 'react-router';
 import Clipboard from 'clipboard'
 import Loading from './../Common/loading.js';
 import TopicTable from './../Common/topicTable.js';
+import SearchWrap from './../Common/search';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import {getHeader, converErrorCodeToMsg} from './../../common/common.js';
@@ -21,6 +22,9 @@ class Device extends Component {
             loaded: true,
             q: '',
             page: 1,
+            start_at:'',
+            end_at:'',
+            order:'asc',
             meta: {pagination: {total: 0, per_page: 0}},
             addModal: false,
             editModal: false,
@@ -39,14 +43,17 @@ class Device extends Component {
         });
     }
 
-    fetchDevices = (page = 1, q = '')=> {
+    fetchDevices = (page = 1, q = '',start_at='',end_at='',order='asc')=> {
         const that = this;
         axios({
             url: `${configJson.prefix}/endpoints/${this.props.params.uuid}/devices`,
             method: 'get',
             params: {
                 page: page,
-                q: q
+                q: q,
+                start_at:start_at,
+                end_at:end_at,
+                order:order
             },
             headers: getHeader()
         })
@@ -55,18 +62,21 @@ class Device extends Component {
                 that.setState({
                     data: response.data.data,
                     meta: response.data.meta,
-                    page: page
+                    page: page,
+                    q:q,
+                    start_at:start_at,
+                    end_at:end_at,
+                    order:order
                 })
             })
             .catch(function (error) {
                 console.log('获取出错')
             })
     };
-    onPageChange = (page) => {
-        this.fetchDevices(page, this.state.q);
-    };
+
     addDevice = ()=> {
         const that = this;
+        const { page ,q,start_at,end_at,order} = this.state;
         const AddDetailForm = this.refs.AddDetailForm.getFieldsValue();
         console.log(AddDetailForm)
         if (!AddDetailForm.name || !AddDetailForm.category || !AddDetailForm.policy) {
@@ -95,7 +105,7 @@ class Device extends Component {
                     reGenerateKeyModal: true,
                     newKey: response.data.password
                 });
-                that.fetchDevices(that.state.page, that.state.q)
+                that.fetchDevices( page,q,start_at,end_at,order);
             })
             .catch(function (error) {
                 converErrorCodeToMsg(error)
@@ -104,6 +114,7 @@ class Device extends Component {
     };
     editDevice = ()=> {
         const that = this;
+        const { page ,q,start_at,end_at,order} = this.state;
         const EditDetailForm = this.refs.EditDetailForm.getFieldsValue();
         if (!EditDetailForm.name || !EditDetailForm.category || !EditDetailForm.policy) {
             message.error(messageJson['category group category null']);
@@ -129,7 +140,7 @@ class Device extends Component {
                 that.setState({
                     editModal: false
                 });
-                that.fetchDevices(that.state.page, that.state.q)
+                that.fetchDevices( page,q,start_at,end_at,order);
             })
             .catch(function (error) {
                 converErrorCodeToMsg(error)
@@ -141,8 +152,8 @@ class Device extends Component {
     }
     delDevice = (uuid)=> {
         console.log("uuid", uuid);
-        const {page, q} = this.state;
         const that = this;
+        const { page ,q,start_at,end_at,order} = this.state;
         axios({
             url: `${configJson.prefix}/endpoints/${this.props.params.uuid}/devices/${uuid}`,
             method: 'delete',
@@ -150,7 +161,7 @@ class Device extends Component {
         })
             .then(function (response) {
                 message.success(messageJson['del device success']);
-                that.fetchDevices(that.state.page, that.state.q)
+                that.fetchDevices(page,q,start_at,end_at,order);
             })
             .catch(function (error) {
                 converErrorCodeToMsg(error)
@@ -182,6 +193,14 @@ class Device extends Component {
             reGenerateKeyModal: false
         })
 
+    };
+
+    onChangeSearch=( page ,q,start_at,end_at,order)=>{
+        this.fetchDevices(page ,q,start_at,end_at,order);
+
+    }
+    onPageChange = (page) => {
+        this.fetchDevices(page, this.state.q);
     };
     searchEndPoint = (value)=> {
         this.fetchDevices(1, value);
@@ -304,12 +323,7 @@ class Device extends Component {
                             <Breadcrumb.Item >设备</Breadcrumb.Item>
                         </Breadcrumb>
                         <div className="operate-box">
-                            <Search
-                                defaultValue={q}
-                                placeholder="input search text"
-                                style={{width: 200}}
-                                onSearch={value => this.searchEndPoint(value)}
-                            />
+                            <SearchWrap onChangeSearch={this.onChangeSearch} {...this.state} />
                             <Button className="search-btn" type="primary" icon="plus" onClick={()=> {
                                 this.setState({addModal: true})
                             }}>添加设备</Button>

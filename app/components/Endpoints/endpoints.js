@@ -131,7 +131,7 @@ class EndPoints extends Component {
     };
 
     render() {
-        const {data = [], page, q,meta={pagination:{total:0,per_page:0}},loaded} = this.props;
+        const {data = [], page, q,start_at,end_at,order,meta={pagination:{total:0,per_page:0}},loaded} = this.props;
         const columns = [{
             title: '域名称',
             dataIndex: 'name',
