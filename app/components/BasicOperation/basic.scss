@@ -41,7 +41,7 @@
 }
 .basic-content{
   .Home{
-    max-width: 1200px;
+    //max-width: 1200px;
     margin: 0 auto;
   }
   background: #ffffff;
@@ -49,7 +49,7 @@
   @include respond-to(medium){
     padding: 5px;
   }
-  padding: 25px;
+  padding: 15px;
 }
 
 .edit-password{

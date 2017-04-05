@@ -170,7 +170,7 @@ class DeviceGroups extends Component {
         return (
             <div className="Home">
                 <Row>
-                    <div style={{marginTop: '20px'}}>
+                    <div style={{marginTop: '10px'}}>
                         <Breadcrumb separator=">">
                             <Breadcrumb.Item>接入管理</Breadcrumb.Item>
                             <Breadcrumb.Item >分组管理</Breadcrumb.Item>

@@ -195,7 +195,7 @@ class EndPoints extends Component {
         return (
             <div className="Home">
                 <Row>
-                    <div style={{marginTop: '20px'}}>
+                    <div style={{marginTop: '10px'}}>
                         <Breadcrumb separator=">">
                             <Breadcrumb.Item>接入管理</Breadcrumb.Item>
                             <Breadcrumb.Item >设备域</Breadcrumb.Item>
