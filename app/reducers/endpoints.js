@@ -1,9 +1,9 @@
 import {GET_ENDPOINTS_FAILED,GET_ENDPOINTS_REQUEST,GET_ENDPOINTS_SUCCEED} from '../actions/endpoints';
 
-export default (state = {page: 1}, action) => {
+export default (state = {page:1,q:'',start_at:'',end_at:'',order:'asc'}, action) => {
     switch (action.type) {
         case GET_ENDPOINTS_REQUEST:
-            return {...state};
+            return {...state, loaded: false};
         case GET_ENDPOINTS_SUCCEED:
             const _data = {
                 data: action.data.data,

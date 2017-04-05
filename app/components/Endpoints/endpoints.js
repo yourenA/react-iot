@@ -38,12 +38,8 @@ class EndPoints extends Component {
         };
     }
     componentDidMount() {
-        /*通过设置loaded，切换路由的时候就不会重复发送请求*/
-        const {loaded} = this.props;
-        if (!loaded) {
-
-        }
-        this.constructor.fetch(this.props, this.props.dispatch)
+        console.log("componentDidMount")
+        this.props.dispatch(fetchEndPoints(1,'','','','asc'))
     }
 
 
@@ -215,7 +211,6 @@ class EndPoints extends Component {
 
                     </div>
                     <Modal
-                        key={1+Date.parse(new Date())}
                         visible={this.state.addModal}
                         title="创建新域"
                         onCancel={()=>{this.setState({addModal:false})}}

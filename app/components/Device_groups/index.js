@@ -37,10 +37,8 @@ class DeviceGroups extends Component {
     }
     componentDidMount() {
         /*通过设置loaded，切换路由的时候就不会重复发送请求*/
-        const {loaded} = this.props;
-        if (!loaded) {
-        }
-        this.constructor.fetch(this.props, this.props.dispatch)
+        this.props.dispatch(fetchDevice_groups(1,'','','','asc'))
+
     }
 
     onPageChange = (page) => {
@@ -188,7 +186,6 @@ class DeviceGroups extends Component {
 
                     </div>
                     <Modal
-                        key={1+Date.parse(new Date())}
                         visible={this.state.addModal}
                         title="创建新设备组"
                         onOk={this.handleOk}

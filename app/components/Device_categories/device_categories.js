@@ -37,10 +37,8 @@ class DeviceCategories extends Component {
     }
     componentDidMount() {
         /*通过设置loaded，切换路由的时候就不会重复发送请求*/
-        const {loaded} = this.props;
-        if (!loaded) {
-        }
-        this.constructor.fetch(this.props, this.props.dispatch)
+        console.log("componentDidMount")
+        this.props.dispatch(fetchDevice_categories(1,'','','','asc'))
     }
 
     onPageChange = (page) => {
@@ -190,7 +188,6 @@ class DeviceCategories extends Component {
 
                     </div>
                     <Modal
-                        key={1+Date.parse(new Date())}
                         visible={this.state.addModal}
                         title="创建设备分类"
                         onOk={this.handleOk}

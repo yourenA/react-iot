@@ -1,9 +1,9 @@
 import {GET_DEVICE_CATEGORIES_FAILED,GET_DEVICE_CATEGORIES_REQUEST,GET_DEVICE_CATEGORIES_SUCCEED} from '../actions/device_categories';
 
-export default (state = {page: 1}, action) => {
+export default (state = {page:1,q:'',start_at:'',end_at:'',order:'asc'}, action) => {
     switch (action.type) {
         case GET_DEVICE_CATEGORIES_REQUEST:
-            return {...state};
+            return {...state, loaded: false};
         case GET_DEVICE_CATEGORIES_SUCCEED:
             const _data = {
                 data: action.data.data,

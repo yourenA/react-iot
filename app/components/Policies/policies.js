@@ -235,7 +235,6 @@ class Policies extends Component {
 
                     </div>
                     <Modal
-                        key={1+Date.parse(new Date())}
                         visible={this.state.addModal}
                         title="创建新策略"
                         onOk={this.handleOk}

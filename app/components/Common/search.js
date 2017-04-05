@@ -27,25 +27,23 @@ class TopicTable extends Component {
         this.props.onChangeSearch(page, q, start_at, end_at, order)
     }
     render() {
-        console.log("this.props.start_at", this.props.start_at)
+        console.log("this.props", this.props.order ? this.props.order : 'asc');
         const dateFormat = 'YYYY-MM-DD';
         return (
             <div className="search-wrap">
-                <Select defaultValue={this.props.order ? this.props.order : 'asc' } onChange={this.onChangeOrder}>
+                <Select defaultValue={ 'asc' } value={this.props.order} onChange={this.onChangeOrder}>
                     <Option value="asc">升序</Option>
                     <Option value="desc">降序</Option>
                 </Select><span className="ant-divider"/>
                 <Search
-                    defaultValue={this.props.q}
+                    defaultValue={''}
                     placeholder="input search text"
                     style={{width: 200}}
                     onSearch={value => this.onChangeSearchText(value)}
                 /><span className="ant-divider"/>
                 <span>开始时间: </span><DatePicker
-                defaultValue={moment(this.props.start_at ? this.props.start_at : '2017-1-1', dateFormat)}
                 onChange={this.onChangeStartDate}/><span className="ant-divider"/>
                 <span>结束时间: </span><DatePicker
-                defaultValue={this.props.end_at ?moment( this.props.end_at, dateFormat):moment()}
                 onChange={this.onChangeEndDate}/><span className="ant-divider"/>
             </div>
 
