@@ -41,8 +41,9 @@ class EndPoints extends Component {
         /*通过设置loaded，切换路由的时候就不会重复发送请求*/
         const {loaded} = this.props;
         if (!loaded) {
-            this.constructor.fetch(this.props, this.props.dispatch)
+
         }
+        this.constructor.fetch(this.props, this.props.dispatch)
     }
 
 
