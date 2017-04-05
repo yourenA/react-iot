@@ -300,7 +300,7 @@ class Device extends Component {
                         </table>
                     </div>
                     <div className="expandRowRender-operate">
-                        <Link onClick={this.setConnetUser.bind(this, record.username)}
+                        <Link onClick={this.setConnetUser.bind(this, record.username)} target='_blank'
                               to={`/basic/endpoints/${this.props.params.uuid}/connect_test`}><Button type="primary">
                             连通测试</Button></Link> <span className="ant-divider"/>
                         <Button type="primary" onClick={()=> {
