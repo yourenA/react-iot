@@ -2,21 +2,23 @@
  * Created by Administrator on 2017/3/6.
  */
 import React, {Component} from 'react';
-import {Link,IndexLink,browserHistory,hashHistory } from 'react-router'
-import $ from 'jquery';
-import {message} from 'antd';
+import {Link,IndexLink} from 'react-router'
 class Nav extends Component {
     showOrHoidePhoneMenu=()=>{
-        const clientW=document.documentElement.clientWidth
-
+        const clientW=document.documentElement.clientWidth;
+        let listDispaly=document.querySelector('.nav_list').style.display;
         if(clientW <= 740){
-            $(".nav ul").slideToggle(200);
+            if(listDispaly==='block'){
+                document.querySelector('.nav_list').style.display='none'
+            }else{
+                document.querySelector('.nav_list').style.display='block'
+            }
         }
     };
     render() {
         return (
             <div className="nav">
-                <ul ref="nav_list" onClick={this.showOrHoidePhoneMenu}  >
+                <ul ref="nav_list" className="nav_list" onClick={this.showOrHoidePhoneMenu}  >
                     <li >
                         <IndexLink  to="/"  activeClassName="actived">首页</IndexLink>
                     </li>

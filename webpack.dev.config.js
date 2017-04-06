@@ -13,7 +13,7 @@ module.exports = {
     },
     entry: {
         index: [
-            'webpack-dev-server/client?http://0.0.0.0:7070', 'webpack/hot/dev-server',
+            'webpack/hot/dev-server',
             './app/index.js'
         ],
         vendor: [
