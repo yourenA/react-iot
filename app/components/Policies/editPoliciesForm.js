@@ -82,15 +82,15 @@ class EditPoliciesForm extends Component {
                         <Input disabled={true} />
                     )}
                 </FormItem>
-                <FormItem
-                    label="描述"
-                    {...formItemLayout}>
-                    {getFieldDecorator('desc', {
-                        initialValue:record.description,
-                    })(
-                        <Input type="textarea" autosize={{minRows: 2, maxRows: 6}}/>
-                    )}
-                </FormItem>
+                {/*<FormItem*/}
+                    {/*label="描述"*/}
+                    {/*{...formItemLayout}>*/}
+                    {/*{getFieldDecorator('desc', {*/}
+                        {/*initialValue:record.description,*/}
+                    {/*})(*/}
+                        {/*<Input type="textarea" autosize={{minRows: 2, maxRows: 6}}/>*/}
+                    {/*)}*/}
+                {/*</FormItem>*/}
                 {formItems}
                 <FormItem {...formItemLayoutWithOutLabel}>
                     <Button type="primary" onClick={this.add} style={{width: '60%'}}>

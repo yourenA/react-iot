@@ -197,7 +197,7 @@ class EndPoints extends Component {
                 <Row>
                     <div style={{marginTop: '10px'}}>
                         <Breadcrumb separator=">">
-                            <Breadcrumb.Item>接入管理</Breadcrumb.Item>
+                            <Breadcrumb.Item>接入设备</Breadcrumb.Item>
                             <Breadcrumb.Item >设备域</Breadcrumb.Item>
                         </Breadcrumb>
                         <div className="operate-box">

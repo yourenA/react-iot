@@ -5,12 +5,6 @@ import configureStore from './store/configureStore';
 import {IndexRoute, Router, Route, hashHistory, browserHistory} from 'react-router';
 import App from './components/App/app';
 import Home from './components/Home/home';
-import EndPoints from './components/Endpoints/endpoints';
-import EndPointDetail from './components/Endpoints/endpointDetail';
-import Device_categories from './components/Device_categories/device_categories';
-import Device_groups from './components/Device_groups/index';
-import Policies from './components/Policies/policies';
-import Edit_password from './components/EditPassword/index';
 import Connect_test from './components/Endpoints/connectTest';
 import Basic from './components/BasicOperation/basic';
 import Temperature from './components/Temperature/index';
@@ -28,23 +22,53 @@ function checkLoginStatus(nextState, replace) {
         store.dispatch(showLogin())
     }
 }
+let Edit_password = (location,cb) => {
+    require.ensure([],require => {
+        cb(null,require('./components/EditPassword/index'));
+    },'Edit_password');
+};
+let EndPoints = (location,cb) => {
+    require.ensure([],require => {
+        cb(null,require('./components/Endpoints/endpoints'));
+    },'EndPoints');
+};
+let EndPointDetail = (location,cb) => {
+    require.ensure([],require => {
+        cb(null,require('./components/Endpoints/endpointDetail'));
+    },'EndPointDetail');
+};
+let Device_categories = (location,cb) => {
+    require.ensure([],require => {
+        cb(null,require('./components/Device_categories/device_categories'));
+    },'Device_categories');
+};
+let Policies = (location,cb) => {
+    require.ensure([],require => {
+        cb(null,require('./components/Policies/policies'));
+    },'Policies');
+};
+let Device_groups = (location,cb) => {
+    require.ensure([],require => {
+        cb(null,require('./components/Device_groups/index'));
+    },'Device_groups');
+};
 ReactDOM.render(
     <Provider store={store}>
         <Router history={hashHistory}>
             <Route path="/" component={App}>
                 <IndexRoute component={Home}/>
                 <Route path="basic" onEnter={checkLoginStatus} component={Basic}>
-                    <IndexRoute component={EndPoints}/>
+                    <IndexRoute getComponent={EndPoints}/>
                     <Route >
                         <Route path="/basic/endpoints/:uuid/connect_test" component={Connect_test}/>
-                        <Route path="endpoints/:uuid" component={EndPointDetail}>
+                        <Route path="endpoints/:uuid" getComponent={EndPointDetail}>
                         </Route>
 
                     </Route>
-                    <Route path="device_categories" component={Device_categories}/>
-                    <Route path="policies" component={Policies}/>
-                    <Route path="device_groups" component={Device_groups}/>
-                    <Route path="edit_password" component={Edit_password}/>
+                    <Route path="device_categories" getComponent={Device_categories}/>
+                    <Route path="policies" getComponent={Policies}/>
+                    <Route path="device_groups" getComponent={Device_groups}/>
+                    <Route path="edit_password" getComponent={Edit_password}/>
                     <Route path="temperature" component={Temperature}/>
                 </Route>
             </Route>

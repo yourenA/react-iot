@@ -281,7 +281,7 @@ class Device extends Component {
                                     <td>{record.group.name }</td>
                                 </tr> : null}
 
-                            <tr>
+                            <tr style={{display:'none'}}>
                                 <td>描述</td>
                                 <td>{record.description}</td>
                             </tr>

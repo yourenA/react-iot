@@ -103,13 +103,13 @@ class AddPoliciesForm extends Component {
                         <Input  />
                     )}
                 </FormItem>
-                <FormItem
-                    label="描述"
-                    {...formItemLayout}>
-                    {getFieldDecorator('desc', {})(
-                        <Input type="textarea" autosize={{minRows: 2, maxRows: 6}}/>
-                    )}
-                </FormItem>
+                {/*<FormItem*/}
+                    {/*label="描述"*/}
+                    {/*{...formItemLayout}>*/}
+                    {/*{getFieldDecorator('desc', {})(*/}
+                        {/*<Input type="textarea"  autosize={{minRows: 2, maxRows: 6}}/>*/}
+                    {/*)}*/}
+                {/*</FormItem>*/}
                 {formItems}
                 <FormItem {...formItemLayoutWithOutLabel}>
                     <Button type="primary" onClick={this.add} style={{width: '60%'}}>
