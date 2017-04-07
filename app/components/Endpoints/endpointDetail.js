@@ -25,6 +25,8 @@ class Device extends Component {
             start_at:'',
             end_at:'',
             order:'asc',
+            category_uuid:null,
+            online_status:'',
             meta: {pagination: {total: 0, per_page: 0}},
             addModal: false,
             editModal: false,
@@ -43,7 +45,7 @@ class Device extends Component {
         });
     }
 
-    fetchDevices = (page = 1, q = '',start_at='',end_at='',order='asc')=> {
+    fetchDevices = (page = 1, q = '',start_at='',end_at='',order='asc',category_uuid=null,online_status='')=> {
         const that = this;
         axios({
             url: `${configJson.prefix}/endpoints/${this.props.params.uuid}/devices`,
@@ -53,7 +55,9 @@ class Device extends Component {
                 q: q,
                 start_at:start_at,
                 end_at:end_at,
-                order:order
+                order:order,
+                category_uuid:category_uuid,
+                online_status:online_status
             },
             headers: getHeader()
         })
@@ -66,7 +70,9 @@ class Device extends Component {
                     q:q,
                     start_at:start_at,
                     end_at:end_at,
-                    order:order
+                    order:order,
+                    category_uuid:category_uuid,
+                    online_status:online_status
                 })
             })
             .catch(function (error) {
@@ -76,7 +82,7 @@ class Device extends Component {
 
     addDevice = ()=> {
         const that = this;
-        const { page ,q,start_at,end_at,order} = this.state;
+        const { page ,q,start_at,end_at,order,category_uuid,online_status} = this.state;
         const AddDetailForm = this.refs.AddDetailForm.getFieldsValue();
         console.log(AddDetailForm)
         if (!AddDetailForm.name || !AddDetailForm.category || !AddDetailForm.policy) {
@@ -105,7 +111,7 @@ class Device extends Component {
                     reGenerateKeyModal: true,
                     newKey: response.data.password
                 });
-                that.fetchDevices( page,q,start_at,end_at,order);
+                that.fetchDevices( page,q,start_at,end_at,order,category_uuid,online_status);
             })
             .catch(function (error) {
                 converErrorCodeToMsg(error)
@@ -114,7 +120,7 @@ class Device extends Component {
     };
     editDevice = ()=> {
         const that = this;
-        const { page ,q,start_at,end_at,order} = this.state;
+        const { page ,q,start_at,end_at,order,category_uuid,online_status} = this.state;
         const EditDetailForm = this.refs.EditDetailForm.getFieldsValue();
         if (!EditDetailForm.name || !EditDetailForm.category || !EditDetailForm.policy) {
             message.error(messageJson['category group category null']);
@@ -140,7 +146,7 @@ class Device extends Component {
                 that.setState({
                     editModal: false
                 });
-                that.fetchDevices( page,q,start_at,end_at,order);
+                that.fetchDevices( page,q,start_at,end_at,order,category_uuid,online_status);
             })
             .catch(function (error) {
                 converErrorCodeToMsg(error)
@@ -153,7 +159,7 @@ class Device extends Component {
     delDevice = (uuid)=> {
         console.log("uuid", uuid);
         const that = this;
-        const { page ,q,start_at,end_at,order} = this.state;
+        const { page ,q,start_at,end_at,order,category_uuid,online_status} = this.state;
         axios({
             url: `${configJson.prefix}/endpoints/${this.props.params.uuid}/devices/${uuid}`,
             method: 'delete',
@@ -161,7 +167,7 @@ class Device extends Component {
         })
             .then(function (response) {
                 message.success(messageJson['del device success']);
-                that.fetchDevices(page,q,start_at,end_at,order);
+                that.fetchDevices(page,q,start_at,end_at,order,category_uuid,online_status);
             })
             .catch(function (error) {
                 converErrorCodeToMsg(error)
@@ -195,8 +201,8 @@ class Device extends Component {
 
     };
 
-    onChangeSearch=( page ,q,start_at,end_at,order)=>{
-        this.fetchDevices(page ,q,start_at,end_at,order);
+    onChangeSearch=( page ,q,start_at,end_at,order,category_uuid,online_status)=>{
+        this.fetchDevices(page ,q,start_at,end_at,order,category_uuid,online_status);
 
     }
     onPageChange = (page) => {
@@ -323,7 +329,7 @@ class Device extends Component {
                             <Breadcrumb.Item >设备</Breadcrumb.Item>
                         </Breadcrumb>
                         <div className="operate-box">
-                            <SearchWrap onChangeSearch={this.onChangeSearch} {...this.state} />
+                            <SearchWrap type="endpointDetail" onChangeSearch={this.onChangeSearch} {...this.state} />
                             <Button className="search-btn" type="primary" icon="plus" onClick={()=> {
                                 this.setState({addModal: true})
                             }}>添加设备</Button>

@@ -11,7 +11,7 @@ import Temperature from './components/Temperature/index';
 import {message} from 'antd';
 import {showLogin, checkLogin} from './actions/checkLogin'
 const store = configureStore(window.__REDUX_STATE__, window.devToolsExtension && window.devToolsExtension());
-
+exports.store  = store;
 function checkLoginStatus(nextState, replace) {
     store.dispatch(checkLogin());
     const isLogin = store.getState().loginState.login;

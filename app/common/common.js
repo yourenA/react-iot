@@ -130,12 +130,17 @@ exports.convertSubFormToData  = (form) => {
 /**
  *  判断错误码(数组)
  * */
+import {hashHistory } from 'react-router';
+import {showLogin,signout} from './../actions/checkLogin';
+import {store} from './../index'
 exports.converErrorCodeToMsg  = (error) => {
     if (error.response.status === 401) {
         message.error(messageJson['token fail']);
         removeLoginStorage();
         setTimeout(()=>{
-            window.location.href='/';
+            hashHistory.replace('/');
+            store.dispatch(signout());
+            store.dispatch(showLogin());
         },1000)
     }else  if(!error.response.data.errors){
         message.error(error.response.data.message);

@@ -61,6 +61,7 @@ class TopicTable extends Component {
                     <Option value="asc">升序</Option>
                     <Option value="desc">降序</Option>
                 </Select><span className="ant-divider"/>
+                <span>名称:</span>
                 <Search
                     value={this.state.q}
                     placeholder="input search text"
