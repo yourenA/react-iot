@@ -2,7 +2,7 @@
  * Created by Administrator on 2017/3/6.
  */
 import React, {Component} from 'react';
-import {Slider} from 'antd'
+import {Slider,Switch} from 'antd'
 import Chart from 'chart.js'
 import  'canvas-gauges';
 let myChart;
@@ -101,6 +101,8 @@ class Temperature extends Component {
                         data-units="°C"
                         data-color-value-box-shadow="false"
                         data-animation-duration="100"
+                        data-highlights='[ {"from": -50, "to": 0, "color": "rgba(0,0, 255, .3)"},
+        {"from": 100, "to": 150, "color": "rgba(255, 0, 0, .3)"} ]'
                 ></canvas>
                 <canvas data-type="radial-gauge"
                         data-width="300"
@@ -114,7 +116,7 @@ class Temperature extends Component {
                         data-minor-ticks="2"
                         data-stroke-ticks="true"
                         data-highlights='[ {"from": -50, "to": 0, "color": "rgba(0,0, 255, .3)"},
-        {"from": 0, "to": 50, "color": "rgba(255, 0, 0, .3)"} ]'
+        {"from": 100, "to": 150, "color": "rgba(255, 0, 0, .3)"} ]'
                         data-ticks-angle="225"
                         data-start-angle="67.5"
                         data-color-major-ticks="#ddd"
@@ -147,9 +149,9 @@ class Temperature extends Component {
                         data-color-value-box-rect="#222"
                         data-color-value-box-rect-end="#333"
                 ></canvas>
+                <Switch checkedChildren={'开灯'} unCheckedChildren={'关灯'} />
                 <Slider onChange={this.changeTemperature} defaultValue={temperature}  min={-50} max={150}/>
                 <div>温度控制</div>
-                <button onClick={this.addDate}>添加数据</button>
                 <div style={{width:'1000px',height:'400px'}}>
                     <canvas id="myChart" width="1000" height="400"></canvas>
                 </div>

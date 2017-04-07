@@ -5,9 +5,6 @@ let autoprefixer=require('autoprefixer');
 module.exports = {
     devtool: 'inline-source-map',
     devServer: {
-        hot: true,
-        inline: true,
-        progress: false,
         port: 7070,
         host: '0.0.0.0'
     },

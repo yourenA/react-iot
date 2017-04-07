@@ -144,12 +144,18 @@
   }
 }
 
+.cleanInfo{
+  overflow: hidden;
+  button{
+    float: right;
+  }
+}
 .addDeviceForm-title{
   text-align: center;
   margin-top: 10px;
 }
 
-.subPanel{
+.subPanel,.pubPanel{
   width: 100%;
   padding: 10px;
   height: 350px;

@@ -15,15 +15,19 @@ import configJson from './../../../config.json';
 import messageJson from './../../common/message.json';
 
 let client;
+let timer;
 class ConnectTest extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            inputInfoType: 'manual',
+            autoInputType: 'dataRange',
             connectPanelModal: false,
             addSubscribeModal: false,
             hadPubTopics: [],
             hadSubTopics: [],
-            subTopicsInfo:[]
+            subTopicsInfo: [],
+            pubBtnText: '发布'
         };
     }
 
@@ -31,7 +35,7 @@ class ConnectTest extends Component {
     }
     createConnectPanel = ()=> {
         console.log("ConnectPanel", this.refs.ConnectPanel.getFieldsValue());
-        const that=this;
+        const that = this;
         const ConnectPanel = this.refs.ConnectPanel.getFieldsValue();
         const hide = message.loading('连线中......', 0);
         const host = `${configJson.MqttServerHost}:${configJson.MqttServerPort}`;
@@ -51,6 +55,9 @@ class ConnectTest extends Component {
             console.log('客户端已连接:' + clientId);
             hide();
             message.success(messageJson["connect success"]);
+            that.setState({
+                connectPanelModal:false
+            })
 
         });
         client.on('reconnect', function () {
@@ -62,12 +69,19 @@ class ConnectTest extends Component {
         client.on('offline', function () {
             console.log('客户端离线:' + clientId);
         });
-        client.on("message", function (topic, payload,packet) {
-            console.log("message事件",[topic, payload].join(": "));
-            console.log("packet",packet)
+        client.on("message", function (topic, payload, packet) {
+            console.log("message事件", [topic, payload].join(": "));
+            console.log("packet", packet)
             that.setState({
-                subTopicsInfo:that.state.subTopicsInfo.concat({qos:packet.qos,topic:topic,info:payload.toString(),dateTime:new Date().toLocaleString()})
+                subTopicsInfo: that.state.subTopicsInfo.concat({
+                    qos: packet.qos,
+                    topic: topic,
+                    info: payload.toString(),
+                    dateTime: new Date().toLocaleString()
+                })
             })
+            let subPanel = document.querySelector('.subPanel');
+            subPanel.scrollTop = subPanel.scrollHeight;
         });
         client.on('error', function (err) {
             console.log('客户端出错:', err);
@@ -76,42 +90,137 @@ class ConnectTest extends Component {
 
     };
     publicTheme = ()=> {
-        console.log("publish client ", client);
-        if(!client){
+        if (!client) {
             message.error(messageJson['connect first']);
             return false
         }
-        const that=this;
+        const that = this;
         const PublishPanel = this.refs.PublishPanel.getFieldsValue();
+        console.log("手动还是自动", this.state.inputInfoType)
+        console.log("数据范围还是数据流", this.state.autoInputType)
+        console.log("PublishPanel", PublishPanel);
         const options = {
             qos: parseInt(PublishPanel.QoS),
             retain: PublishPanel.retain
         };
-        if(!PublishPanel.topic){
+        if (!PublishPanel.topic) {
             message.error(messageJson['pub topic must no null']);
             return false
         }
-        console.log(options);
-        client.publish(PublishPanel.topic, PublishPanel.info, options,(err)=>{
-            if(err){
-                console.log("发布出错", err)
-                message.error(messageJson['pub topic fail']);
-            }else{
-                that.setState({
-                    hadPubTopics:that.state.hadPubTopics.concat({...PublishPanel,dateTime:new Date().toLocaleString()})
-                })
+        if (this.state.inputInfoType === 'manual') {
+            this.publishAction(PublishPanel.topic, PublishPanel.info, options);
+        } else if (this.state.inputInfoType === 'auto') {
+            let min = Number(PublishPanel.min),
+                max = Number(PublishPanel.max),
+                accuracy = Number(PublishPanel.accuracy),
+                interval = Number(PublishPanel.interval),
+                times = Number(PublishPanel.times),
+                random = PublishPanel.random;
+            if (this.state.pubBtnText === '发布') {
+                this.setState({
+                    pubBtnText: '停止'
+                });
+                if (this.state.autoInputType === 'dataRange') {
+                    let initTimes = 0;
+
+                    timer = setInterval(function () {
+                        if (random) {
+                            let randomNum;
+                            if (accuracy === 0.1) {
+                                randomNum = (Math.round((Math.random() * (max - min) + min) * 10) / 10).toFixed(1)
+                            } else if (accuracy === 0.01) {
+                                randomNum = (Math.round((Math.random() * (max - min) + min) * 100) / 100).toFixed(2)
+                            } else {
+                                randomNum = Math.floor(Math.random() * (max - min) + min)
+
+                            }
+                            that.publishAction(PublishPanel.topic, randomNum, options);
+
+                        } else {
+                            if (min > max) {
+                                min = Number(PublishPanel.min)
+                            }
+                            that.publishAction(PublishPanel.topic, min, options);
+                            if (accuracy === 0.1) {
+                                min = parseFloat((min + accuracy).toFixed(1));
+                            } else if (accuracy === 0.01) {
+                                min = parseFloat((min + accuracy).toFixed(2));
+                            } else {
+                                min = min + accuracy
+                            }
+
+                        }
+                        initTimes++;
+                        if (initTimes >= times) {
+                            clearInterval(timer)
+                        }
+                    }, interval * 1000)
+
+                } else if (this.state.autoInputType === 'dateFlow') {
+                    let dataFlowInfo = PublishPanel.dataFlowInfo.split(',');
+                    console.log("dataFlowInfo", dataFlowInfo);
+                    let initPosition = 0;
+                    timer = setInterval(function () {
+                        if (random) {
+                            that.publishAction(PublishPanel.topic, dataFlowInfo[Math.floor(Math.random() * dataFlowInfo.length)], options);
+                        } else {
+                            if (initPosition >= dataFlowInfo.length) {
+                                initPosition = 0
+                            }
+                            that.publishAction(PublishPanel.topic, dataFlowInfo[initPosition], options);
+
+                        }
+                        initPosition++;
+                        if (initPosition >= times) {
+                            clearInterval(timer)
+                        }
+                    }, interval * 1000)
+
+                }
+            } else if (this.state.pubBtnText === '停止') {
+                this.setState({
+                    pubBtnText: '发布'
+                });
+                clearInterval(timer)
             }
-        })
+
+
+        }
+
+
     };
+    publishAction = (topic, info, options)=> {
+        const that = this;
+        client.publish(topic, info, options, (err)=> {
+            if (err) {
+                console.log("发布出错", err);
+                message.error(messageJson['pub topic fail']);
+            } else {
+                that.setState({
+                    hadPubTopics: that.state.hadPubTopics.concat({
+                        topic: topic,
+                        info: info,
+                        QoS: options.qos,
+                        dateTime: new Date().toLocaleString()
+                    })
+                },function () {
+                    let pubPanel = document.querySelector('.pubPanel');
+                    pubPanel.scrollTop = pubPanel.scrollHeight;
+                })
+
+
+            }
+        });
+    }
     addSubscribePanel = ()=> {
         console.log("sub client ", client);
-        if(!client){
+        if (!client) {
             message.error(messageJson['connect first']);
             return false
         }
         const AddSubscribePanel = this.refs.AddSubscribePanel.getFieldsValue();
         const tempArr = [];
-        const that=this;
+        const that = this;
         for (var k in AddSubscribePanel) {
             if (k.indexOf('topics') >= 0) {
                 if (AddSubscribePanel.hasOwnProperty(k)) {
@@ -129,7 +238,7 @@ class ConnectTest extends Component {
             if (err) {
                 console.log("订阅出错", err);
                 message.error(messageJson['sub topic fail']);
-            }else{
+            } else {
                 message.success(messageJson['sub topic success']);
 
             }
@@ -138,6 +247,22 @@ class ConnectTest extends Component {
     }
     goback = ()=> {
         hashHistory.goBack()
+    }
+    changeInputInfoType = (key)=> {
+        console.log(key)
+        if (this.state.pubBtnText == '停止') {
+            message.error(messageJson['stop pub first']);
+            return false
+        } else {
+            this.setState({
+                inputInfoType: key
+            })
+        }
+    }
+    changeAutoType = (value)=> {
+        this.setState({
+            autoInputType: value
+        })
     }
 
     render() {
@@ -157,17 +282,33 @@ class ConnectTest extends Component {
                 <Row gutter={20}>
                     <Col xs={24} sm={24} md={14} lg={14}>
                         <Card title="发布面板">
+                            <div className="cleanInfo">
+                                <Button onClick={()=>{this.setState({hadPubTopics:[]})}} type="danger">
+                                    清空发布信息面板
+                                </Button>
+                            </div>
+
                             <ShowPublishPanel hadPubTopics={this.state.hadPubTopics} ref="ShowPublishPanel"/>
-                            <PublishPanel ref="PublishPanel"/>
+                            <PublishPanel ref="PublishPanel" inputInfoType={this.state.inputInfoType}
+                                          changeInputInfoType={this.changeInputInfoType}
+                                          changeAutoType={this.changeAutoType}
+                                          autoInputType={this.state.autoInputType}
+                                          pubBtnText={this.state.pubBtnText}
+                            />
                             <Row type="flex" justify="end ">
                                 <Button onClick={this.publicTheme} type="primary" htmlType="submit" className="">
-                                    发布
+                                    {this.state.pubBtnText}
                                 </Button>
                             </Row>
                         </Card>
                     </Col>
                     <Col xs={24} sm={24} md={10} lg={10}>
                         <Card title="订阅面板">
+                            <div className="cleanInfo">
+                                <Button onClick={()=>{this.setState({subTopicsInfo:[]})}} type="danger">
+                                    清空订阅信息面板
+                                </Button>
+                            </div>
                             <SubscriptionPanel subTopicsInfo={this.state.subTopicsInfo}/>
                             <Row type="flex" justify="end ">
                                 <Button onClick={()=> {
@@ -180,7 +321,6 @@ class ConnectTest extends Component {
                     </Col>
                 </Row>
                 <Modal
-                    key={1 + Date.parse(new Date())}
                     visible={this.state.connectPanelModal}
                     title="连接参数面板"
                     onCancel={()=> {

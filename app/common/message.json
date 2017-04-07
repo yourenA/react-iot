@@ -45,5 +45,6 @@
   "pub topic success":"发布主题成功",
   "pub topic fail":"发布主题失败",
   "sub topic success":"订阅主题成功",
-  "sub topic fail":"订阅主题失败"
+  "sub topic fail":"订阅主题失败",
+  "stop pub first":"请先停止发布"
 }
