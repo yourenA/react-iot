@@ -20,6 +20,7 @@ class ConnectTest extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            clientIsConnect:false,
             inputInfoType: 'manual',
             autoInputType: 'dataRange',
             connectPanelModal: false,
@@ -48,7 +49,7 @@ class ConnectTest extends Component {
             clean: true,
             protocolId: 'MQTT',
             reconnectPeriod: 1000,
-            connectTimeout: 30 * 1000,
+            connectTimeout: 10 * 1000,
         };
         client = mqtt.connect(host, options);
         client.on('connect', function () {
@@ -56,7 +57,8 @@ class ConnectTest extends Component {
             hide();
             message.success(messageJson["connect success"]);
             that.setState({
-                connectPanelModal:false
+                connectPanelModal:false ,
+                clientIsConnect:true
             })
 
         });
@@ -65,12 +67,22 @@ class ConnectTest extends Component {
         });
         client.on('close', function () {
             console.log('客户端已关闭:' + clientId);
+            client=null;
+            if(timer){
+                clearInterval(timer);
+            }
+            that.setState({
+                clientIsConnect:false,
+                pubBtnText: '发布'
+            })
         });
         client.on('offline', function () {
             console.log('客户端离线:' + clientId);
+            that.setState({
+                clientIsConnect:false
+            })
         });
         client.on("message", function (topic, payload, packet) {
-            console.log("message事件", [topic, payload].join(": "));
             console.log("packet", packet)
             that.setState({
                 subTopicsInfo: that.state.subTopicsInfo.concat({
@@ -79,16 +91,32 @@ class ConnectTest extends Component {
                     info: payload.toString(),
                     dateTime: new Date().toLocaleString()
                 })
-            })
+            });
             let subPanel = document.querySelector('.subPanel');
             subPanel.scrollTop = subPanel.scrollHeight;
         });
         client.on('error', function (err) {
             console.log('客户端出错:', err);
-            client.end()
+            client.end();
+            that.setState({
+                clientIsConnect:false
+            })
         })
 
     };
+    disconnect=()=>{
+        console.log("disconnect client",client);
+        if (!client) {
+            message.error(messageJson['connect first']);
+            return false
+        }else{
+            client.end();
+            message.success(messageJson["disconnect success"]);
+            this.setState({
+                clientIsConnect:false
+            })
+        }
+    }
     publicTheme = ()=> {
         if (!client) {
             message.error(messageJson['connect first']);
@@ -124,6 +152,11 @@ class ConnectTest extends Component {
                     let initTimes = 0;
 
                     timer = setInterval(function () {
+                        if(!that.state.clientIsConnect){
+                            message.error(messageJson['client had disconnect']);
+                            clearInterval(timer);
+                            return false
+                        }
                         if (random) {
                             let randomNum;
                             if (accuracy === 0.1) {
@@ -152,7 +185,10 @@ class ConnectTest extends Component {
                         }
                         initTimes++;
                         if (initTimes >= times) {
-                            clearInterval(timer)
+                            clearInterval(timer);
+                            that.setState({
+                                pubBtnText: '发布'
+                            });
                         }
                     }, interval * 1000)
 
@@ -161,6 +197,11 @@ class ConnectTest extends Component {
                     console.log("dataFlowInfo", dataFlowInfo);
                     let initPosition = 0;
                     timer = setInterval(function () {
+                        if(!that.state.clientIsConnect){
+                            message.error(messageJson['client had disconnect']);
+                            clearInterval(timer);
+                            return false
+                        }
                         if (random) {
                             that.publishAction(PublishPanel.topic, dataFlowInfo[Math.floor(Math.random() * dataFlowInfo.length)], options);
                         } else {
@@ -172,16 +213,19 @@ class ConnectTest extends Component {
                         }
                         initPosition++;
                         if (initPosition >= times) {
-                            clearInterval(timer)
+                            clearInterval(timer);
+                            that.setState({
+                                pubBtnText: '发布'
+                            });
                         }
                     }, interval * 1000)
 
                 }
             } else if (this.state.pubBtnText === '停止') {
+                clearInterval(timer);
                 this.setState({
                     pubBtnText: '发布'
                 });
-                clearInterval(timer)
             }
 
 
@@ -278,9 +322,18 @@ class ConnectTest extends Component {
                     <Button type="primary" icon="plus" onClick={()=> {
                         this.setState({connectPanelModal: true})
                     }}>连接参数面板</Button>
+                    {this.state.clientIsConnect?
+                        <Popconfirm placement="topRight" title={`确定要断开连接吗?`}
+                                    onConfirm={this.disconnect}>
+                            <button style={{marginLeft:'10px'}} className="ant-btn btn-info">
+                                断开连接
+                            </button>
+                        </Popconfirm>
+                        :null}
+
                 </div>
                 <Row gutter={20}>
-                    <Col xs={24} sm={24} md={14} lg={14}>
+                    <Col xs={24} sm={24} md={16} lg={14}>
                         <Card title="发布面板">
                             <div className="cleanInfo">
                                 <Button onClick={()=>{this.setState({hadPubTopics:[]})}} type="danger">
@@ -302,7 +355,7 @@ class ConnectTest extends Component {
                             </Row>
                         </Card>
                     </Col>
-                    <Col xs={24} sm={24} md={10} lg={10}>
+                    <Col xs={24} sm={24} md={8} lg={10}>
                         <Card title="订阅面板">
                             <div className="cleanInfo">
                                 <Button onClick={()=>{this.setState({subTopicsInfo:[]})}} type="danger">

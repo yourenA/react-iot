@@ -152,18 +152,6 @@ class EndPoints extends Component {
                 )
             }
         }, {
-            title: '接入地址',
-            dataIndex: 'websocket_hostname',
-            key: 'websocket_hostname',
-            render:(text,record,index)=>{
-                return(
-                    <div>
-                        <p>{text}</p>
-                        <p>{record.mqtt_hostname}</p>
-                    </div>
-                )
-            }
-        },  {
             title: '设备总数',
             dataIndex: 'device_count',
             key: 'device_count',

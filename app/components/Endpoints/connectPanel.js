@@ -66,6 +66,7 @@ class ConnectPanelForm extends Component {
                                 label="心跳时间"
                             >
                                 {getFieldDecorator('keepalive', {
+                                    initialValue: 60,
                                     rules: [{required: true, message: '身份密钥不能为空'}],
                                 })(
                                     <Input addonAfter="秒"/>

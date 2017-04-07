@@ -31,7 +31,6 @@ class Nav extends Component {
                     <li >
                         <Link>帮助与支持</Link>
                     </li>
-                    <li ><Link  to="/basic/temperature" target='_blank'>温度测试</Link> </li>
 
                     {
                         this.props.loginState.username?
