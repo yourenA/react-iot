@@ -10,7 +10,6 @@ module.exports = {
     },
     entry: {
         index: [
-            'webpack/hot/dev-server',
             './app/index.js'
         ],
         vendor: [
@@ -56,7 +55,6 @@ module.exports = {
         })
     ],
     plugins: [
-        new webpack.HotModuleReplacementPlugin(),
         new webpack.optimize.CommonsChunkPlugin('vendor', 'vendor.js'),
 
         new webpack.DefinePlugin({
