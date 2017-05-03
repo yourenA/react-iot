@@ -37,21 +37,21 @@ let EndPointDetail = (location,cb) => {
         cb(null,require('./components/Endpoints/endpointDetail'));
     },'EndPointDetail');
 };
-let Device_categories = (location,cb) => {
-    require.ensure([],require => {
-        cb(null,require('./components/Device_categories/device_categories'));
-    },'Device_categories');
-};
-let Policies = (location,cb) => {
-    require.ensure([],require => {
-        cb(null,require('./components/Policies/policies'));
-    },'Policies');
-};
-let Device_groups = (location,cb) => {
-    require.ensure([],require => {
-        cb(null,require('./components/Device_groups/index'));
-    },'Device_groups');
-};
+// let Device_categories = (location,cb) => {
+//     require.ensure([],require => {
+//         cb(null,require('./components/Device_categories/device_categories'));
+//     },'Device_categories');
+// };
+// let Policies = (location,cb) => {
+//     require.ensure([],require => {
+//         cb(null,require('./components/Policies/policies'));
+//     },'Policies');
+// };
+// let Device_groups = (location,cb) => {
+//     require.ensure([],require => {
+//         cb(null,require('./components/Device_groups/index'));
+//     },'Device_groups');
+// };
 ReactDOM.render(
     <Provider store={store}>
         <Router history={hashHistory}>
@@ -65,9 +65,9 @@ ReactDOM.render(
                         </Route>
 
                     </Route>
-                    <Route path="device_categories" getComponent={Device_categories}/>
-                    <Route path="policies" getComponent={Policies}/>
-                    <Route path="device_groups" getComponent={Device_groups}/>
+                    {/*<Route path="device_categories" getComponent={Device_categories}/>*/}
+                    {/*<Route path="policies" getComponent={Policies}/>*/}
+                    {/*<Route path="device_groups" getComponent={Device_groups}/>*/}
                     <Route path="edit_password" getComponent={Edit_password}/>
                     <Route path="temperature" component={Temperature}/>
                 </Route>

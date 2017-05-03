@@ -74,7 +74,7 @@ class TopicTable extends Component {
                     <Option value="asc">升序</Option>
                     <Option value="desc">降序</Option>
                 </Select><span className="ant-divider"/>
-                <span>名称:</span>
+                <span>设备名称:</span>
                 <Search
                     defaultValue={''}
                     placeholder="input search text"

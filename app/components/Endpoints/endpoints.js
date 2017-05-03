@@ -190,7 +190,7 @@ class EndPoints extends Component {
                         </Breadcrumb>
                         <div className="operate-box">
                             <SearchWrap onChangeSearch={this.onChangeSearch} {...this.props} />
-                            <Button className="search-btn" type="primary" icon="plus" onClick={()=>{this.setState({addModal:true})}}>创建域</Button>
+                            <Button className="search-btn" type="primary" icon="plus" onClick={()=>{this.setState({addModal:true})}}>添加设备</Button>
                         </div>
                         <Loading show={loaded} />
                         <Table bordered  style={{display:loaded? 'block':'none'}} rowKey="uuid" columns={columns} dataSource={data} pagination={false}/>
