@@ -13,12 +13,12 @@ class Basic extends React.Component {
 
     handleClick=(e)=> {
         const sidebar=document.querySelector('.sidebar');
-        sidebar.style.left='-240px';
+        sidebar.style.left='-180px';
     }
     showSidebar=()=>{
         const sidebar=document.querySelector('.sidebar');
         if(sidebar.offsetLeft == 0){
-            sidebar.style.left='-240px';
+            sidebar.style.left='-180px';
         }else{
             sidebar.style.left=0;
         }

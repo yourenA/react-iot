@@ -27,6 +27,18 @@ body {
         left: 0;
       }
     }
+    .logo{
+      display: inline-block;
+      width: 180px;
+      height: $nav-height;
+      line-height: $nav-height;
+      background: $theme-blue;
+      P{
+        color:white;
+        font-size: 22px;
+        text-align: center;
+      }
+    }
     .App-logo {
       position: relative;
       left: 20px;
@@ -107,10 +119,8 @@ body {
       vertical-align: top;
       height: $nav-height;
       line-height: $nav-height;
-      margin-right: 40px;
       float: right;
       @include respond-to(medium){
-        margin-right: 10px;
       }
       span{
         cursor: pointer;
@@ -121,7 +131,7 @@ body {
       }
       .username{
         position: relative;
-        width: 115px;
+        width: 120px;
         text-align: center;
 
         span{

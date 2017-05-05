@@ -28,8 +28,9 @@ class App extends Component {
             <div className="App">
                 <div className="header-nav">
                     <div className="header-nav-content">
-                        <img src={logo} className="App-logo" alt="logo"/>
-                        <span className="logo-text">C-IoT</span>
+                        <div className="logo">
+                            <p>辂轺科技IoT</p>
+                        </div>
                         <Nav {...this.props}/>
                         <div className="loginOrRegisterBtn">
                             {
