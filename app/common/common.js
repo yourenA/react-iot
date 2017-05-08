@@ -16,6 +16,14 @@ exports.formItemLayout={
         sm: {span: 14},
     }
 };
+exports.formItemLayoutForOrganize={
+    labelCol: {
+        sm: {span: 4},
+    },
+    wrapperCol: {
+        sm: {span: 20},
+    }
+};
 exports.formItemLayoutWithLabel={
     labelCol: {
         xs: {span: 24},

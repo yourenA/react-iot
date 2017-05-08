@@ -19,7 +19,7 @@ class NormalLoginForm extends Component {
         const {getFieldDecorator} = this.props.form;
         const display = this.props.isHide ? 'none' : 'block';
         return (
-            <div id="components-form-demo-normal-login" style={{display: display}}>
+            <div className="components-form-demo-normal-login" style={{display: display}}>
                 <Form onSubmit={this.handleSubmit} className="login-form">
                     <FormItem>
                         {getFieldDecorator('username', {

@@ -31,7 +31,9 @@ class Nav extends Component {
                     <li >
                         <Link>帮助与支持</Link>
                     </li>
-
+                    <li >
+                        <Link to="/organization_register" activeClassName="actived">新机构注册</Link>
+                    </li>
                     {
                         this.props.loginState.username?
                             <li >

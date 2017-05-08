@@ -1,6 +1,6 @@
 import {GET_ENDPOINTS_FAILED,GET_ENDPOINTS_REQUEST,GET_ENDPOINTS_SUCCEED} from '../actions/endpoints';
 
-export default (state = {page:1,q:'',start_at:'',end_at:'',order:'asc'}, action) => {
+export default (state = {page:1,q:'',start_at:'',end_at:'',order:'asc',status:'',ep_type:''}, action) => {
     switch (action.type) {
         case GET_ENDPOINTS_REQUEST:
             return {...state, loaded: false};
@@ -13,7 +13,9 @@ export default (state = {page:1,q:'',start_at:'',end_at:'',order:'asc'}, action)
                 q:action.q,
                 start_at:action.start_at,
                 end_at:action.end_at,
-                order:action.order
+                order:action.order,
+                status:action.status,
+                ep_type:action.ep_type
             };
             return {...state, ..._data};
         case GET_ENDPOINTS_FAILED:

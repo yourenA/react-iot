@@ -16,54 +16,58 @@ class TopicTable extends Component {
         };
     }
     componentDidMount = () => {
-        const that=this;
-        axios({
-            url:`${configJson.prefix}/device_categories`,
-            method: 'get',
-            params:{
-                return:'all'
-            },
-            headers:getHeader()
-        }).then(function (response) {
-            that.setState({
-                categoryArr:response.data.data
-            })
-        });
+        // const that=this;
+        // axios({
+        //     url:`${configJson.prefix}/device_categories`,
+        //     method: 'get',
+        //     params:{
+        //         return:'all'
+        //     },
+        //     headers:getHeader()
+        // }).then(function (response) {
+        //     that.setState({
+        //         categoryArr:response.data.data
+        //     })
+        // });
     }
     onChangeSearchText = (value)=> {
-        const {page, q, start_at, end_at, order,category_uuid,online_status} = this.props;
-        this.props.onChangeSearch(page, value, start_at, end_at, order,category_uuid,online_status)
+        const {page, q, start_at, end_at, order,status,ep_type} = this.props;
+        this.props.onChangeSearch(1, value, start_at, end_at, order,status,ep_type)
+    };
+    onChangeSearchType = (value)=> {
+        const {page, q, start_at, end_at, order,status,ep_type} = this.props;
+        this.props.onChangeSearch(1, q, start_at, end_at, order,status,value)
     };
     onChangeStartDate = (date, dateString)=> {
         console.log(date, dateString);
-        const {page, q, start_at, end_at, order,category_uuid,online_status} = this.props;
-        this.props.onChangeSearch(page, q, dateString, end_at, order,category_uuid,online_status)
+        const {page, q, start_at, end_at, order,ep_type,status} = this.props;
+        this.props.onChangeSearch(1, q, dateString, end_at, order,status,ep_type)
     }
     onChangeEndDate = (date, dateString)=> {
         console.log(date, dateString);
-        const {page, q, start_at, end_at, order,category_uuid,online_status} = this.props;
-        this.props.onChangeSearch(page, q, start_at, dateString, order,category_uuid,online_status)
+        const {page, q, start_at, end_at, order,ep_type,status} = this.props;
+        this.props.onChangeSearch(1, q, start_at, dateString, order,status,ep_type)
     }
     onChangeOrder = (order)=> {
         console.log(order)
-        const {page, q, start_at, end_at,category_uuid,online_status} = this.props;
-        this.props.onChangeSearch(page, q, start_at, end_at, order,category_uuid,online_status)
+        const {page, q, start_at, end_at,ep_type,status} = this.props;
+        this.props.onChangeSearch(1, q, start_at, end_at, order,status,ep_type)
     }
     onChangeCategory_uuid=(category_uuid)=>{
         console.log(category_uuid);
         if(category_uuid==='chose'){
             category_uuid=''
         }
-        const {page, q, start_at, end_at,order,online_status} = this.props;
-        this.props.onChangeSearch(page, q, start_at, end_at, order,category_uuid,online_status)
+        const {page, q, start_at, end_at,order,status,ep_type} = this.props;
+        this.props.onChangeSearch(1, q, start_at, end_at, order,status,ep_type)
     }
-    onChangeOnline_status=(online_status)=>{
-        console.log(online_status);
-        if(online_status==='chose'){
-            online_status=''
+    onChangeOnline_status=(status)=>{
+        console.log(status);
+        if(status==='0'){
+            status=''
         }
-        const {page, q, start_at, end_at,order,category_uuid} = this.props;
-        this.props.onChangeSearch(page, q, start_at, end_at, order,category_uuid,online_status)
+        const {page, q, start_at, end_at,order,ep_type} = this.props;
+        this.props.onChangeSearch(1, q, start_at, end_at, order,status,ep_type)
     }
     render() {
         console.log("this.props", this.props.order ? this.props.order : 'asc');
@@ -77,9 +81,14 @@ class TopicTable extends Component {
                 <span>设备名称:</span>
                 <Search
                     defaultValue={''}
-                    placeholder="input search text"
-                    style={{width: 200}}
+                    style={{width: 150}}
                     onSearch={value => this.onChangeSearchText(value)}
+                /><span className="ant-divider"/>
+                <span>类型:</span>
+                <Search
+                    defaultValue={''}
+                    style={{width: 100}}
+                    onSearch={value => this.onChangeSearchType(value)}
                 /><span className="ant-divider"/>
                 {this.props.type === 'endpointDetail' ?
                     <span>
@@ -91,16 +100,18 @@ class TopicTable extends Component {
                             { this.state.categoryArr.map(item => <Option key={item.uuid} value={item.uuid}>{item.name}</Option>) }
                         </Select>
                         <span className="ant-divider"/>
-                        <span>
+
+                    </span> : null}
+                <span>
                             状态:
                         </span>
-                        <Select style={{ width: 120 }}   defaultValue={ 'chose' } onChange={this.onChangeOnline_status}>
-                             <Option value="chose">所有状态</Option>
-                            <Option value="online">在线</Option>
-                            <Option value="offline">离线</Option>
-                        </Select>
-                        <span className="ant-divider"/>
-                    </span> : null}
+                <Select style={{ width: 120 }}   defaultValue={ '0' } onChange={this.onChangeOnline_status}>
+                    <Option value="0">所有状态</Option>
+                    <Option value="1">在线</Option>
+                    <Option value="-1">离线</Option>
+                    <Option value="-2">未激活</Option>
+                </Select>
+                <span className="ant-divider"/>
                 <span>开始时间: </span><DatePicker
                 onChange={this.onChangeStartDate}/><span className="ant-divider"/>
                 <span>结束时间: </span><DatePicker

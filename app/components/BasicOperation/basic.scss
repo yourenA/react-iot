@@ -137,10 +137,10 @@
       max-width: 80px;
     }
   }
-  .anticon-edit {
-    cursor: pointer;
-    vertical-align: text-top;
-  }
+}
+.anticon-edit {
+  cursor: pointer;
+  vertical-align: text-top;
 }
 
 
@@ -156,6 +156,7 @@
   .expandRowRender-table {
     max-width: 600px;
     &>table tr td:first-child{
+      width: 50px;
       text-align: right;
       vertical-align: top;
     }

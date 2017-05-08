@@ -15,7 +15,7 @@ class AddOrEditNamedescForm extends React.Component {
                         initialValue: this.props.name || '',
                         rules: [{required: true, message: '请输入名称'}],
                     })(
-                        <Input disabled={this.props.type === 'endpoint'&&this.props.name ? true : false} placeholder="名称:长度3-32个字符"/>
+                        <Input  placeholder="名称"/>
                     )}
                 </FormItem>
                 <FormItem>
@@ -26,7 +26,7 @@ class AddOrEditNamedescForm extends React.Component {
                     )}
                 </FormItem>
                 {this.props.type === 'endpoint' ?
-                    <p>说明：名称只能由英文字母、数字、“_”(下划线)、“-”（即中横线）构成。“-” 不能单独或连续使用，不能放在开头或结尾。</p>
+                    <p>名称和描述不是必须的，名称相当于昵称</p>
                     : null}
             </Form>
         );

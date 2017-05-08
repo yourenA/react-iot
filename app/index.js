@@ -32,11 +32,17 @@ let EndPoints = (location,cb) => {
         cb(null,require('./components/Endpoints/endpoints'));
     },'EndPoints');
 };
-let EndPointDetail = (location,cb) => {
+
+let OrganizationRegister = (location,cb) => {
     require.ensure([],require => {
-        cb(null,require('./components/Endpoints/endpointDetail'));
-    },'EndPointDetail');
+        cb(null,require('./components/OrganizationRegister/index'));
+    },'OrganizationRegister');
 };
+// let EndPointDetail = (location,cb) => {
+//     require.ensure([],require => {
+//         cb(null,require('./components/Endpoints/endpointDetail'));
+//     },'EndPointDetail');
+// };
 // let Device_categories = (location,cb) => {
 //     require.ensure([],require => {
 //         cb(null,require('./components/Device_categories/device_categories'));
@@ -57,12 +63,13 @@ ReactDOM.render(
         <Router history={hashHistory}>
             <Route path="/" component={App}>
                 <IndexRoute component={Home}/>
+                <Route path="organization_register" getComponent={OrganizationRegister} />
                 <Route path="basic" onEnter={checkLoginStatus} component={Basic}>
                     <IndexRoute getComponent={EndPoints}/>
                     <Route >
                         <Route path="/basic/endpoints/:uuid/connect_test" component={Connect_test}/>
-                        <Route path="endpoints/:uuid" getComponent={EndPointDetail}>
-                        </Route>
+                        {/*<Route path="endpoints/:uuid" getComponent={EndPointDetail}>
+                        </Route>*/}
 
                     </Route>
                     {/*<Route path="device_categories" getComponent={Device_categories}/>*/}
