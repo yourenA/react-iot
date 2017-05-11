@@ -10,7 +10,28 @@ import configJson from './../../../config.json';
 import {getHeader,converErrorCodeToMsg} from './../../common/common.js';
 import {formItemLayoutForOrganize} from './../../common/common';
 
-class EditPassword extends Component {
+class EditCompany extends Component {
+    constructor(props){
+        super(props);
+    }
+    componentDidMount() {
+        const {form} = this.props;
+        axios({
+            url:`${configJson.prefix}/company`,
+            method: 'get',
+            headers:getHeader()
+        }) .then(function (response) {
+            console.log(response);
+            form.setFieldsValue({
+                name:response.data.name,
+                telephone:response.data.telephone,
+                address:response.data.address
+            });
+        })
+            .catch(function (error) {
+                converErrorCodeToMsg(error)
+            });
+    }
     handleSubmit = (e) => {
         e.preventDefault();
         const that =this;
@@ -19,19 +40,14 @@ class EditPassword extends Component {
             if (!err) {
                 console.log(values);
                 axios({
-                    url:`${configJson.prefix}/password/reset`,
-                    method: 'post',
+                    url:`${configJson.prefix}/company`,
+                    method: 'put',
                     data:values,
                     headers:getHeader()
                 })
                     .then(function (response) {
                         console.log(response);
-                        message.success(messageJson['edit password success']);
-                        form.setFieldsValue({
-                            old_password:'',
-                            new_password:'',
-                            new_password_confirmation:''
-                        });
+                        message.success(messageJson['edit company success']);
                     })
                     .catch(function (error) {
                         converErrorCodeToMsg(error)
@@ -46,41 +62,30 @@ class EditPassword extends Component {
             <div   className="Home edit-password">
                 <Form onSubmit={this.handleSubmit}>
                     <FormItem
-                        label="E-mail"
+                        label="机构名称"
                         {...formItemLayoutForOrganize}>
-                        {getFieldDecorator('username', {
-                            initialValue:localStorage.getItem('username') ||sessionStorage.getItem('username')
+                        {getFieldDecorator('name', {
                         })(
-                            <Input disabled={true} />
+                            <Input  />
                         )}
                     </FormItem>
                     <FormItem
-                        label="原密码"
+                        label="电话"
                         {...formItemLayoutForOrganize}>
-                        {getFieldDecorator('old_password', {
-                        })(
-                            <Input  type="password" />
+                        {getFieldDecorator('telephone')(
+                            <Input />
                         )}
                     </FormItem>
                     <FormItem
-                        label="新密码"
+                        label="地址"
                         {...formItemLayoutForOrganize}>
-                        {getFieldDecorator('new_password', {
-                        })(
-                            <Input type="password" />
-                        )}
-                    </FormItem>
-                    <FormItem
-                        label="重复新密码"
-                        {...formItemLayoutForOrganize}>
-                        {getFieldDecorator('new_password_confirmation', {
-                        })(
-                            <Input type="password"/>
+                        {getFieldDecorator('address')(
+                            <Input  />
                         )}
                     </FormItem>
                     <FormItem>
                         <Button type="primary" style={{width:'100%'}} htmlType="submit" className="login-form-button">
-                            确定修改密码
+                            确定修改资料
                         </Button>
                     </FormItem>
                 </Form>
@@ -90,6 +95,6 @@ class EditPassword extends Component {
     }
 }
 
-const EditPasswordWrap = Form.create()(EditPassword);
+const EditCompanyWrap = Form.create()(EditCompany);
 
-export default EditPasswordWrap;
+export default EditCompanyWrap;

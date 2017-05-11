@@ -5,7 +5,7 @@ import './login.scss';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import configJson from './../../../config.json';
-import {getHeader,converErrorCodeToMsg} from './../../common/common.js';
+import {converErrorCodeToMsg} from './../../common/common.js';
 
 class NormalLoginForm extends Component {
     constructor(props) {
@@ -66,30 +66,20 @@ class NormalLoginForm extends Component {
         const { getFieldDecorator } = this.props.form;
         const display=this.props.isHide ? 'none': 'block';
         return (
-            <div id="components-form-demo-normal-login"  style={{display:display}}>
+            <div className="components-form-demo-normal-login"  style={{display:display}}>
                 <Form onSubmit={this.handleSubmit} className="login-form">
-                    {/*<FormItem   >*/}
-                        {/*<Row gutter={8}>*/}
-                            {/*<Col span={15}>*/}
-                                {/*<Input style={{ borderColor: this.state.emailState?'':'#f04134',boxShadow: this.state.emailState?'':'none'}}  defaultValue={this.state.email} onChange={this.changeEmail} placeholder="Input you email" />*/}
-                            {/*</Col>*/}
-                            {/*<Col span={9}>*/}
-                                {/*<Button style={{float:'right'}} onClick={this.getVerifyCode}>获取验证码</Button>*/}
-                            {/*</Col>*/}
-                        {/*</Row>*/}
-                    {/*</FormItem>*/}
                     <FormItem>
                         {getFieldDecorator('username', {
                             rules: [{ type: 'email', message: 'The input is not valid E-mail!'},{ required: true, message: 'Please input your username!' }],
                         })(
                             <Row gutter={8}>
-                            <Col span={15}>
-                            <Input addonBefore={<Icon type="user" />} placeholder="Username" />
-                            </Col>
-                            <Col span={9}>
-                            <Button style={{float:'right'}} onClick={this.getVerifyCode}>获取验证码</Button>
-                            </Col>
-                                </Row>
+                                <Col span={15}>
+                                    <Input addonBefore={<Icon type="user"/>} placeholder="Username"/>
+                                </Col>
+                                <Col span={9}>
+                                    <Button style={{float: 'right'}} onClick={this.getVerifyCode}>获取验证码</Button>
+                                </Col>
+                            </Row>
                         )}
                     </FormItem>
                     <FormItem>

@@ -20,10 +20,8 @@ class AddCategory extends Component {
         e.preventDefault();
         let submitUrl='';
         if (this.props.type === 'category') {
-            console.log("提交分类");
             submitUrl='device_categories'
         }else if(this.props.type==='group'){
-            console.log("提交分组");
             submitUrl='device_groups'
         }
         const that = this;

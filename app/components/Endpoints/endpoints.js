@@ -237,7 +237,7 @@ class EndPoints extends Component {
                             <div style={{display:'inline-block'}}>
                                 <span className="ant-divider"/>
                                 <Popconfirm placement="topRight" title={ `确定要删除 ${record.name} 吗?`}
-                                            onConfirm={this.delEndPoint}>
+                                            onConfirm={this.delEndPoint.bind(this,record.uuid)}>
                                     <button className="ant-btn ant-btn-danger " data-id={record.uuid}
                                     >删除
                                     </button>

@@ -38,7 +38,7 @@ class Basic extends React.Component {
                         <SubMenu key="sub0" title={<span><Icon type="user" /><span>账号设置</span></span>}>
                             <Menu.Item key="/basic/edit_password"><IndexLink to="/basic/edit_password" >密码修改</IndexLink></Menu.Item>
                             <Menu.Item key="/basic/news0">  <Link  to="/basic/news" >账号安全</Link></Menu.Item>
-                            <Menu.Item key="/basic/news00">  <Link  to="/basic/news" >资料修改</Link></Menu.Item>
+                            <Menu.Item key="/basic/edit_company">  <Link  to="/basic/edit_company" >资料修改</Link></Menu.Item>
                         </SubMenu>
                         <Menu.Item key="3"><span><Icon type="info-circle-o" /><span>信息概况</span></span></Menu.Item>
                         <SubMenu key="sub1" title={<span><Icon type="cloud" /><span>接入管理</span></span>}>

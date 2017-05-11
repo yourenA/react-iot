@@ -27,6 +27,11 @@ let Edit_password = (location,cb) => {
         cb(null,require('./components/EditPassword/index'));
     },'Edit_password');
 };
+let Edit_company = (location,cb) => {
+    require.ensure([],require => {
+        cb(null,require('./components/EditCompany/index'));
+    },'Edit_company');
+};
 let EndPoints = (location,cb) => {
     require.ensure([],require => {
         cb(null,require('./components/Endpoints/endpoints'));
@@ -38,11 +43,11 @@ let OrganizationRegister = (location,cb) => {
         cb(null,require('./components/OrganizationRegister/index'));
     },'OrganizationRegister');
 };
-// let EndPointDetail = (location,cb) => {
-//     require.ensure([],require => {
-//         cb(null,require('./components/Endpoints/endpointDetail'));
-//     },'EndPointDetail');
-// };
+let EndPointDetail = (location,cb) => {
+    require.ensure([],require => {
+        cb(null,require('./components/Endpoints/endpointDetail'));
+    },'EndPointDetail');
+};
 // let Device_categories = (location,cb) => {
 //     require.ensure([],require => {
 //         cb(null,require('./components/Device_categories/device_categories'));
@@ -68,14 +73,15 @@ ReactDOM.render(
                     <IndexRoute getComponent={EndPoints}/>
                     <Route >
                         <Route path="/basic/endpoints/:uuid/connect_test" component={Connect_test}/>
-                        {/*<Route path="endpoints/:uuid" getComponent={EndPointDetail}>
-                        </Route>*/}
+                        <Route path="endpoints/:uuid" getComponent={EndPointDetail}>
+                        </Route>
 
                     </Route>
                     {/*<Route path="device_categories" getComponent={Device_categories}/>*/}
                     {/*<Route path="policies" getComponent={Policies}/>*/}
                     {/*<Route path="device_groups" getComponent={Device_groups}/>*/}
                     <Route path="edit_password" getComponent={Edit_password}/>
+                    <Route path="edit_company" getComponent={Edit_company}/>
                     <Route path="temperature" component={Temperature}/>
                 </Route>
             </Route>

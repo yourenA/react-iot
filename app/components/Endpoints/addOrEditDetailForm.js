@@ -3,7 +3,7 @@
  */
 import React, {Component} from 'react';
 import {Form, Icon, Input, Button, Checkbox, Select} from 'antd';
-import {formItemLayout, formItemLayoutWithLabel, formItemLayoutWithOutLabel} from './../../common/common';
+import {formItemLayout } from './../../common/common';
 import axios from 'axios';
 import AddCategory from './addCategory';
 import AddPolicy from './addpolicy';

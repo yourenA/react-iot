@@ -4,7 +4,6 @@
 import React, {Component} from 'react';
 import {fetchDevice_categories} from '../../actions/device_categories';
 import {Modal, Input, Icon, Breadcrumb, Row, Col, Button, Table, Pagination, Popconfirm,message} from 'antd';
-const Search = Input.Search;
 import {connect} from 'react-redux';
 import Loading from './../Common/loading.js';
 import AddOrNameDescForm from './../Common/addOrEditNameDesc'
@@ -36,8 +35,6 @@ class DeviceCategories extends Component {
         };
     }
     componentDidMount() {
-        /*通过设置loaded，切换路由的时候就不会重复发送请求*/
-        console.log("componentDidMount")
         this.props.dispatch(fetchDevice_categories(1,'','','','asc'))
     }
 

@@ -32,10 +32,10 @@ class App extends Component {
                             <p>辂轺科技IoT</p>
                         </div>
                         <Nav {...this.props}/>
-                        <div className="loginOrRegisterBtn">
+                        <div className="loginOrRegisterBtn" >
                             {
                                 this.props.loginState.username?<div className="username"><span>{this.props.loginState.username}</span> <UserSubMenu showLogin={this.props.showLogin} signout={this.props.signout}/></div> :
-                                    <p> <span className="loginBtn" onClick={this.props.showLogin}>登录</span> | <span onClick={this.props.showRegister} className="registerBtn">注册</span></p>
+                                    <p> <span className="loginBtn" onClick={this.props.showLogin}>登录</span></p>
                             }
                         </div>
                     </div>
