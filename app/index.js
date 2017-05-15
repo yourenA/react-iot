@@ -43,6 +43,9 @@ let OrganizationRegister = (location,cb) => {
         cb(null,require('./components/OrganizationRegister/index'));
     },'OrganizationRegister');
 };
+import Activation from './components/OrganizationRegister/activation';
+import ForgetPassword from './components/OrganizationRegister/forgetPassword';
+
 let EndPointDetail = (location,cb) => {
     require.ensure([],require => {
         cb(null,require('./components/Endpoints/endpointDetail'));
@@ -69,13 +72,14 @@ ReactDOM.render(
             <Route path="/" component={App}>
                 <IndexRoute component={Home}/>
                 <Route path="organization_register" getComponent={OrganizationRegister} />
+                <Route path="activation" component={Activation} />
+                <Route path="forget_password" component={ForgetPassword} />
                 <Route path="basic" onEnter={checkLoginStatus} component={Basic}>
                     <IndexRoute getComponent={EndPoints}/>
                     <Route >
-                        <Route path="/basic/endpoints/:uuid/connect_test" component={Connect_test}/>
+                        <Route path="/basic/endpoints/connect_test" component={Connect_test}/>
                         <Route path="endpoints/:uuid" getComponent={EndPointDetail}>
                         </Route>
-
                     </Route>
                     {/*<Route path="device_categories" getComponent={Device_categories}/>*/}
                     {/*<Route path="policies" getComponent={Policies}/>*/}

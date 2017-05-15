@@ -159,6 +159,10 @@ class EndPoints extends Component {
         const {q, start_at, end_at, order, status, ep_type} = this.props;
         this.constructor.fetch(this.props, this.props.dispatch, page, q, start_at, end_at, order, status, ep_type);
     };
+
+    setConnetUser = (username)=> {
+        localStorage.setItem('connect_user', username);
+    }
     render() {
         const {
             data = [], page, q, start_at, end_at, order, meta = {
@@ -270,10 +274,10 @@ class EndPoints extends Component {
                         </table>
                     </div>
                     <div className="expandRowRender-operate">
-                      {/*  <Link onClick={this.setConnetUser.bind(this, record.username)} target='_blank'
-                              to={`/basic/endpoints/${this.props.params.uuid}/connect_test`}><Button type="primary">
+                     <Link onClick={this.setConnetUser.bind(this, record.username)} target='_blank'
+                              to={`/basic/endpoints/connect_test`}><Button type="primary">
                             连通测试</Button></Link> <span className="ant-divider"/>
-                        <Button type="primary" onClick={()=> {
+                        {/*   <Button type="primary" onClick={()=> {
                             this.setState({editModal: true, edituuid: record.uuid, editRecord: record})
                         }}>修改</Button> <span className="ant-divider"/>
                         <Button type="primary"

@@ -2,8 +2,18 @@ import React, {Component} from 'react';
 import {Form, Icon, Input, Button, Checkbox,message} from 'antd';
 const FormItem = Form.Item;
 import './login.scss';
+import axios from 'axios';
+import messageJson from './../../common/message.json';
+import configJson from './../../../config.json';
+import {converErrorCodeToMsg} from './../../common/common.js';
 
 class NormalLoginForm extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            activeSuccess: false,
+        };
+    }
     handleSubmit = (e) => {
         e.preventDefault();
         const that =this;
@@ -14,7 +24,26 @@ class NormalLoginForm extends Component {
             }
         });
     }
+    sendEmail=(type)=>{
+        this.props.form.validateFields(['username'],(err, values) => {
+            if (!err) {
+                console.log('Received values of form: ', values);
+                axios({
+                    url:`${configJson.prefix}/${type}/link`,
+                    method: 'post',
+                    data: values
+                })
+                    .then(function (response) {
+                        console.log(response);
+                        message.success(messageJson['sendEmail success']);
+                    })
+                    .catch(function (error) {
+                        converErrorCodeToMsg(error)
+                    });
+            }
 
+        });
+    }
     render() {
         const {getFieldDecorator} = this.props.form;
         const display = this.props.isHide ? 'none' : 'block';
@@ -23,14 +52,14 @@ class NormalLoginForm extends Component {
                 <Form onSubmit={this.handleSubmit} className="login-form">
                     <FormItem>
                         {getFieldDecorator('username', {
-                            rules: [{required: true, message: 'Please input your username!'}],
+                            rules: [{required: true, message: '请先输入你的用户名(E-mail)'}],
                         })(
                             <Input addonBefore={<Icon type="user"/>} placeholder="E-mail"/>
                         )}
                     </FormItem>
                     <FormItem>
                         {getFieldDecorator('password', {
-                            rules: [{required: true, message: 'Please input your Password!'}],
+                            rules: [{required: true, message: '请输入密码'}],
                         })(
                             <Input addonBefore={<Icon type="lock"/>} type="password" placeholder="Password"/>
                         )}
@@ -40,14 +69,20 @@ class NormalLoginForm extends Component {
                             valuePropName: 'checked',
                             initialValue: true,
                         })(
-                            <Checkbox>Remember me</Checkbox>
+                            <Checkbox>记住我</Checkbox>
                         )}
-                        <a className="login-form-forgot">Forgot password</a>
+                        <a onClick={()=>this.sendEmail('password')} className="login-form-forgot">忘记密码</a>
                         <Button type="primary" htmlType="submit" className="login-form-button">
                             Log in
                         </Button>
-                        Or <a onClick={this.props.showRegister}>register now!</a>
+                        <a >注册</a>
                     </FormItem>
+                    {!this.props.activeSuccess ?
+                        <div>
+                            <Button  type="primary"  style={{float:'right'}} onClick={()=>this.sendEmail('register')}>
+                                发送激活邮件
+                            </Button>
+                        </div>:null}
                 </Form>
             </div>
 

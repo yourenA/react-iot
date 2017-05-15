@@ -48,7 +48,7 @@ class Basic extends React.Component {
                             {/*<Menu.Item key="/basic/device_categories"> <Link  to="/basic/device_categories" >分类管理</Link></Menu.Item>*/}
                         </SubMenu>
                         <SubMenu key="sub2" title={<span><Icon type="appstore" /><span>应用</span></span>}>
-                            <Menu.Item key="/basic/connect_test"> <Link  to="/basic/temperature" target='_blank'>温度测试</Link></Menu.Item>
+                            <Menu.Item key="/basic/temperature"> <Link  to="/basic/temperature" >温度测试</Link></Menu.Item>
 
                         </SubMenu>
                         <SubMenu key="sub4" title={<span><Icon type="setting" /><span>后台管理</span></span>}>

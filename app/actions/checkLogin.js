@@ -3,6 +3,8 @@
  */
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
 export const LOGIN_FAIL = 'LOGIN_FAIL';
+export const ACTIVE_SUCCESS = 'ACTIVE_SUCCESS';
+export const ACTIVE_FAIL = 'ACTIVE_FAIL';
 export const SIGNOUT_SUCCESS = 'SIGNOUT_SUCCESS';
 export const SIGNOUT_FAIL = 'SIGNOUT_FAIL';
 export const SHOWREGISTERDIV='SHOWREGISTERDIV'
@@ -52,7 +54,12 @@ export function login(user) {
                 });
             })
             .catch(function (error) {
-                if(error.response.status === 403){
+                if(error.response.status === 409){
+                    message.error(messageJson['email no active']);
+                    dispatch({
+                        type: ACTIVE_FAIL,
+                    });
+                } else if(error.response.status === 403){
                     message.error(messageJson['sign in fail']);
                 }else{
                     message.error(messageJson['unknown error']);

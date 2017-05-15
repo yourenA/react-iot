@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Form, Col, Input, Button, Row,message} from 'antd';
+import {Form, Col, Input, Button, Row,message,Modal} from 'antd';
 const FormItem = Form.Item;
 import {formItemLayoutForOrganize} from './../../common/common';
 import './index.scss';
@@ -9,6 +9,12 @@ import configJson from './../../../config.json';
 import {converErrorCodeToMsg} from './../../common/common.js';
 
 class OrganizationRegister extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            registerSuccess: false,
+        };
+    }
     handleSubmit = (e) => {
         const that=this;
         e.preventDefault();
@@ -23,38 +29,36 @@ class OrganizationRegister extends Component {
                     .then(function (response) {
                         console.log(response);
                         message.success(messageJson['register success']);
-                        that.props.hideMask()
+                        that.setState({
+                            registerSuccess:true
+                        })
                     })
                     .catch(function (error) {
-                        console.log(error.response.data);
                         converErrorCodeToMsg(error)
                     });
             }
 
         });
     };
-    getVerifyCode=()=>{
-        const that=this;
-        const username=this.props.form.getFieldsValue().username;
-        console.log(" username", username);
-        const emailRegex = /^([0-9A-Za-z\-_\.]+)@([0-9a-z]+\.[a-z]{2,3}(\.[a-z]{2})?)$/g;
-        if( emailRegex.test( username )){
-            axios({
-                url:`${configJson.prefix}/register/verify_code`,
-                method: 'post',
-                data: {
-                    username: username,
-                }
-            })
-                .then(function (response) {
-                    console.log(response);
-                    message.success(messageJson['send email success']);
+    sendEmail=()=>{
+        this.props.form.validateFields(['username'],(err, values) => {
+            if (!err) {
+                console.log('Received values of form: ', values);
+                axios({
+                    url:`${configJson.prefix}/register/link`,
+                    method: 'post',
+                    data: values
                 })
-                .catch(function (error) {
-                    console.log(error.response.data.message);
-                    converErrorCodeToMsg(error)
-                });
-        }
+                    .then(function (response) {
+                        console.log(response);
+                        message.success(messageJson['sendEmail success']);
+                    })
+                    .catch(function (error) {
+                        converErrorCodeToMsg(error)
+                    });
+            }
+
+        });
     }
     render() {
         const {getFieldDecorator} = this.props.form;
@@ -72,24 +76,8 @@ class OrganizationRegister extends Component {
                                         { type: 'email', message: '请输入正确邮箱地址'},
                                         {required: true, message: '请输入你的邮箱'}],
                                 })(
-                                    <Row gutter={8}>
-                                        <Col span={18}>
-                                            <Input  />
-                                        </Col>
-                                        <Col span={6}>
-                                            <Button style={{float: 'right'}} onClick={this.getVerifyCode}>获取验证码</Button>
-                                        </Col>
-                                    </Row>
+                                    <Input  />
 
-                                )}
-                            </FormItem>
-                            <FormItem
-                                label="验证码"
-                                {...formItemLayoutForOrganize}>
-                                {getFieldDecorator('verify_code', {
-                                    rules: [{ required: true, message: '请输入验证码' }],
-                                })(
-                                    <Input   />
                                 )}
                             </FormItem>
                             <FormItem
@@ -141,6 +129,14 @@ class OrganizationRegister extends Component {
                                 </Button>
                             </FormItem>
                         </Form>
+
+                        {this.state.registerSuccess ?
+                            <div>
+                                <p className="active-success">激活邮件已经发送至你的邮箱，请注意查收！如果没有请点击'重新发送邮件'按钮重新发送邮件</p>
+                                <Button  type="primary"  style={{float:'right'}} onClick={this.sendEmail}>
+                                    重新发送邮件
+                                </Button>
+                            </div>:null}
                     </div>
                 </div>
             </div>

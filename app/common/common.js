@@ -134,6 +134,20 @@ exports.convertSubFormToData  = (form) => {
 
     return topics;
 };
+/**
+ * 将订阅主题表单转换为发送数据
+ * */
+exports.getUrlParam  = (name) => {
+    const search=window.location.href.split('?')[window.location.href.split('?').length-1];
+    const searchParam=search.split('&');
+    for(let i=0,len=searchParam.length;i<len;i++){
+        const eachParam=searchParam[i].split('=');
+        if(eachParam[0]===name){
+            return eachParam[1]
+        }
+    }
+    return null
+};
 
 /**
  *  判断错误码(数组)
