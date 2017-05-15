@@ -20,6 +20,30 @@ class ConnectTest extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            jsonParam : [
+                {
+                    "uri": "/Test/0",
+                    "obs": false,
+                    "type": "application/vnd.oma.lwm2m+tlv"
+                },
+                {
+                    "uri": "/Test/0/S",
+                    "rt": "ResourceTest",
+                    "obs": false,
+                    "type": ""
+                },
+                {
+                    "uri": "/Test/0/D",
+                    "rt": "ResourceTest",
+                    "obs": true,
+                    "type": ""
+                },
+                {
+                    "uri": "/3/0",
+                    "obs": false,
+                    "type": "application/vnd.oma.lwm2m+tlv"
+                }
+            ],
             clientIsConnect:false,
             inputInfoType: 'manual',
             autoInputType: 'dataRange',
@@ -117,24 +141,24 @@ class ConnectTest extends Component {
             })
         }
     }
+    getJsonParam=(jsonParam)=>{
+        this.setState({
+            jsonParam:jsonParam
+        })
+    }
     publicTheme = ()=> {
+        console.log("资源参数",this.state.jsonParam)
         if (!client) {
             message.error(messageJson['connect first']);
             return false
         }
         const that = this;
         const PublishPanel = this.refs.PublishPanel.getFieldsValue();
-        console.log("手动还是自动", this.state.inputInfoType)
-        console.log("数据范围还是数据流", this.state.autoInputType)
         console.log("PublishPanel", PublishPanel);
         const options = {
             qos: parseInt(PublishPanel.QoS),
             retain: PublishPanel.retain
         };
-        if (!PublishPanel.topic) {
-            message.error(messageJson['pub topic must no null']);
-            return false
-        }
         if (this.state.inputInfoType === 'manual') {
             this.publishAction(PublishPanel.topic, PublishPanel.info, options);
         } else if (this.state.inputInfoType === 'auto') {
@@ -232,7 +256,7 @@ class ConnectTest extends Component {
         }
 
 
-    };
+    }
     publishAction = (topic, info, options)=> {
         const that = this;
         client.publish(topic, info, options, (err)=> {
@@ -315,7 +339,6 @@ class ConnectTest extends Component {
                 <Breadcrumb separator=">">
                     <Breadcrumb.Item>接入管理</Breadcrumb.Item>
                     <Breadcrumb.Item ><Link to='/basic'>设备域</Link></Breadcrumb.Item>
-                    <Breadcrumb.Item ><Link onClick={this.goback}>设备</Link></Breadcrumb.Item>
                     <Breadcrumb.Item >连接测试</Breadcrumb.Item>
                 </Breadcrumb>
                 <div className="operate-box">
@@ -333,7 +356,7 @@ class ConnectTest extends Component {
 
                 </div>
                 <Row gutter={20}>
-                    <Col xs={24} sm={24} md={16} lg={14}>
+                    <Col xs={20} sm={20} md={20} lg={20}>
                         <Card title="发布面板">
                             <div className="cleanInfo">
                                 <Button onClick={()=>{this.setState({hadPubTopics:[]})}} type="danger">
@@ -342,7 +365,7 @@ class ConnectTest extends Component {
                             </div>
 
                             <ShowPublishPanel hadPubTopics={this.state.hadPubTopics} ref="ShowPublishPanel"/>
-                            <PublishPanel ref="PublishPanel" inputInfoType={this.state.inputInfoType}
+                            <PublishPanel getJsonParam={this.getJsonParam} jsonParam={this.state.jsonParam} ref="PublishPanel" inputInfoType={this.state.inputInfoType}
                                           changeInputInfoType={this.changeInputInfoType}
                                           changeAutoType={this.changeAutoType}
                                           autoInputType={this.state.autoInputType}
@@ -355,7 +378,7 @@ class ConnectTest extends Component {
                             </Row>
                         </Card>
                     </Col>
-                    <Col xs={24} sm={24} md={8} lg={10}>
+                   {/* <Col xs={24} sm={24} md={8} lg={10}>
                         <Card title="订阅面板">
                             <div className="cleanInfo">
                                 <Button onClick={()=>{this.setState({subTopicsInfo:[]})}} type="danger">
@@ -371,7 +394,7 @@ class ConnectTest extends Component {
                                 </Button>
                             </Row>
                         </Card>
-                    </Col>
+                    </Col>*/}
                 </Row>
                 <Modal
                     visible={this.state.connectPanelModal}

@@ -2,22 +2,16 @@
  * Created by Administrator on 2017/3/6.
  */
 import React, {Component} from 'react';
-import {Form, Icon, Input, Button, Checkbox, Select, Col, Row} from 'antd';
-const FormItem = Form.Item;
+import {Form, Col, Row} from 'antd';
 class ShowPublicInfo extends Component {
     constructor(props) {
         super(props);
         this.state = {};
     }
     render() {
-        const {getFieldDecorator, getFieldValue} = this.props.form;
-        const infoLayout = {
-            labelCol: {span: 4},
-            wrapperCol: {span: 20},
-        };
         return (
             <Row gutter={10}>
-                <Col span={4}>
+                <Col span={4} style={{textAlign:'right'}}>
                     发布的信息
                 </Col>
                 <Col span={20}>

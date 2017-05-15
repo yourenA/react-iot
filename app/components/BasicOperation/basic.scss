@@ -191,7 +191,7 @@
 .subPanel,.pubPanel{
   width: 100%;
   padding: 10px;
-  height: 350px;
+  height: 300px;
   border: 1px solid #d9d9d9;
   border-radius: 4px;
   margin-bottom: 10px;
@@ -206,7 +206,10 @@
       margin-right: 10px;
     }
   }
-
+}
+.JsonPanel{
+  height: 300px;
+  overflow-y:hidden;
 }
 
 .search-wrap{

@@ -7,6 +7,7 @@ const Option = Select.Option
 const FormItem = Form.Item;
 const TabPane = Tabs.TabPane;
 const RadioGroup = Radio.Group;
+import ShowJsonParamInfoPanel from './showJsonParam'
 class PublishPanelForm extends Component {
     constructor(props) {
         super(props);
@@ -50,51 +51,8 @@ class PublishPanelForm extends Component {
         };
         return (
             <div>
+                <ShowJsonParamInfoPanel getJsonParam={this.props.getJsonParam} jsonParam={this.props.jsonParam}/>
                 <Form onSubmit={this.handleSubmit}>
-                    <Row gutter={10}>
-                        <Col span={12}>
-                            <FormItem
-                                {...themeLayout}
-                                label="发布主题"
-                            >
-                                {getFieldDecorator('topic', {
-                                    rules: [{required: true, message: '发布主题不能为空'}],
-                                })(
-                                    <Input  />
-                                )}
-                            </FormItem>
-                        </Col>
-                        <Col span={8}>
-                            <FormItem
-                                {...qosLayout}
-                                label="QoS"
-                            >
-                                {getFieldDecorator('QoS', {
-                                    initialValue: '0',
-                                    rules: [{required: true, message: 'QoS不能为空'}],
-                                })(
-                                    <Select placeholder="">
-                                        <Option value="0">0</Option>
-                                        <Option value="1">1</Option>
-                                    </Select>
-                                )}
-
-                            </FormItem>
-                        </Col>
-                        <Col span={4}>
-                            <FormItem
-                                {...retainLayout}
-                            >
-                                {getFieldDecorator('retain', {
-                                    valuePropName: 'checked',
-                                    initialValue: true,
-                                })(
-                                    <Checkbox>retain</Checkbox>
-                                )}
-
-                            </FormItem>
-                        </Col>
-                    </Row>
                     <Row gutter={10}>
                         <Col span={4} style={{textAlign: 'right', top: '60px', position: 'relative'}}>
                             发布信息
