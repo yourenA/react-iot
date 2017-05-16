@@ -27,6 +27,7 @@ import SearchWrap from './../Common/search';
 import axios from 'axios';
 import messageJson from './../../common/message.json';
 import configJson from './../../../config.json';
+import TopicTable from './../Common/topicTable.js';
 
 import {getHeader, converErrorCodeToMsg} from './../../common/common.js';
 
@@ -266,7 +267,7 @@ class EndPoints extends Component {
                             <tr>
                                 <td>主题</td>
                                 <td>
-                                  {/*  <TopicT/!**!/able dataSource={record.topics.data}/>*/}
+                                    <TopicTable dataSource={record.topics.data}/>
                                 </td>
                             </tr>
                             </tbody>
@@ -275,9 +276,10 @@ class EndPoints extends Component {
                     </div>
                     <div className="expandRowRender-operate">
                      <Link onClick={this.setConnetUser.bind(this, record.username)} target='_blank'
-                              to={`/basic/endpoints/connect_test`}><Button type="primary">
-                            连通测试</Button></Link> <span className="ant-divider"/>
-                        {/*   <Button type="primary" onClick={()=> {
+                              to={`/basic/endpoints/${record.uuid}/connect_test`}><Button type="primary">
+                            连通测试</Button></Link>
+                        {/*  <span className="ant-divider"/>
+                         <Button type="primary" onClick={()=> {
                             this.setState({editModal: true, edituuid: record.uuid, editRecord: record})
                         }}>修改</Button> <span className="ant-divider"/>
                         <Button type="primary"

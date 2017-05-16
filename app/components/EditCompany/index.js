@@ -2,7 +2,7 @@
  * Created by Administrator on 2017/3/27.
  */
 import React, {Component} from 'react';
-import {Form, Icon, Input, Button,message} from 'antd';
+import {Form, Icon, Input, Button,message,Tooltip} from 'antd';
 const FormItem = Form.Item;
 import axios from 'axios';
 import messageJson from './../../common/message.json';
@@ -55,7 +55,15 @@ class EditCompany extends Component {
             }
         });
     };
-
+    judgmentPhone = (rule, value, callback)=> {
+        const teleReg = /^((0\d{2,3})-)(\d{7,8})$/;
+        const mobileReg = /^1[358]\d{9}$/;
+        if (!teleReg.test(value) && !mobileReg.test(value)) {
+            callback('请输入正确电话')
+        }
+        // Note: 必须总是返回一个 callback，否则 validateFieldsAndScroll 无法响应
+        callback()
+    }
     render() {
         const {getFieldDecorator} = this.props.form;
         return (
@@ -70,10 +78,22 @@ class EditCompany extends Component {
                         )}
                     </FormItem>
                     <FormItem
-                        label="电话"
+                        label={(
+                            <span>
+                                        电话&nbsp;
+                                <Tooltip title="固话区号后需添加”-“">
+                                            <Icon type="question-circle-o"/>
+                                        </Tooltip>
+                                    </span>
+                        )}
+
                         {...formItemLayoutForOrganize}>
-                        {getFieldDecorator('telephone')(
-                            <Input />
+                        {getFieldDecorator('telephone', {
+                            rules: [{required: true, message: '请输入电话'}, {
+                                validator: this.judgmentPhone
+                            }],
+                        })(
+                            <Input  />
                         )}
                     </FormItem>
                     <FormItem

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Form, Col, Input, Button, Row,message,Modal} from 'antd';
+import {Form, Col, Input, Button, Tooltip, message, Icon } from 'antd';
 const FormItem = Form.Item;
 import {formItemLayoutForOrganize} from './../../common/common';
 import './index.scss';
@@ -15,14 +15,15 @@ class OrganizationRegister extends Component {
             registerSuccess: false,
         };
     }
+
     handleSubmit = (e) => {
-        const that=this;
+        const that = this;
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 console.log('Received values of form: ', values);
                 axios({
-                    url:`${configJson.prefix}/register`,
+                    url: `${configJson.prefix}/register`,
                     method: 'post',
                     data: values
                 })
@@ -30,7 +31,7 @@ class OrganizationRegister extends Component {
                         console.log(response);
                         message.success(messageJson['register success']);
                         that.setState({
-                            registerSuccess:true
+                            registerSuccess: true
                         })
                     })
                     .catch(function (error) {
@@ -40,12 +41,12 @@ class OrganizationRegister extends Component {
 
         });
     };
-    sendEmail=()=>{
-        this.props.form.validateFields(['username'],(err, values) => {
+    sendEmail = ()=> {
+        this.props.form.validateFields(['username'], (err, values) => {
             if (!err) {
                 console.log('Received values of form: ', values);
                 axios({
-                    url:`${configJson.prefix}/register/link`,
+                    url: `${configJson.prefix}/register/link`,
                     method: 'post',
                     data: values
                 })
@@ -60,6 +61,17 @@ class OrganizationRegister extends Component {
 
         });
     }
+    judgmentPhone = (rule, value, callback)=> {
+        const teleReg = /^((0\d{2,3})-)(\d{7,8})$/;
+        const mobileReg = /^1[358]\d{9}$/;
+        console.log("value", value)
+        if (!teleReg.test(value) && !mobileReg.test(value)) {
+            callback('请输入正确电话')
+        }
+        // Note: 必须总是返回一个 callback，否则 validateFieldsAndScroll 无法响应
+        callback()
+    }
+
     render() {
         const {getFieldDecorator} = this.props.form;
         return (
@@ -73,11 +85,10 @@ class OrganizationRegister extends Component {
                                 {...formItemLayoutForOrganize}>
                                 {getFieldDecorator('username', {
                                     rules: [
-                                        { type: 'email', message: '请输入正确邮箱地址'},
+                                        {type: 'email', message: '请输入正确邮箱地址'},
                                         {required: true, message: '请输入你的邮箱'}],
                                 })(
                                     <Input  />
-
                                 )}
                             </FormItem>
                             <FormItem
@@ -86,7 +97,7 @@ class OrganizationRegister extends Component {
                                 {getFieldDecorator('password', {
                                     rules: [{required: true, message: '请输入你的密码'}],
                                 })(
-                                    <Input type="password" />
+                                    <Input type="password"/>
                                 )}
                             </FormItem>
                             <FormItem
@@ -95,7 +106,7 @@ class OrganizationRegister extends Component {
                                 {getFieldDecorator('password_confirmation', {
                                     rules: [{required: true, message: '请输入相同密码'}],
                                 })(
-                                    <Input type="password" />
+                                    <Input type="password"/>
                                 )}
                             </FormItem>
                             <FormItem
@@ -108,9 +119,20 @@ class OrganizationRegister extends Component {
                                 )}
                             </FormItem>
                             <FormItem
-                                label="电话"
+                                label={(
+                                    <span>
+                                        电话&nbsp;
+                                        <Tooltip title="固话区号后需添加”-“">
+                                            <Icon type="question-circle-o"/>
+                                        </Tooltip>
+                                    </span>
+                                )}
+
                                 {...formItemLayoutForOrganize}>
                                 {getFieldDecorator('telephone', {
+                                    rules: [{required: true, message: '请输入电话'}, {
+                                        validator: this.judgmentPhone
+                                    }],
                                 })(
                                     <Input  />
                                 )}
@@ -118,13 +140,12 @@ class OrganizationRegister extends Component {
                             <FormItem
                                 label="地址"
                                 {...formItemLayoutForOrganize}>
-                                {getFieldDecorator('address', {
-                                })(
+                                {getFieldDecorator('address', {})(
                                     <Input  />
                                 )}
                             </FormItem>
                             <FormItem>
-                                <Button type="primary" htmlType="submit" style={{float:'right'}}>
+                                <Button type="primary" htmlType="submit" style={{float: 'right'}}>
                                     注册新机构
                                 </Button>
                             </FormItem>
@@ -132,11 +153,10 @@ class OrganizationRegister extends Component {
 
                         {this.state.registerSuccess ?
                             <div>
-                                <p className="active-success">激活邮件已经发送至你的邮箱，请注意查收！如果没有请点击'重新发送邮件'按钮重新发送邮件</p>
-                                <Button  type="primary"  style={{float:'right'}} onClick={this.sendEmail}>
-                                    重新发送邮件
-                                </Button>
-                            </div>:null}
+                                <p className="active-success">激活邮件已经发送至你的邮箱，请注意查收！如果没有请点击 '<span
+                                    style={{color: 'red', cursor: 'pointer'}} onClick={this.sendEmail}>重新发送邮件</span>'重新发送邮件
+                                </p>
+                            </div> : null}
                     </div>
                 </div>
             </div>

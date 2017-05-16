@@ -13,6 +13,7 @@ import AddSubscribePanel from './addSubscribePanel';
 import {getHeader, converErrorCodeToMsg, convertSubFormToData} from './../../common/common.js';
 import configJson from './../../../config.json';
 import messageJson from './../../common/message.json';
+import ShowJsonParamInfoPanel from './showJsonParam'
 
 let client;
 let timer;
@@ -44,9 +45,11 @@ class ConnectTest extends Component {
                     "type": "application/vnd.oma.lwm2m+tlv"
                 }
             ],
+
             clientIsConnect:false,
             inputInfoType: 'manual',
             autoInputType: 'dataRange',
+            connectSourceParamModal:false,
             connectPanelModal: false,
             addSubscribeModal: false,
             hadPubTopics: [],
@@ -57,6 +60,9 @@ class ConnectTest extends Component {
     }
 
     componentDidMount = () => {
+    }
+    connectSourceParam=()=>{
+        console.log(this.state.jsonParam)
     }
     createConnectPanel = ()=> {
         console.log("ConnectPanel", this.refs.ConnectPanel.getFieldsValue());
@@ -91,7 +97,6 @@ class ConnectTest extends Component {
         });
         client.on('close', function () {
             console.log('客户端已关闭:' + clientId);
-            client=null;
             if(timer){
                 clearInterval(timer);
             }
@@ -147,7 +152,6 @@ class ConnectTest extends Component {
         })
     }
     publicTheme = ()=> {
-        console.log("资源参数",this.state.jsonParam)
         if (!client) {
             message.error(messageJson['connect first']);
             return false
@@ -356,7 +360,7 @@ class ConnectTest extends Component {
 
                 </div>
                 <Row gutter={20}>
-                    <Col xs={20} sm={20} md={20} lg={20}>
+                    <Col xs={20} sm={20} md={16} lg={14}>
                         <Card title="发布面板">
                             <div className="cleanInfo">
                                 <Button onClick={()=>{this.setState({hadPubTopics:[]})}} type="danger">
@@ -378,7 +382,7 @@ class ConnectTest extends Component {
                             </Row>
                         </Card>
                     </Col>
-                   {/* <Col xs={24} sm={24} md={8} lg={10}>
+                    <Col xs={24} sm={24} md={8} lg={10}>
                         <Card title="订阅面板">
                             <div className="cleanInfo">
                                 <Button onClick={()=>{this.setState({subTopicsInfo:[]})}} type="danger">
@@ -394,7 +398,7 @@ class ConnectTest extends Component {
                                 </Button>
                             </Row>
                         </Card>
-                    </Col>*/}
+                    </Col>
                 </Row>
                 <Modal
                     visible={this.state.connectPanelModal}
@@ -412,7 +416,27 @@ class ConnectTest extends Component {
                         </Button>,
                     ]}
                 >
-                    <ConnectPanel ref="ConnectPanel"/>
+                    <ShowJsonParamInfoPanel getJsonParam={this.props.getJsonParam} jsonParam={this.props.jsonParam}/>
+
+                    <ConnectPanel uuid={this.props.params.uuid} ref="ConnectPanel"/>
+                </Modal>
+                <Modal
+                    visible={this.state.connectSourceParamModal}
+                    title="资源参数面板"
+                    onCancel={()=> {
+                        this.setState({connectSourceParamModal: false})
+                    }}
+                    footer={[
+                        <Button key="back" type="ghost" size="large"
+                                onClick={()=> {
+                                    this.setState({connectSourceParamModal: false})
+                                }}>取消</Button>,
+                        <Button key="submit" type="primary" size="large" onClick={this.connectSourceParam}>
+                            确定
+                        </Button>,
+                    ]}
+                >
+                    <ShowJsonParamInfoPanel getJsonParam={this.getJsonParam} jsonParam={this.state.jsonParam}/>
                 </Modal>
                 <Modal
                     visible={this.state.addSubscribeModal}

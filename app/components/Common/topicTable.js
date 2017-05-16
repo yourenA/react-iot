@@ -11,23 +11,17 @@ class TopicTable extends Component {
             key: 'name',
         }, {
             title: '权限',
-            dataIndex: 'allow_publish',
-            key: 'allow_publish',
+            dataIndex: 'type',
+            key: 'type',
             render: (text, record, index)=> {
-                if (record.allow_publish === 1 && record.allow_subscribe === 1) {
-                    return (
-                        <p>订阅+发布</p>
-                    )
-                } else if (record.allow_publish === 1 && record.allow_subscribe === -1) {
+                if (record.type==='pub') {
                     return (
                         <p>发布</p>
                     )
-                } else if (record.allow_publish === -1 && record.allow_subscribe === 1) {
+                } else if (record.type==='sub') {
                     return (
                         <p>订阅</p>
                     )
-                } else {
-                    return null
                 }
 
             }

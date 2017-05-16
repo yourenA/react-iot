@@ -42,9 +42,11 @@ export function login(user) {
                 console.log(response);
                 sessionStorage.setItem('username',user.username);
                 sessionStorage.setItem('usertoken',response.data.token);
+                sessionStorage.setItem('userPermissions',JSON.stringify(response.data.permissions.data));
                 if(user.remember === true){
                     localStorage.setItem('username',user.username);
                     localStorage.setItem('usertoken',response.data.token);
+                    localStorage.setItem('userPermissions',JSON.stringify(response.data.permissions.data));
                 }
                 message.success(messageJson['sign in success']);
                 dispatch({

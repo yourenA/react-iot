@@ -32,6 +32,11 @@ let Edit_company = (location,cb) => {
         cb(null,require('./components/EditCompany/index'));
     },'Edit_company');
 };
+let Company_user = (location,cb) => {
+    require.ensure([],require => {
+        cb(null,require('./components/EditCompany/companyUser'));
+    },'Company_user');
+};
 let EndPoints = (location,cb) => {
     require.ensure([],require => {
         cb(null,require('./components/Endpoints/endpoints'));
@@ -77,7 +82,7 @@ ReactDOM.render(
                 <Route path="basic" onEnter={checkLoginStatus} component={Basic}>
                     <IndexRoute getComponent={EndPoints}/>
                     <Route >
-                        <Route path="/basic/endpoints/connect_test" component={Connect_test}/>
+                        <Route path="/basic/endpoints/:uuid/connect_test" component={Connect_test}/>
                         <Route path="endpoints/:uuid" getComponent={EndPointDetail}>
                         </Route>
                     </Route>
@@ -86,6 +91,7 @@ ReactDOM.render(
                     {/*<Route path="device_groups" getComponent={Device_groups}/>*/}
                     <Route path="edit_password" getComponent={Edit_password}/>
                     <Route path="edit_company" getComponent={Edit_company}/>
+                    <Route path="company_user" getComponent={Company_user}/>
                     <Route path="temperature" component={Temperature}/>
                 </Route>
             </Route>

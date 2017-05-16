@@ -60,9 +60,11 @@ exports.isLogin = () => {
 const removeLoginStorage = () => {
     sessionStorage.removeItem('username');
     sessionStorage.removeItem('usertoken');
+    sessionStorage.removeItem('userPermissions');
     sessionStorage.clear();
     localStorage.removeItem('username');
     localStorage.removeItem('usertoken');
+    localStorage.removeItem('userPermissions');
     localStorage.clear();
 };
 exports.removeLoginStorage=removeLoginStorage;
@@ -156,6 +158,11 @@ import {hashHistory } from 'react-router';
 import {showLogin,signout} from './../actions/checkLogin';
 import {store} from './../index'
 exports.converErrorCodeToMsg  = (error) => {
+    console.log("error",error.toString())
+    if(error.toString()==='Error: Network Error'){
+        message.error(messageJson['network error'],3);
+        return false
+    }
     if (error.response.status === 401) {
         message.error(messageJson['token fail']);
         removeLoginStorage();
@@ -174,3 +181,16 @@ exports.converErrorCodeToMsg  = (error) => {
         message.error(messageJson['unknown error']);
     }
 }
+
+/**
+ *  获取用户权限
+ * */
+exports.getUserPermission  = (name) => {
+    const allPermisssions=JSON.parse(sessionStorage.getItem('userPermissions')||locationShape.getItem('userPermissions'));
+    for(let i=0,len=allPermisssions.len;i<len;i++){
+        if(allPermisssions[i].name===name){
+            return true
+        }
+    }
+    return false
+};

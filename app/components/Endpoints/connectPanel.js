@@ -35,11 +35,11 @@ class ConnectPanelForm extends Component {
                         <Col span={12}>
                             <FormItem
                                 {...usernameLayout}
-                                label="用户名"
+                                label="主机名称"
                             >
                                 {getFieldDecorator('username', {
-                                    initialValue: localStorage.getItem('connect_user') || '',
-                                    rules: [{required: true, message: '用户名不能为空'}],
+                                    initialValue: 'iot.v4s.com.cn',
+                                    rules: [{required: true, message: '主机名称不能为空'}],
                                 })(
                                     <Input  />
                                 )}
@@ -60,6 +60,19 @@ class ConnectPanelForm extends Component {
                         </Col>
                     </Row>
                     <Row gutter={10}>
+                        <Col span={12}>
+                            <FormItem
+                                {...usernameLayout}
+                                label="设备"
+                            >
+                                {getFieldDecorator('username', {
+                                    initialValue: this.props.uuid || '',
+                                    rules: [{required: true, message: '设备不能为空'}],
+                                })(
+                                    <Input  />
+                                )}
+                            </FormItem>
+                        </Col>
                         <Col span={12}>
                             <FormItem
                                 {...keyLayout}

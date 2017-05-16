@@ -7,7 +7,6 @@ const Option = Select.Option
 const FormItem = Form.Item;
 const TabPane = Tabs.TabPane;
 const RadioGroup = Radio.Group;
-import ShowJsonParamInfoPanel from './showJsonParam'
 class PublishPanelForm extends Component {
     constructor(props) {
         super(props);
@@ -51,145 +50,189 @@ class PublishPanelForm extends Component {
         };
         return (
             <div>
-                <ShowJsonParamInfoPanel getJsonParam={this.props.getJsonParam} jsonParam={this.props.jsonParam}/>
                 <Form onSubmit={this.handleSubmit}>
                     <Row gutter={10}>
-                        <Col span={4} style={{textAlign: 'right', top: '60px', position: 'relative'}}>
-                            发布信息
+                        <Col span={12}>
+                            <FormItem
+                                {...themeLayout}
+                                label="发布主题"
+                            >
+                                {getFieldDecorator('topic', {
+                                    rules: [{required: true, message: '发布主题不能为空'}],
+                                })(
+                                    <Input  />
+                                )}
+                            </FormItem>
                         </Col>
-                        <Col span={20}>
-                            <Tabs onChange={this.changeInputInfoType} activeKey={this.props.inputInfoType}>
-                                <TabPane tab="手动" key="manual">
-                                    <FormItem>
-                                        {getFieldDecorator('info', {})(
-                                            <Input type="textarea" autosize={{minRows: 3, maxRows: 3}}/>
-                                        )}
-                                    </FormItem>
-                                </TabPane>
-                                <TabPane tab="自动" key="auto">
-                                    <Row gutter={10}>
-                                        <Col span={4}>
-                                            <RadioGroup onChange={this.changeAutoType} value={this.props.autoInputType}>
-                                                <Radio style={radioStyle} value='dataRange'>数据范围</Radio>
-                                                <Radio style={radioStyle} value='dateFlow'>数据流</Radio>
-                                            </RadioGroup>
-                                        </Col>
-                                        <Col span={20}>
-                                            <Row>
-                                                <Col span={6}>
-                                                    <FormItem>
-                                                        {getFieldDecorator('min', {
-                                                            initialValue: 20,
-                                                        })(
-                                                            <Input type="number"/>
-                                                        )}
-                                                    </FormItem>
-                                                </Col>
-                                                <Col span={1}>
-                                                    <div style={{marginTop: '6px', textAlign: 'center'}}>
-                                                        --
-                                                    </div>
-                                                </Col>
-                                                <Col span={6}>
-                                                    <FormItem>
-                                                        {getFieldDecorator('max', {
-                                                            initialValue: 200,
-                                                        })(
-                                                            <Input type="number"/>
-                                                        )}
-                                                    </FormItem>
-                                                </Col>
-                                                <Col span={10}>
-                                                    <FormItem
-                                                        {...qosLayout}
-                                                        label="精度"
-                                                        colon={false}>
-                                                        {getFieldDecorator('accuracy', {
-                                                            initialValue: '1',
-                                                        })(
-                                                            <Select >
-                                                                <Option value="1">整数</Option>
-                                                                <Option value="0.1">一位小数</Option>
-                                                                <Option value="0.01">两位小数</Option>
-                                                            </Select>
-                                                        )}
-                                                    </FormItem>
-                                                </Col>
-                                                <Col span={23}>
-                                                    <FormItem>
-                                                        {getFieldDecorator('dataFlowInfo', {})(
-                                                            <Input placeholder="请使用逗号分隔"/>
-                                                        )}
-                                                    </FormItem>
-                                                </Col>
-                                            </Row>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col span={9} offset={4}>
+                        <Col span={8}>
+                            <FormItem
+                                {...qosLayout}
+                                label="QoS"
+                            >
+                                {getFieldDecorator('QoS', {
+                                    initialValue: '0',
+                                    rules: [{required: true, message: 'QoS不能为空'}],
+                                })(
+                                    <Select placeholder="">
+                                        <Option value="0">0</Option>
+                                        <Option value="1">1</Option>
+                                    </Select>
+                                )}
 
-                                            <FormItem
-                                                {...themeLayout}
-                                                label="时间间隔"
-                                                colon={false}>
-                                                {getFieldDecorator('interval', {
-                                                    initialValue: 10,
-                                                    rules: [{
-                                                        type: 'integer', message: '必须为整数',
-                                                    }, {
-                                                        required: true, message: '次数3-100W之间',
-                                                    }]
-                                                })(
-                                                    <InputNumber
-                                                        min={1}
-                                                        max={120}/>
-                                                )}
-                                                <span className="ant-form-text"> 秒</span>
-                                            </FormItem>
-                                        </Col>
-                                        <Col span={5}>
-                                            <FormItem
-                                                {...timesLayout}
-                                                label="发送次数"
-                                                colon={false}>
-                                                {getFieldDecorator('times', {
-                                                    initialValue: 100,
-                                                    rules: [{
-                                                        type: 'integer', message: '必须为整数',
-                                                    }, {
-                                                        required: true, message: '次数3-100W之间',
-                                                    }]
-                                                })(
-                                                    <InputNumber
-                                                        min={3}
-                                                        max={1000000}/>
-                                                )}
-                                            </FormItem>
-                                        </Col>
-                                        <Col span={3} offset={3}>
-                                            <FormItem
-                                                {...retainLayout}
-                                            >
-                                                {getFieldDecorator('random', {
-                                                    valuePropName: 'checked',
-                                                    initialValue: true,
-                                                })(
-                                                    <Checkbox>随机</Checkbox>
-                                                )}
+                            </FormItem>
+                        </Col>
+                        <Col span={4}>
+                            <FormItem
+                                {...retainLayout}
+                            >
+                                {getFieldDecorator('retain', {
+                                    valuePropName: 'checked',
+                                    initialValue: true,
+                                })(
+                                    <Checkbox>retain</Checkbox>
+                                )}
 
-                                            </FormItem>
-                                        </Col>
-
-                                    </Row>
-                                </TabPane>
-                            </Tabs>
+                            </FormItem>
                         </Col>
                     </Row>
+                        <Row gutter={10}>
+                            <Col span={4} style={{textAlign: 'right', top: '60px', position: 'relative'}}>
+                                发布信息
+                            </Col>
+                            <Col span={20}>
+                                <Tabs onChange={this.changeInputInfoType} activeKey={this.props.inputInfoType}>
+                                    <TabPane tab="手动" key="manual">
+                                        <FormItem>
+                                            {getFieldDecorator('info', {})(
+                                                <Input type="textarea" autosize={{minRows: 3, maxRows: 3}}/>
+                                            )}
+                                        </FormItem>
+                                    </TabPane>
+                                    <TabPane tab="自动" key="auto">
+                                        <Row gutter={10}>
+                                            <Col span={4}>
+                                                <RadioGroup onChange={this.changeAutoType}
+                                                            value={this.props.autoInputType}>
+                                                    <Radio style={radioStyle} value='dataRange'>数据范围</Radio>
+                                                    <Radio style={radioStyle} value='dateFlow'>数据流</Radio>
+                                                </RadioGroup>
+                                            </Col>
+                                            <Col span={20}>
+                                                <Row>
+                                                    <Col span={6}>
+                                                        <FormItem>
+                                                            {getFieldDecorator('min', {
+                                                                initialValue: 20,
+                                                            })(
+                                                                <Input type="number"/>
+                                                            )}
+                                                        </FormItem>
+                                                    </Col>
+                                                    <Col span={1}>
+                                                        <div style={{marginTop: '6px', textAlign: 'center'}}>
+                                                            --
+                                                        </div>
+                                                    </Col>
+                                                    <Col span={6}>
+                                                        <FormItem>
+                                                            {getFieldDecorator('max', {
+                                                                initialValue: 200,
+                                                            })(
+                                                                <Input type="number"/>
+                                                            )}
+                                                        </FormItem>
+                                                    </Col>
+                                                    <Col span={10}>
+                                                        <FormItem
+                                                            {...qosLayout}
+                                                            label="精度"
+                                                            colon={false}>
+                                                            {getFieldDecorator('accuracy', {
+                                                                initialValue: '1',
+                                                            })(
+                                                                <Select >
+                                                                    <Option value="1">整数</Option>
+                                                                    <Option value="0.1">一位小数</Option>
+                                                                    <Option value="0.01">两位小数</Option>
+                                                                </Select>
+                                                            )}
+                                                        </FormItem>
+                                                    </Col>
+                                                    <Col span={23}>
+                                                        <FormItem>
+                                                            {getFieldDecorator('dataFlowInfo', {})(
+                                                                <Input placeholder="请使用逗号分隔"/>
+                                                            )}
+                                                        </FormItem>
+                                                    </Col>
+                                                </Row>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col span={9} offset={4}>
+
+                                                <FormItem
+                                                    {...themeLayout}
+                                                    label="时间间隔"
+                                                    colon={false}>
+                                                    {getFieldDecorator('interval', {
+                                                        initialValue: 10,
+                                                        rules: [{
+                                                            type: 'integer', message: '必须为整数',
+                                                        }, {
+                                                            required: true, message: '次数3-100W之间',
+                                                        }]
+                                                    })(
+                                                        <InputNumber
+                                                            min={1}
+                                                            max={120}/>
+                                                    )}
+                                                    <span className="ant-form-text"> 秒</span>
+                                                </FormItem>
+                                            </Col>
+                                            <Col span={5}>
+                                                <FormItem
+                                                    {...timesLayout}
+                                                    label="发送次数"
+                                                    colon={false}>
+                                                    {getFieldDecorator('times', {
+                                                        initialValue: 100,
+                                                        rules: [{
+                                                            type: 'integer', message: '必须为整数',
+                                                        }, {
+                                                            required: true, message: '次数3-100W之间',
+                                                        }]
+                                                    })(
+                                                        <InputNumber
+                                                            min={3}
+                                                            max={1000000}/>
+                                                    )}
+                                                </FormItem>
+                                            </Col>
+                                            <Col span={3} offset={3}>
+                                                <FormItem
+                                                    {...retainLayout}
+                                                >
+                                                    {getFieldDecorator('random', {
+                                                        valuePropName: 'checked',
+                                                        initialValue: true,
+                                                    })(
+                                                        <Checkbox>随机</Checkbox>
+                                                    )}
+
+                                                </FormItem>
+                                            </Col>
+
+                                        </Row>
+                                    </TabPane>
+                                </Tabs>
+                            </Col>
+                        </Row>
                 </Form>
             </div>
-        )
-            ;
+    )
+    ;
     }
-}
-const PublishPanel = Form.create()(PublishPanelForm);
-export default PublishPanel;
+    }
+    const PublishPanel = Form.create()(PublishPanelForm);
+    export default PublishPanel;
