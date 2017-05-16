@@ -176,7 +176,7 @@ class PublishPanelForm extends Component {
                                                     label="时间间隔"
                                                     colon={false}>
                                                     {getFieldDecorator('interval', {
-                                                        initialValue: 10,
+                                                        initialValue: 1,
                                                         rules: [{
                                                             type: 'integer', message: '必须为整数',
                                                         }, {

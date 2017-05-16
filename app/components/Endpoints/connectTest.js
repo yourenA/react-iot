@@ -135,7 +135,7 @@ class ConnectTest extends Component {
     };
     disconnect=()=>{
         console.log("disconnect client",client);
-        if (!client) {
+        if (!this.state.clientIsConnect) {
             message.error(messageJson['connect first']);
             return false
         }else{
@@ -152,7 +152,8 @@ class ConnectTest extends Component {
         })
     }
     publicTheme = ()=> {
-        if (!client) {
+        console.log("this.state.clientIsConnect",this.state.clientIsConnect)
+        if (!this.state.clientIsConnect) {
             message.error(messageJson['connect first']);
             return false
         }
@@ -163,6 +164,10 @@ class ConnectTest extends Component {
             qos: parseInt(PublishPanel.QoS),
             retain: PublishPanel.retain
         };
+        if(!PublishPanel.topic){
+            message.error(messageJson['pub topic must no null']);
+            return false
+        }
         if (this.state.inputInfoType === 'manual') {
             this.publishAction(PublishPanel.topic, PublishPanel.info, options);
         } else if (this.state.inputInfoType === 'auto') {
@@ -180,11 +185,14 @@ class ConnectTest extends Component {
                     let initTimes = 0;
 
                     timer = setInterval(function () {
+                        console.log("that.state.clientIsConnect",that.state.clientIsConnect)
                         if(!that.state.clientIsConnect){
                             message.error(messageJson['client had disconnect']);
                             clearInterval(timer);
                             return false
                         }
+                        console.log("是否随机",random)
+                        console.log("精度",accuracy)
                         if (random) {
                             let randomNum;
                             if (accuracy === 0.1) {
@@ -195,13 +203,13 @@ class ConnectTest extends Component {
                                 randomNum = Math.floor(Math.random() * (max - min) + min)
 
                             }
-                            that.publishAction(PublishPanel.topic, randomNum, options);
+                            console.log("发送的数据",randomNum)
+                            that.publishAction(PublishPanel.topic, randomNum.toString(), options);
 
                         } else {
                             if (min > max) {
                                 min = Number(PublishPanel.min)
                             }
-                            that.publishAction(PublishPanel.topic, min, options);
                             if (accuracy === 0.1) {
                                 min = parseFloat((min + accuracy).toFixed(1));
                             } else if (accuracy === 0.01) {
@@ -209,6 +217,8 @@ class ConnectTest extends Component {
                             } else {
                                 min = min + accuracy
                             }
+                            console.log("发送的数据",min);
+                            that.publishAction(PublishPanel.topic, min.toString(), options);
 
                         }
                         initTimes++;
@@ -346,6 +356,10 @@ class ConnectTest extends Component {
                     <Breadcrumb.Item >连接测试</Breadcrumb.Item>
                 </Breadcrumb>
                 <div className="operate-box">
+                    <Button type="primary"  onClick={()=> {
+                        this.setState({connectSourceParamModal: true})
+                    }}>资源参数面板</Button>
+                    <span className="ant-divider"/>
                     <Button type="primary" icon="plus" onClick={()=> {
                         this.setState({connectPanelModal: true})
                     }}>连接参数面板</Button>
@@ -369,7 +383,7 @@ class ConnectTest extends Component {
                             </div>
 
                             <ShowPublishPanel hadPubTopics={this.state.hadPubTopics} ref="ShowPublishPanel"/>
-                            <PublishPanel getJsonParam={this.getJsonParam} jsonParam={this.state.jsonParam} ref="PublishPanel" inputInfoType={this.state.inputInfoType}
+                            <PublishPanel ref="PublishPanel" inputInfoType={this.state.inputInfoType}
                                           changeInputInfoType={this.changeInputInfoType}
                                           changeAutoType={this.changeAutoType}
                                           autoInputType={this.state.autoInputType}
@@ -416,8 +430,6 @@ class ConnectTest extends Component {
                         </Button>,
                     ]}
                 >
-                    <ShowJsonParamInfoPanel getJsonParam={this.props.getJsonParam} jsonParam={this.props.jsonParam}/>
-
                     <ConnectPanel uuid={this.props.params.uuid} ref="ConnectPanel"/>
                 </Modal>
                 <Modal

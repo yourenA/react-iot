@@ -38,10 +38,7 @@ class showJsonParam extends Component {
     render() {
         return (
             <Row gutter={10}>
-                <Col span={4} style={{textAlign:'right'}}>
-                    参数资源
-                </Col>
-                <Col span={20}>
+                <Col span={24}>
                     <div className=" JsonPanel" >
                         <div
                             id='jsoneditor'
@@ -54,5 +51,4 @@ class showJsonParam extends Component {
         )
     }
 }
-const showJsonParamInfoPanel = Form.create()(showJsonParam);
-export default showJsonParamInfoPanel;
+export default showJsonParam;
