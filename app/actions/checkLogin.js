@@ -56,6 +56,10 @@ export function login(user) {
                 });
             })
             .catch(function (error) {
+                if(error.toString()==='Error: Network Error'){
+                    message.error(messageJson['network error'],3);
+                    return false
+                }
                 if(error.response.status === 409){
                     message.error(messageJson['email no active']);
                     dispatch({
