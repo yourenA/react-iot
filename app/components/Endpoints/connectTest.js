@@ -14,38 +14,23 @@ import {getHeader, converErrorCodeToMsg, convertSubFormToData} from './../../com
 import configJson from './../../../config.json';
 import messageJson from './../../common/message.json';
 import ShowJsonParamInfoPanel from './showJsonParam'
-
+import axios from 'axios';
 let client;
 let timer;
 class ConnectTest extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            jsonParam : [
-                {
-                    "uri": "/Test/0",
-                    "obs": false,
-                    "type": "application/vnd.oma.lwm2m+tlv"
-                },
-                {
-                    "uri": "/Test/0/S",
-                    "rt": "ResourceTest",
-                    "obs": false,
-                    "type": ""
-                },
-                {
-                    "uri": "/Test/0/D",
-                    "rt": "ResourceTest",
-                    "obs": true,
-                    "type": ""
-                },
-                {
-                    "uri": "/3/0",
-                    "obs": false,
-                    "type": "application/vnd.oma.lwm2m+tlv"
-                }
-            ],
-
+            jsonParam : JSON.parse( localStorage.getItem('connect_topics')) || {
+                "sub": [
+                    "0/light",
+                    "1/light"
+                ],
+                "pub": [
+                    "0/light/open",
+                    "1/light/close"
+                ]
+            },
             clientIsConnect:false,
             inputInfoType: 'manual',
             autoInputType: 'dataRange',
@@ -60,9 +45,6 @@ class ConnectTest extends Component {
     }
 
     componentDidMount = () => {
-    }
-    connectSourceParam=()=>{
-        console.log(this.state.jsonParam)
     }
     createConnectPanel = ()=> {
         console.log("ConnectPanel", this.refs.ConnectPanel.getFieldsValue());
@@ -112,7 +94,7 @@ class ConnectTest extends Component {
             })
         });
         client.on("message", function (topic, payload, packet) {
-            console.log("packet", packet)
+            console.log("接收信息", packet)
             that.setState({
                 subTopicsInfo: that.state.subTopicsInfo.concat({
                     qos: packet.qos,
@@ -133,6 +115,33 @@ class ConnectTest extends Component {
         })
 
     };
+    connectSourceParam=()=>{
+        console.log(this.state.jsonParam);
+        const that=this;
+        const ShowJsonParamInfoPanel = this.refs.ShowJsonParamInfoPanel.getFieldsValue();
+        const sendData={
+            topics:JSON.stringify(this.state.jsonParam),
+            ...ShowJsonParamInfoPanel
+        };
+        console.log("sendData",sendData);
+        axios({
+            url: `${configJson.prefix}/endpoints/${this.props.params.uuid}/base`,
+            method: 'put',
+            data:sendData,
+            headers: getHeader()
+        })
+            .then(function (response) {
+                console.log(response);
+                that.setState({
+                    connectSourceParamModal: false,
+                });
+                message.success(messageJson['init/update sourceParam success']);
+            })
+            .catch(function (error) {
+                converErrorCodeToMsg(error)
+            });
+    }
+
     disconnect=()=>{
         console.log("disconnect client",client);
         if (!this.state.clientIsConnect) {
@@ -356,20 +365,23 @@ class ConnectTest extends Component {
                     <Breadcrumb.Item >连接测试</Breadcrumb.Item>
                 </Breadcrumb>
                 <div className="operate-box">
-                    <Button type="primary"  onClick={()=> {
-                        this.setState({connectSourceParamModal: true})
-                    }}>资源参数面板</Button>
-                    <span className="ant-divider"/>
                     <Button type="primary" icon="plus" onClick={()=> {
                         this.setState({connectPanelModal: true})
                     }}>连接参数面板</Button>
                     {this.state.clientIsConnect?
-                        <Popconfirm placement="topRight" title={`确定要断开连接吗?`}
-                                    onConfirm={this.disconnect}>
-                            <button style={{marginLeft:'10px'}} className="ant-btn btn-info">
-                                断开连接
-                            </button>
-                        </Popconfirm>
+                        <div  className="search-wrap">
+                            <span className="ant-divider"/>
+                            <button className="ant-btn btn-info"  onClick={()=> {
+                                this.setState({connectSourceParamModal: true})
+                            }}>设备初始化参数</button>
+                            <span className="ant-divider"/>
+                            <Popconfirm placement="topRight" title={`确定要断开连接吗?`}
+                                        onConfirm={this.disconnect}>
+                                <button  className="ant-btn btn-warning">
+                                    断开连接
+                                </button>
+                            </Popconfirm>
+                        </div>
                         :null}
 
                 </div>
@@ -444,11 +456,11 @@ class ConnectTest extends Component {
                                     this.setState({connectSourceParamModal: false})
                                 }}>取消</Button>,
                         <Button key="submit" type="primary" size="large" onClick={this.connectSourceParam}>
-                            确定
+                            初始化/更新
                         </Button>,
                     ]}
                 >
-                    <ShowJsonParamInfoPanel getJsonParam={this.getJsonParam} jsonParam={this.state.jsonParam}/>
+                    <ShowJsonParamInfoPanel ref="ShowJsonParamInfoPanel"  getJsonParam={this.getJsonParam} jsonParam={this.state.jsonParam}/>
                 </Modal>
                 <Modal
                     visible={this.state.addSubscribeModal}

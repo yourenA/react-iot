@@ -161,8 +161,17 @@ class EndPoints extends Component {
         this.constructor.fetch(this.props, this.props.dispatch, page, q, start_at, end_at, order, status, ep_type);
     };
 
-    setConnetUser = (username)=> {
-        localStorage.setItem('connect_user', username);
+    setConnetPassword = (password,topics)=> {
+        localStorage.setItem('connect_password', password);
+        let parseTopic={sub:[],pub:[]}
+        for(let i=0,len=topics.data.length;i<len;i++){
+            if(topics.data[i].type==='sub'){
+                parseTopic.sub.push(topics.data[i].name)
+            }else if(topics.data[i].type==='pub'){
+                parseTopic.pub.push(topics.data[i].name)
+            }
+        }
+        localStorage.setItem('connect_topics', JSON.stringify(parseTopic));
     }
     render() {
         const {
@@ -226,7 +235,16 @@ class EndPoints extends Component {
             render: (text, record, index) => {
                 return (
                     <div>
-                        <Dropdown overlay={
+                        {record.status==='未激活'?
+                            <div style={{display:'inline-block'}}>
+                                <Popconfirm placement="topRight" title={ `确定要删除 ${record.name} 吗?`}
+                                            onConfirm={this.delEndPoint.bind(this,record.uuid)}>
+                                    <button className="ant-btn ant-btn-danger " data-id={record.uuid}
+                                    >删除
+                                    </button>
+                                </Popconfirm>
+                            </div>
+                            :<Dropdown overlay={
                             <Menu onClick={(e)=> {
                                 this.banEndPoint(record.uuid,e.key)
                             }}>
@@ -237,18 +255,7 @@ class EndPoints extends Component {
                             <Button>
                                 禁/启用 <Icon type="down"/>
                             </Button>
-                        </Dropdown>
-                        {record.status==='未激活'?
-                            <div style={{display:'inline-block'}}>
-                                <span className="ant-divider"/>
-                                <Popconfirm placement="topRight" title={ `确定要删除 ${record.name} 吗?`}
-                                            onConfirm={this.delEndPoint.bind(this,record.uuid)}>
-                                    <button className="ant-btn ant-btn-danger " data-id={record.uuid}
-                                    >删除
-                                    </button>
-                                </Popconfirm>
-                            </div>
-                            :null}
+                        </Dropdown>}
 
                     </div>
                 )
@@ -275,9 +282,9 @@ class EndPoints extends Component {
                         </table>
                     </div>
                     <div className="expandRowRender-operate">
-                     <Link onClick={this.setConnetUser.bind(this, record.username)} target='_blank'
+                     <Link onClick={this.setConnetPassword.bind(this, record.password,record.topics)} target='_blank'
                               to={`/basic/endpoints/${record.uuid}/connect_test`}><Button type="primary">
-                            连通测试</Button></Link>
+                            设备模拟测试</Button></Link>
                         {/*  <span className="ant-divider"/>
                          <Button type="primary" onClick={()=> {
                             this.setState({editModal: true, edituuid: record.uuid, editRecord: record})

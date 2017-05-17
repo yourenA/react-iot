@@ -48,6 +48,7 @@
   "topic name fail":"主题格式为：字线、数字、分隔符为'/'，并且不能为空",
   "topic name cant null":"主题不能为空",
   "connect success":"连接成功",
+  "init/update sourceParam success":"初始化/更新资源参数成功",
   "client had disconnect":"连接已经断开",
   "disconnect success":"断开连接",
   "connect first":"请先连接",

@@ -4,6 +4,7 @@
 import React, {Component} from 'react';
 import {Form, Icon, Input, Button, Checkbox, Select, Col, Row} from 'antd';
 const FormItem = Form.Item;
+import configJson from './../../../config.json';
 class ConnectPanelForm extends Component {
     constructor(props) {
         super(props);
@@ -16,17 +17,17 @@ class ConnectPanelForm extends Component {
             labelCol: {span: 7},
             wrapperCol: {span: 17},
         };
-        const portLayout = {
-            labelCol: {span: 7},
-            wrapperCol: {span: 17},
-        };
         const usernameLayout = {
             labelCol: {span: 6},
             wrapperCol: {span: 18},
         };
-        const keyLayout = {
+        const portLayout = {
             labelCol: {span: 8},
             wrapperCol: {span: 16},
+        };
+        const keyLayout = {
+            labelCol: {span: 4},
+            wrapperCol: {span: 20},
         };
         return (
             <div>
@@ -37,23 +38,24 @@ class ConnectPanelForm extends Component {
                                 {...usernameLayout}
                                 label="主机名称"
                             >
-                                {getFieldDecorator('username', {
-                                    initialValue: 'iot.v4s.com.cn',
+                                {getFieldDecorator('host', {
+                                    initialValue: configJson.MqttServerHost,
                                     rules: [{required: true, message: '主机名称不能为空'}],
                                 })(
-                                    <Input  />
+                                    <Input  disabled/>
                                 )}
                             </FormItem>
                         </Col>
                         <Col span={12}>
                             <FormItem
-                                {...keyLayout}
-                                label="身份密钥"
+                                {...portLayout}
+                                label="端口"
                             >
-                                {getFieldDecorator('password', {
-                                    rules: [{required: true, message: '身份密钥不能为空'}],
+                                {getFieldDecorator('port', {
+                                    initialValue:configJson.MqttServerPort,
+                                    rules: [{required: true, message: '端口不能为空'}],
                                 })(
-                                    <Input />
+                                    <Input disabled/>
                                 )}
 
                             </FormItem>
@@ -75,14 +77,30 @@ class ConnectPanelForm extends Component {
                         </Col>
                         <Col span={12}>
                             <FormItem
-                                {...keyLayout}
+                                {...portLayout}
                                 label="心跳时间"
                             >
                                 {getFieldDecorator('keepalive', {
                                     initialValue: 60,
-                                    rules: [{required: true, message: '身份密钥不能为空'}],
+                                    rules: [{required: true, message: '心跳时间不能为空'}],
                                 })(
                                     <Input addonAfter="秒"/>
+                                )}
+
+                            </FormItem>
+                        </Col>
+                    </Row>
+                    <Row gutter={10}>
+                        <Col span={24}>
+                            <FormItem
+                                {...keyLayout}
+                                label="身份密钥"
+                            >
+                                {getFieldDecorator('password', {
+                                    initialValue: localStorage.getItem('connect_password'),
+                                    rules: [{required: true, message: '身份密钥不能为空'}],
+                                })(
+                                    <Input />
                                 )}
 
                             </FormItem>
