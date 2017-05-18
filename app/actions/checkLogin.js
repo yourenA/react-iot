@@ -40,6 +40,9 @@ export function login(user) {
         })
             .then(function (response) {
                 console.log(response);
+                if(window.location.href.indexOf('basic')){
+                    hashHistory.replace('/');
+                }
                 sessionStorage.setItem('username',user.username);
                 sessionStorage.setItem('usertoken',response.data.token);
                 sessionStorage.setItem('userPermissions',JSON.stringify(response.data.permissions.data));

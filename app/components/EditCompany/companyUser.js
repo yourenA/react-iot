@@ -37,7 +37,7 @@ class Device extends Component {
     }
 
     componentDidMount() {
-        this.fetchDevices();
+        // this.fetchDevices();
     }
 
     fetchDevices = (page = 1, q = '',start_at='',end_at='',order='asc',category_uuid=null,online_status='')=> {
@@ -250,71 +250,25 @@ class Device extends Component {
                 )
             }
         }];
-        const expandedRowRender = (record)=> {
-            return (
-                <div className="expandRowRender-box">
-                    <div className="expandRowRender-table">
-                        <table>
-                            <tbody>
-                            {record.group ?
-                                <tr>
-                                    <td>设备组</td>
-                                    <td>{record.group.name }</td>
-                                </tr> : null}
-
-                            <tr style={{display:'none'}}>
-                                <td>描述</td>
-                                <td>{record.description}</td>
-                            </tr>
-                            <tr>
-                                <td>策略</td>
-                                <td>{record.policy.name}</td>
-                            </tr>
-                            <tr>
-                                <td>主题</td>
-                                <td>
-                                    <TopicTable dataSource={record.policy.topics.data}/>
-                                </td>
-                            </tr>
-                            </tbody>
-
-                        </table>
-                    </div>
-                    <div className="expandRowRender-operate">
-                        <Link onClick={this.setConnetUser.bind(this, record.username)} target='_blank'
-                              to={`/basic/endpoints/${this.props.params.uuid}/connect_test`}><Button type="primary">
-                            连通测试</Button></Link> <span className="ant-divider"/>
-                        <Button type="primary" onClick={()=> {
-                            this.setState({editModal: true, edituuid: record.uuid, editRecord: record})
-                        }}>修改</Button> <span className="ant-divider"/>
-                        <Button type="primary"
-                                onClick={this.reGenerateKey.bind(this, record.uuid)}>重新生成秘钥</Button>
-                    </div>
-                </div>
-
-            );
-        }
         return (
             <div className="Home">
                 <Row>
                     <div style={{marginTop: '20px'}}>
                         <Breadcrumb separator=">">
-                            <Breadcrumb.Item>接入管理</Breadcrumb.Item>
-                            <Breadcrumb.Item ><Link to='/basic'>设备域</Link></Breadcrumb.Item>
-                            <Breadcrumb.Item >设备</Breadcrumb.Item>
+                            <Breadcrumb.Item>账号设置</Breadcrumb.Item>
+                            <Breadcrumb.Item >机构用户</Breadcrumb.Item>
                         </Breadcrumb>
                         <div className="operate-box">
-                            <SearchWrap  onChangeSearch={this.onChangeSearch} {...this.state} />
                             <Button className="search-btn" type="primary" icon="plus" onClick={()=> {
                                 this.setState({addModal: true})
                             }}>添加用户</Button>
                         </div>
-                        <Loading show={loaded}/>
+                       {/* <Loading show={loaded}/>
                         <Table bordered
                                style={{display: loaded ? 'block' : 'none'}} rowKey="uuid" columns={columns}
                                dataSource={data} pagination={false}/>
                         <Pagination total={meta.pagination.total} current={page} pageSize={meta.pagination.per_page}
-                                    style={{marginTop: '10px'}} onChange={this.onPageChange}/>
+                                    style={{marginTop: '10px'}} onChange={this.onPageChange}/>*/}
 
                     </div>
                     <Modal

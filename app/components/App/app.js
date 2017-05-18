@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import logo from './car.svg';
 import './app.scss'
 import Mask from '../Login/mask';
 import LoginDiv from '../Login/login'

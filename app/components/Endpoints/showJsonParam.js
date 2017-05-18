@@ -58,7 +58,7 @@ class showJsonParam extends Component {
                             label="类型"
                             {...formItemLayoutForOrganize}>
                             {getFieldDecorator('type', {
-                                initialValue: 'type-1',
+                                initialValue: this.props.type,
                                 rules: [
                                     {required: true, message: '请输入类型'}],
                             })(
@@ -69,7 +69,7 @@ class showJsonParam extends Component {
                             label="序列号"
                             {...formItemLayoutForOrganize}>
                             {getFieldDecorator('serial_no', {
-                                initialValue: 'xxxxxx-xxx-xxx',
+                                initialValue:this.props.serial_no,
                                 rules: [{required: true, message: '请输入序列号'}],
                             })(
                                 <Input />

@@ -60,7 +60,14 @@ class PublishPanelForm extends Component {
                                 {getFieldDecorator('topic', {
                                     rules: [{required: true, message: '发布主题不能为空'}],
                                 })(
-                                    <Input  />
+                                    <Select
+                                        allowClear={true}
+                                        disabled={!this.props.clientIsConnect}
+                                        placeholder="选择发布主题"
+                                        style={{width: '100%'}}
+                                    >
+                                        {this.props.pubChildren}
+                                    </Select>
                                 )}
                             </FormItem>
                         </Col>

@@ -2,8 +2,8 @@
  * Created by Administrator on 2017/3/6.
  */
 import React, {Component} from 'react';
-import {Modal, Input, Icon, Breadcrumb, Row, Col, Button, Table, Pagination, Popconfirm, Card, message} from 'antd';
-const Search = Input.Search;
+import {Modal, Input, Icon, Breadcrumb, Row, Col, Button, Table, Select, Popconfirm, Card, message} from 'antd';
+const Option = Select.Option;
 import {Link, hashHistory} from 'react-router';
 import ConnectPanel from './connectPanel'
 import PublishPanel from './publishPanel'
@@ -20,37 +20,67 @@ let timer;
 class ConnectTest extends Component {
     constructor(props) {
         super(props);
+        this.hide = function () {
+        };
         this.state = {
-            jsonParam : JSON.parse( localStorage.getItem('connect_topics')) || {
-                "sub": [
-                    "0/light",
-                    "1/light"
-                ],
-                "pub": [
-                    "0/light/open",
-                    "1/light/close"
-                ]
-            },
-            clientIsConnect:false,
+            jsonParam: {sub:[],pub:[]},
+            clientIsConnect: false,
             inputInfoType: 'manual',
             autoInputType: 'dataRange',
-            connectSourceParamModal:false,
+            connectSourceParamModal: false,
             connectPanelModal: false,
             addSubscribeModal: false,
             hadPubTopics: [],
             hadSubTopics: [],
             subTopicsInfo: [],
-            pubBtnText: '发布'
+            pubBtnText: '发布',
+            serial_no:'',
+            type:''
         };
     }
 
     componentDidMount = () => {
+        const that = this;
+        axios({
+            url: `${configJson.prefix}/endpoints/${this.props.params.uuid}`,
+            method: 'GET',
+            headers: getHeader()
+        })
+            .then(function (response) {
+                console.log("response",response);
+                let parseTopic={sub:[],pub:[]};
+                let topics=response.data.topics;
+                for(let i=0,len=topics.data.length;i<len;i++){
+                    if(topics.data[i].type==='sub'){
+                        parseTopic.sub.push(topics.data[i].name)
+                    }else if(topics.data[i].type==='pub'){
+                        parseTopic.pub.push(topics.data[i].name)
+                    }
+                }
+                that.setState({
+                    jsonParam:parseTopic,
+                    serial_no:response.data.serial_no,
+                    type:response.data.type
+                })
+            })
+            .catch(function (error) {
+                console.log(error.response);
+                converErrorCodeToMsg(error)
+            });
+    }
+    componentWillUnmount = ()=> {
+        this.hide();
+        client.end();
     }
     createConnectPanel = ()=> {
+        if (this.state.clientIsConnect) {
+            message.error(messageJson['had connected']);
+            return false
+        }
         console.log("ConnectPanel", this.refs.ConnectPanel.getFieldsValue());
+        this.hide = message.loading('连线中......', 0);
         const that = this;
         const ConnectPanel = this.refs.ConnectPanel.getFieldsValue();
-        const hide = message.loading('连线中......', 0);
         const host = `${configJson.MqttServerHost}:${configJson.MqttServerPort}`;
         const clientId = 'mqttjs_' + Math.random().toString(16).substr(2, 8);
         const options = {
@@ -60,17 +90,19 @@ class ConnectTest extends Component {
             clientId: clientId,
             clean: true,
             protocolId: 'MQTT',
-            reconnectPeriod: 1000,
+            protocolVersion: 4,
+            reconnectPeriod: 2000,
             connectTimeout: 10 * 1000,
         };
+        console.log("options", options)
         client = mqtt.connect(host, options);
         client.on('connect', function () {
             console.log('客户端已连接:' + clientId);
-            hide();
+            that.hide();
             message.success(messageJson["connect success"]);
             that.setState({
-                connectPanelModal:false ,
-                clientIsConnect:true
+                connectPanelModal: false,
+                clientIsConnect: true
             })
 
         });
@@ -79,18 +111,19 @@ class ConnectTest extends Component {
         });
         client.on('close', function () {
             console.log('客户端已关闭:' + clientId);
-            if(timer){
+            // message.error(messageJson['connect error']);
+            if (timer) {
                 clearInterval(timer);
             }
             that.setState({
-                clientIsConnect:false,
+                clientIsConnect: false,
                 pubBtnText: '发布'
             })
         });
         client.on('offline', function () {
             console.log('客户端离线:' + clientId);
             that.setState({
-                clientIsConnect:false
+                clientIsConnect: false
             })
         });
         client.on("message", function (topic, payload, packet) {
@@ -110,24 +143,24 @@ class ConnectTest extends Component {
             console.log('客户端出错:', err);
             client.end();
             that.setState({
-                clientIsConnect:false
+                clientIsConnect: false
             })
         })
 
     };
-    connectSourceParam=()=>{
+    connectSourceParam = ()=> {
         console.log(this.state.jsonParam);
-        const that=this;
+        const that = this;
         const ShowJsonParamInfoPanel = this.refs.ShowJsonParamInfoPanel.getFieldsValue();
-        const sendData={
-            topics:JSON.stringify(this.state.jsonParam),
+        const sendData = {
+            topics: JSON.stringify(this.state.jsonParam),
             ...ShowJsonParamInfoPanel
         };
-        console.log("sendData",sendData);
+        console.log("sendData", sendData);
         axios({
             url: `${configJson.prefix}/endpoints/${this.props.params.uuid}/base`,
             method: 'put',
-            data:sendData,
+            data: sendData,
             headers: getHeader()
         })
             .then(function (response) {
@@ -142,26 +175,33 @@ class ConnectTest extends Component {
             });
     }
 
-    disconnect=()=>{
-        console.log("disconnect client",client);
+    disconnect = ()=> {
+        console.log("disconnect client", client);
         if (!this.state.clientIsConnect) {
             message.error(messageJson['connect first']);
             return false
-        }else{
+        } else {
             client.end();
             message.success(messageJson["disconnect success"]);
             this.setState({
-                clientIsConnect:false
+                clientIsConnect: false
             })
         }
     }
-    getJsonParam=(jsonParam)=>{
+    disconnect2 = ()=> {
+        client.end();
+        this.hide();
         this.setState({
-            jsonParam:jsonParam
+            clientIsConnect: false
+        })
+    }
+    getJsonParam = (jsonParam)=> {
+        this.setState({
+            jsonParam: jsonParam
         })
     }
     publicTheme = ()=> {
-        console.log("this.state.clientIsConnect",this.state.clientIsConnect)
+        console.log("this.state.clientIsConnect", this.state.clientIsConnect)
         if (!this.state.clientIsConnect) {
             message.error(messageJson['connect first']);
             return false
@@ -173,12 +213,13 @@ class ConnectTest extends Component {
             qos: parseInt(PublishPanel.QoS),
             retain: PublishPanel.retain
         };
-        if(!PublishPanel.topic){
+        if (!PublishPanel.topic) {
             message.error(messageJson['pub topic must no null']);
             return false
         }
+        const pubTopic=this.state.jsonParam.pub[Number(PublishPanel.topic)];
         if (this.state.inputInfoType === 'manual') {
-            this.publishAction(PublishPanel.topic, PublishPanel.info, options);
+            this.publishAction(pubTopic, PublishPanel.info, options);
         } else if (this.state.inputInfoType === 'auto') {
             let min = Number(PublishPanel.min),
                 max = Number(PublishPanel.max),
@@ -194,14 +235,14 @@ class ConnectTest extends Component {
                     let initTimes = 0;
 
                     timer = setInterval(function () {
-                        console.log("that.state.clientIsConnect",that.state.clientIsConnect)
-                        if(!that.state.clientIsConnect){
+                        console.log("that.state.clientIsConnect", that.state.clientIsConnect)
+                        if (!that.state.clientIsConnect) {
                             message.error(messageJson['client had disconnect']);
                             clearInterval(timer);
                             return false
                         }
-                        console.log("是否随机",random)
-                        console.log("精度",accuracy)
+                        console.log("是否随机", random)
+                        console.log("精度", accuracy)
                         if (random) {
                             let randomNum;
                             if (accuracy === 0.1) {
@@ -212,8 +253,8 @@ class ConnectTest extends Component {
                                 randomNum = Math.floor(Math.random() * (max - min) + min)
 
                             }
-                            console.log("发送的数据",randomNum)
-                            that.publishAction(PublishPanel.topic, randomNum.toString(), options);
+                            console.log("发送的数据", randomNum)
+                            that.publishAction(pubTopic, randomNum.toString(), options);
 
                         } else {
                             if (min > max) {
@@ -226,8 +267,8 @@ class ConnectTest extends Component {
                             } else {
                                 min = min + accuracy
                             }
-                            console.log("发送的数据",min);
-                            that.publishAction(PublishPanel.topic, min.toString(), options);
+                            console.log("发送的数据", min);
+                            that.publishAction(pubTopic, min.toString(), options);
 
                         }
                         initTimes++;
@@ -244,18 +285,18 @@ class ConnectTest extends Component {
                     console.log("dataFlowInfo", dataFlowInfo);
                     let initPosition = 0;
                     timer = setInterval(function () {
-                        if(!that.state.clientIsConnect){
+                        if (!that.state.clientIsConnect) {
                             message.error(messageJson['client had disconnect']);
                             clearInterval(timer);
                             return false
                         }
                         if (random) {
-                            that.publishAction(PublishPanel.topic, dataFlowInfo[Math.floor(Math.random() * dataFlowInfo.length)], options);
+                            that.publishAction(pubTopic, dataFlowInfo[Math.floor(Math.random() * dataFlowInfo.length)], options);
                         } else {
                             if (initPosition >= dataFlowInfo.length) {
                                 initPosition = 0
                             }
-                            that.publishAction(PublishPanel.topic, dataFlowInfo[initPosition], options);
+                            that.publishAction(pubTopic, dataFlowInfo[initPosition], options);
 
                         }
                         initPosition++;
@@ -294,7 +335,7 @@ class ConnectTest extends Component {
                         QoS: options.qos,
                         dateTime: new Date().toLocaleString()
                     })
-                },function () {
+                }, function () {
                     let pubPanel = document.querySelector('.pubPanel');
                     pubPanel.scrollTop = pubPanel.scrollHeight;
                 })
@@ -303,42 +344,42 @@ class ConnectTest extends Component {
             }
         });
     }
-    addSubscribePanel = ()=> {
-        console.log("sub client ", client);
-        if (!client) {
-            message.error(messageJson['connect first']);
-            return false
-        }
-        const AddSubscribePanel = this.refs.AddSubscribePanel.getFieldsValue();
-        const tempArr = [];
-        const that = this;
-        for (var k in AddSubscribePanel) {
-            if (k.indexOf('topics') >= 0) {
-                if (AddSubscribePanel.hasOwnProperty(k)) {
-                    tempArr.push(AddSubscribePanel[k])
-                }
-            }
-        }
-        this.setState({
-            hadSubTopics: tempArr,
-            addSubscribeModal: false,
-        });
-        const AddSubscribeDate = convertSubFormToData(AddSubscribePanel);
-        console.log("AddSubscribePanel", AddSubscribeDate);
-        client.subscribe(AddSubscribeDate, (err, granted)=> {
-            if (err) {
-                console.log("订阅出错", err);
-                message.error(messageJson['sub topic fail']);
-            } else {
-                message.success(messageJson['sub topic success']);
-
-            }
-
-        })
-    }
-    goback = ()=> {
-        hashHistory.goBack()
-    }
+    // addSubscribePanel = ()=> {
+    //     console.log("sub client ", client);
+    //     if (!client) {
+    //         message.error(messageJson['connect first']);
+    //         return false
+    //     }
+    //     const AddSubscribePanel = this.refs.AddSubscribePanel.getFieldsValue();
+    //     const tempArr = [];
+    //     const that = this;
+    //     for (var k in AddSubscribePanel) {
+    //         if (k.indexOf('topics') >= 0) {
+    //             if (AddSubscribePanel.hasOwnProperty(k)) {
+    //                 tempArr.push(AddSubscribePanel[k])
+    //             }
+    //         }
+    //     }
+    //     this.setState({
+    //         hadSubTopics: tempArr,
+    //         addSubscribeModal: false,
+    //     });
+    //     const AddSubscribeDate = convertSubFormToData(AddSubscribePanel);
+    //     console.log("AddSubscribePanel", AddSubscribeDate);
+    //     client.subscribe(AddSubscribeDate, (err, granted)=> {
+    //         if (err) {
+    //             console.log("订阅出错", err);
+    //             message.error(messageJson['sub topic fail']);
+    //         } else {
+    //             message.success(messageJson['sub topic success']);
+    //
+    //         }
+    //
+    //     })
+    // }
+    // goback = ()=> {
+    //     hashHistory.goBack()
+    // }
     changeInputInfoType = (key)=> {
         console.log(key)
         if (this.state.pubBtnText == '停止') {
@@ -355,8 +396,37 @@ class ConnectTest extends Component {
             autoInputType: value
         })
     }
+    handleDelSubChildren=(value)=>{
+        client.unsubscribe(this.state.jsonParam.sub[Number(value)], (err, granted)=> {
+            if (err) {
+                console.log("取消订阅出错", err);
+                message.error(messageJson['cancel sub topic fail']);
+            }else{
+                message.success(messageJson['cancel sub topic success']);
+            }
+
+        });
+    }
+    handleSelectSubChildren = (value)=> {
+        client.subscribe(this.state.jsonParam.sub[Number(value)], (err, granted)=> {
+            if (err) {
+                console.log("订阅出错", err);
+                message.error(messageJson['sub topic fail']);
+            } else {
+                message.success(messageJson['sub topic success']);
+            }
+        })
+    }
 
     render() {
+        const subChildren = [];
+        for (let i = 0; i < this.state.jsonParam.sub.length; i++) {
+            subChildren.push(<Option key={i}>{this.state.jsonParam.sub[i]}</Option>);
+        }
+        const pubChildren = [];
+        for (let i = 0; i < this.state.jsonParam.pub.length; i++) {
+            pubChildren.push(<Option key={i}>{this.state.jsonParam.pub[i]}</Option>);
+        }
         return (
             <div className="Home">
                 <Breadcrumb separator=">">
@@ -365,37 +435,42 @@ class ConnectTest extends Component {
                     <Breadcrumb.Item >连接测试</Breadcrumb.Item>
                 </Breadcrumb>
                 <div className="operate-box">
+                    <button className="ant-btn btn-info" onClick={()=> {
+                        this.setState({connectSourceParamModal: true})
+                    }}>设备初始化参数
+                    </button>
+                    <span className="ant-divider"/>
                     <Button type="primary" icon="plus" onClick={()=> {
                         this.setState({connectPanelModal: true})
                     }}>连接参数面板</Button>
-                    {this.state.clientIsConnect?
-                        <div  className="search-wrap">
-                            <span className="ant-divider"/>
-                            <button className="ant-btn btn-info"  onClick={()=> {
-                                this.setState({connectSourceParamModal: true})
-                            }}>设备初始化参数</button>
+                    {this.state.clientIsConnect ?
+                        <div className="search-wrap">
                             <span className="ant-divider"/>
                             <Popconfirm placement="topRight" title={`确定要断开连接吗?`}
                                         onConfirm={this.disconnect}>
-                                <button  className="ant-btn btn-warning">
+                                <button className="ant-btn btn-warning">
                                     断开连接
                                 </button>
                             </Popconfirm>
                         </div>
-                        :null}
+                        : null}
 
                 </div>
                 <Row gutter={20}>
                     <Col xs={20} sm={20} md={16} lg={14}>
                         <Card title="发布面板">
                             <div className="cleanInfo">
-                                <Button onClick={()=>{this.setState({hadPubTopics:[]})}} type="danger">
+                                <Button onClick={()=> {
+                                    this.setState({hadPubTopics: []})
+                                }} type="danger">
                                     清空发布信息面板
                                 </Button>
                             </div>
 
                             <ShowPublishPanel hadPubTopics={this.state.hadPubTopics} ref="ShowPublishPanel"/>
                             <PublishPanel ref="PublishPanel" inputInfoType={this.state.inputInfoType}
+                                          clientIsConnect={this.state.clientIsConnect}
+                                          pubChildren={pubChildren}
                                           changeInputInfoType={this.changeInputInfoType}
                                           changeAutoType={this.changeAutoType}
                                           autoInputType={this.state.autoInputType}
@@ -411,7 +486,9 @@ class ConnectTest extends Component {
                     <Col xs={24} sm={24} md={8} lg={10}>
                         <Card title="订阅面板">
                             <div className="cleanInfo">
-                                <Button onClick={()=>{this.setState({subTopicsInfo:[]})}} type="danger">
+                                <Button onClick={()=> {
+                                    this.setState({subTopicsInfo: []})
+                                }} type="danger">
                                     清空订阅信息面板
                                 </Button>
                             </div>
@@ -422,6 +499,25 @@ class ConnectTest extends Component {
                                 }} type="primary" htmlType="submit" className="">
                                     添加订阅主题
                                 </Button>
+                            </Row>
+                            <Row>
+                                <Col span={4}>
+                                    <p style={{height: "28px", lineHeight: "28px"}}>
+                                        订阅主题 :
+                                    </p>
+                                </Col>
+                                <Col span={20}>
+                                    <Select
+                                        disabled={!this.state.clientIsConnect}
+                                        multiple={true}
+                                        placeholder="选择订阅主题，可多选"
+                                        style={{width: '100%'}}
+                                        onDeselect={this.handleDelSubChildren}
+                                        onSelect={this.handleSelectSubChildren}
+                                    >
+                                        {subChildren}
+                                    </Select>
+                                </Col>
                             </Row>
                         </Card>
                     </Col>
@@ -434,11 +530,9 @@ class ConnectTest extends Component {
                     }}
                     footer={[
                         <Button key="back" type="ghost" size="large"
-                                onClick={()=> {
-                                    this.setState({connectPanelModal: false})
-                                }}>取消</Button>,
+                                onClick={this.disconnect2}>断开连接</Button>,
                         <Button key="submit" type="primary" size="large" onClick={this.createConnectPanel}>
-                            确定
+                            建立连接
                         </Button>,
                     ]}
                 >
@@ -460,9 +554,10 @@ class ConnectTest extends Component {
                         </Button>,
                     ]}
                 >
-                    <ShowJsonParamInfoPanel ref="ShowJsonParamInfoPanel"  getJsonParam={this.getJsonParam} jsonParam={this.state.jsonParam}/>
+                    <ShowJsonParamInfoPanel type={this.state.type} serial_no={this.state.serial_no} ref="ShowJsonParamInfoPanel" getJsonParam={this.getJsonParam}
+                                            jsonParam={this.state.jsonParam}/>
                 </Modal>
-                <Modal
+               {/* <Modal
                     visible={this.state.addSubscribeModal}
                     title="添加订阅主题"
                     width={300}
@@ -480,7 +575,7 @@ class ConnectTest extends Component {
                     ]}
                 >
                     <AddSubscribePanel hadSubTopics={this.state.hadSubTopics} ref="AddSubscribePanel"/>
-                </Modal>
+                </Modal>*/}
             </div>
         );
     }

@@ -163,15 +163,6 @@ class EndPoints extends Component {
 
     setConnetPassword = (password,topics)=> {
         localStorage.setItem('connect_password', password);
-        let parseTopic={sub:[],pub:[]}
-        for(let i=0,len=topics.data.length;i<len;i++){
-            if(topics.data[i].type==='sub'){
-                parseTopic.sub.push(topics.data[i].name)
-            }else if(topics.data[i].type==='pub'){
-                parseTopic.pub.push(topics.data[i].name)
-            }
-        }
-        localStorage.setItem('connect_topics', JSON.stringify(parseTopic));
     }
     render() {
         const {
@@ -231,7 +222,7 @@ class EndPoints extends Component {
         }, {
             title: '操作',
             key: 'action',
-            width: 190,
+            width: 120,
             render: (text, record, index) => {
                 return (
                     <div>
