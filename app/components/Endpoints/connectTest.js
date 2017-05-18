@@ -493,13 +493,13 @@ class ConnectTest extends Component {
                                 </Button>
                             </div>
                             <SubscriptionPanel subTopicsInfo={this.state.subTopicsInfo}/>
-                            <Row type="flex" justify="end ">
+                          {/*  <Row type="flex" justify="end ">
                                 <Button onClick={()=> {
                                     this.setState({addSubscribeModal: true})
                                 }} type="primary" htmlType="submit" className="">
                                     添加订阅主题
                                 </Button>
-                            </Row>
+                            </Row>*/}
                             <Row>
                                 <Col span={4}>
                                     <p style={{height: "28px", lineHeight: "28px"}}>
