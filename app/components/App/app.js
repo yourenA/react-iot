@@ -14,7 +14,7 @@ class App extends Component {
         const nav_list=document.querySelector('.nav>ul');
         window.addEventListener("resize", function () {
             const clientW=document.documentElement.clientWidth;
-            if(clientW > 740){
+            if(clientW > 890){
                 nav_list.style.display='block'
             }else{
                 nav_list.style.display='none'

@@ -7,7 +7,7 @@ class Nav extends Component {
     showOrHoidePhoneMenu=()=>{
         const clientW=document.documentElement.clientWidth;
         let listDispaly=document.querySelector('.nav_list').style.display;
-        if(clientW <= 740){
+        if(clientW <= 890){
             if(listDispaly==='block'){
                 document.querySelector('.nav_list').style.display='none'
             }else{

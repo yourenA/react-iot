@@ -457,7 +457,7 @@ class ConnectTest extends Component {
 
                 </div>
                 <Row gutter={20}>
-                    <Col xs={20} sm={20} md={16} lg={14}>
+                    <Col xs={24} sm={24} md={16} lg={14}>
                         <Card title="发布面板">
                             <div className="cleanInfo">
                                 <Button onClick={()=> {
@@ -501,12 +501,12 @@ class ConnectTest extends Component {
                                 </Button>
                             </Row>*/}
                             <Row>
-                                <Col span={4}>
+                                <Col span={3}>
                                     <p style={{height: "28px", lineHeight: "28px"}}>
                                         订阅主题 :
                                     </p>
                                 </Col>
-                                <Col span={20}>
+                                <Col span={21}>
                                     <Select
                                         disabled={!this.state.clientIsConnect}
                                         multiple={true}
