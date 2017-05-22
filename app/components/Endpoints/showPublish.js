@@ -12,7 +12,7 @@ class ShowPublicInfo extends Component {
         return (
             <Row gutter={10}>
                 <Col span={4} style={{textAlign:'right'}}>
-                    发布的信息
+                    发布的信息:
                 </Col>
                 <Col span={20}>
                     <div className="pubPanel" >

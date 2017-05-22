@@ -104,7 +104,7 @@ class PublishPanelForm extends Component {
                     </Row>
                         <Row gutter={10}>
                             <Col span={4} style={{textAlign: 'right', top: '60px', position: 'relative'}}>
-                                发布信息
+                                发布信息:
                             </Col>
                             <Col span={20}>
                                 <Tabs onChange={this.changeInputInfoType} activeKey={this.props.inputInfoType}>

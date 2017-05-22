@@ -500,13 +500,13 @@ class ConnectTest extends Component {
                                     添加订阅主题
                                 </Button>
                             </Row>*/}
-                            <Row>
-                                <Col span={3}>
-                                    <p style={{height: "28px", lineHeight: "28px"}}>
+                            <div>
+                                <div style={{display:'inline-block',width:'66px',height: "28px", lineHeight: "28px"}}>
+                                    <p>
                                         订阅主题 :
                                     </p>
-                                </Col>
-                                <Col span={21}>
+                                </div>
+                                <div style={{display:'inline-block',width:'calc(100% - 66px)'}}>
                                     <Select
                                         disabled={!this.state.clientIsConnect}
                                         multiple={true}
@@ -517,8 +517,8 @@ class ConnectTest extends Component {
                                     >
                                         {subChildren}
                                     </Select>
-                                </Col>
-                            </Row>
+                                </div>
+                            </div>
                         </Card>
                     </Col>
                 </Row>
